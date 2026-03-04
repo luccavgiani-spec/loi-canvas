@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import heroImg from '@/assets/hero-candle.jpg';
+import { heroBanner as heroImg } from '@/assets';
 import { Button } from '@/components/ui/button';
 
 const Hero = () => {

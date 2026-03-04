@@ -6,8 +6,7 @@ import Manifesto from '@/components/home/Manifesto';
 import Newsletter from '@/components/home/Newsletter';
 import FAQ from '@/components/home/FAQ';
 import { mockProducts } from '@/lib/mocks';
-import banner01 from '@/assets/banner-01.jpg';
-import banner02 from '@/assets/banner-02.jpg';
+import { bannerCollection as banner01, bannerAtelier as banner02 } from '@/assets';
 
 const Index = () => {
   const bestsellers = mockProducts.filter(p => p.is_bestseller).slice(0, 4);

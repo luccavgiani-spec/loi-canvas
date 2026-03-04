@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { logoLoieDark } from '@/assets';
 
 const Footer = () => {
   return (
@@ -7,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="md:col-span-1">
-            <h3 className="font-heading text-2xl tracking-[0.2em] uppercase mb-4">Loiê</h3>
+            <img src={logoLoieDark} alt="Loiê" className="h-10 w-auto mb-4" />
             <p className="text-sm opacity-70 leading-relaxed">
               Velas artesanais feitas à mão com cera de soja 100% natural e fragrâncias exclusivas.
             </p>

@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, Settings, Menu, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useState } from 'react';
+import { logoLoie } from '@/assets';
 
 const Header = () => {
   const { count, setIsOpen } = useCart();
@@ -23,8 +24,8 @@ const Header = () => {
         </button>
 
         {/* Logo */}
-        <Link to="/" className="font-heading text-2xl md:text-3xl font-light tracking-[0.2em] text-foreground uppercase">
-          Loiê
+        <Link to="/" className="flex items-center">
+          <img src={logoLoie} alt="Loiê Velas Artesanais" className="h-10 md:h-12 w-auto" />
         </Link>
 
         {/* Desktop nav */}
