@@ -1,5 +1,5 @@
 import Layout from '@/components/layout/Layout';
-import banner02 from '@/assets/banner-02.jpg';
+import { bannerAtelier as banner02 } from '@/assets';
 
 const About = () => {
   return (
