@@ -119,7 +119,7 @@ const About = () => {
                 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#f4edd2', lineHeight: 1.2 }}
               >
                 Acreditamos que os aromas têm o poder de transformar
-                <em style={{ color: '#989857' }}> ambientes em memórias.</em>
+                <em style={{ color: '#989857' }}>— feito de tempo, matéria, escolhas e presença</em>
               </h2>
               <p
                 style={{
