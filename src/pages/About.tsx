@@ -131,10 +131,11 @@ const About = () => {
                   lineHeight: 1.8,
                 }}
               >
-                Do derretimento ao rótulo, cada detalhe é feito à mão no nosso ateliê.
-                Nossas velas são produzidas em pequenos lotes, com cera de soja 100% vegetal
-                e fragrâncias cuidadosamente selecionadas por perfumistas brasileiros.
-                Não fazemos apenas velas — criamos atmosferas que ficam.
+                {'\n'}A Loiê Sala Aromática é esse gesto poético, mas também é um ateliê real — feito de tempo, matéria, escolhas e presença
+                {'\n'}A Loiê nasceu em 2015, a partir de pequenos experimentos realizados pelo artista e fundador André Magalhães Liza. Desde o início, o gesto de acender uma vela esteve ligado ao desejo de qualificar o tempo — dentro de casa, no cotidiano, no silêncio entre as tarefas.
+                {'\n\n'}O ateliê tomou forma com a ocupação de uma casa antiga de família, no interior de São Paulo. Reativar esse espaço foi também um exercício de memória: recuperar valores, ritmos e afetos que atravessam gerações. A casa moldou a Loiê tanto quanto a Loiê passou a habitar a casa.
+                {'\n\n'}Ao longo de sua trajetória, a marca foi construída em diferentes etapas e parcerias, sempre guiada pela atenção às matérias-primas, ao fazer manual e à experiência sensível do aroma. Trabalhamos com ceras vegetais, óleos essenciais e processos cuidadosos, respeitando o tempo de cada criação.
+                {'\n\n'}Hoje a Loiê Sala Aromática segue como um ateliê autoral dedicado à criação de atmosferas — objetos que convidam à presença, ao cuidado e a uma relação mais consciente com o espaço e consigo mesmo. Acreditamos que habitar o agora, com atenção e delicadeza, também é uma forma de transformar o mundo.
               </p>
               <div className="mt-10">
                 <Link to="/shop" className="loi-btn">explorar coleção</Link>
