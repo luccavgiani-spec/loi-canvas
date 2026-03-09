@@ -22,14 +22,39 @@ const sections = [
 const Policies = () => {
   return (
     <Layout>
-      <section className="py-16 md:py-24">
-        <div className="container max-w-3xl">
-          <h1 className="heading-display text-4xl md:text-5xl text-center mb-12">Políticas</h1>
-          <div className="space-y-10">
-            {sections.map(s => (
+      <section className="py-16 md:py-24 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="loi-label block mb-4">informações</span>
+            <h1
+              className="heading-display"
+              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#f4edd2' }}
+            >
+              Políticas
+            </h1>
+          </div>
+          <div className="space-y-12">
+            {sections.map((s) => (
               <div key={s.title}>
-                <h2 className="heading-display text-2xl mb-3">{s.title}</h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">{s.content}</p>
+                <h2
+                  className="heading-display mb-4"
+                  style={{ fontSize: '1.6rem', color: '#f4edd2' }}
+                >
+                  {s.title}
+                </h2>
+                <div className="loi-divider mb-4" />
+                <p
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontWeight: 300,
+                    fontStyle: 'italic',
+                    fontSize: '1rem',
+                    color: 'rgba(244,237,210,0.45)',
+                    lineHeight: 1.8,
+                  }}
+                >
+                  {s.content}
+                </p>
               </div>
             ))}
           </div>

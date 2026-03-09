@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 
-const Footer = () => {
+const HomeFooter = () => {
   return (
     <footer style={{ background: '#1e1a16' }}>
+      {/* Main footer */}
       <div className="max-w-[1400px] mx-auto px-6 py-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
@@ -37,6 +38,8 @@ const Footer = () => {
                 { to: '/shop?collection=Cítricos', label: 'Cítricos' },
                 { to: '/shop?collection=Amadeirados', label: 'Amadeirados' },
                 { to: '/shop?collection=Orientais', label: 'Orientais' },
+                { to: '/shop?collection=Herbais', label: 'Herbais' },
+                { to: '/shop?collection=Gourmand', label: 'Gourmand' },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
@@ -91,10 +94,24 @@ const Footer = () => {
           <div>
             <h4 className="loi-label mb-6">contato</h4>
             <ul className="space-y-3">
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li
+                style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.8rem',
+                  color: 'rgba(244,237,210,0.4)',
+                }}
+              >
                 contato@loie.com.br
               </li>
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li
+                style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.8rem',
+                  color: 'rgba(244,237,210,0.4)',
+                }}
+              >
                 São Paulo, Brasil
               </li>
               <li className="pt-2">
@@ -104,11 +121,20 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* Bottom bar */}
         <div
           className="mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
           style={{ borderTop: '1px solid rgba(152,152,87,0.1)' }}
         >
-          <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', letterSpacing: '0.05em' }}>
+          <p
+            style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.7rem',
+              color: 'rgba(244,237,210,0.25)',
+              letterSpacing: '0.05em',
+            }}
+          >
             © {new Date().getFullYear()} Loiê. Todos os direitos reservados.
           </p>
           <div className="flex gap-8">
@@ -116,7 +142,15 @@ const Footer = () => {
               <Link
                 key={label}
                 to="/policies"
-                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
+                style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.7rem',
+                  color: 'rgba(244,237,210,0.25)',
+                  textDecoration: 'none',
+                  letterSpacing: '0.05em',
+                  transition: 'color 0.3s ease',
+                }}
                 className="hover:!text-[rgba(244,237,210,0.5)]"
               >
                 {label}
@@ -125,8 +159,18 @@ const Footer = () => {
           </div>
         </div>
       </div>
+
+      {/* Brand symbol bottom */}
+      <div className="flex justify-center pb-10">
+        <img
+          src="/hero/SIMBOLO_t.png"
+          alt=""
+          className="w-10 h-10 object-contain"
+          style={{ opacity: 0.2 }}
+        />
+      </div>
     </footer>
   );
 };
 
-export default Footer;
+export default HomeFooter;

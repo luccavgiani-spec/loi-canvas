@@ -1,55 +1,102 @@
 import Layout from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
 const Contact = () => {
   return (
     <Layout>
-      <section className="py-16 md:py-24">
-        <div className="container max-w-4xl">
-          <h1 className="heading-display text-4xl md:text-5xl text-center mb-12">Contato</h1>
+      <section className="py-16 md:py-24 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="loi-label block mb-4">fale conosco</span>
+            <h1
+              className="heading-display"
+              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#f4edd2' }}
+            >
+              Contato
+            </h1>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-16">
             <div>
-              <h2 className="heading-display text-2xl mb-6">Fale conosco</h2>
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <Mail size={16} className="text-accent" />
-                  <span>contato@loie.com.br</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <Phone size={16} className="text-accent" />
-                  <span>(11) 99999-0000</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <MapPin size={16} className="text-accent" />
-                  <span>São Paulo, SP — Brasil</span>
-                </div>
+              <h2
+                className="heading-display mb-6"
+                style={{ fontSize: '1.8rem', color: '#f4edd2' }}
+              >
+                Adoramos ouvir você
+              </h2>
+              <div className="space-y-5 mb-8">
+                {[
+                  { icon: Mail, text: 'contato@loie.com.br' },
+                  { icon: Phone, text: '(11) 99999-0000' },
+                  { icon: MapPin, text: 'São Paulo, SP — Brasil' },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-center gap-3">
+                    <Icon size={16} style={{ color: '#989857' }} />
+                    <span
+                      style={{
+                        fontFamily: "'Montserrat', sans-serif",
+                        fontWeight: 300,
+                        fontSize: '0.85rem',
+                        color: 'rgba(244,237,210,0.5)',
+                      }}
+                    >
+                      {text}
+                    </span>
+                  </div>
+                ))}
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Respondemos em até 24 horas úteis. Para dúvidas sobre pedidos, inclua o número do pedido na mensagem.
+              <p
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontWeight: 300,
+                  fontStyle: 'italic',
+                  fontSize: '1rem',
+                  color: 'rgba(244,237,210,0.4)',
+                  lineHeight: 1.7,
+                }}
+              >
+                Respondemos em até 24 horas úteis. Para dúvidas sobre pedidos,
+                inclua o número do pedido na mensagem.
               </p>
             </div>
 
-            <form className="space-y-4" onSubmit={e => e.preventDefault()}>
+            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+              {[
+                { label: 'Nome', type: 'text' },
+                { label: 'E-mail', type: 'email' },
+              ].map((field) => (
+                <div key={field.label}>
+                  <label className="loi-label block mb-2">{field.label}</label>
+                  <input
+                    type={field.type}
+                    className="w-full px-4 py-3 bg-transparent text-sm"
+                    style={{
+                      border: '1px solid rgba(152,152,87,0.2)',
+                      color: '#f4edd2',
+                      fontFamily: "'Montserrat', sans-serif",
+                      fontWeight: 300,
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+              ))}
               <div>
-                <Label className="text-xs uppercase tracking-wider">Nome</Label>
-                <Input className="mt-1" />
+                <label className="loi-label block mb-2">Mensagem</label>
+                <textarea
+                  rows={5}
+                  className="w-full px-4 py-3 bg-transparent text-sm resize-none"
+                  style={{
+                    border: '1px solid rgba(152,152,87,0.2)',
+                    color: '#f4edd2',
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontWeight: 300,
+                    outline: 'none',
+                  }}
+                />
               </div>
-              <div>
-                <Label className="text-xs uppercase tracking-wider">E-mail</Label>
-                <Input type="email" className="mt-1" />
-              </div>
-              <div>
-                <Label className="text-xs uppercase tracking-wider">Mensagem</Label>
-                <Textarea className="mt-1 min-h-[120px]" />
-              </div>
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 w-full text-sm uppercase tracking-wider">
-                Enviar mensagem
-              </Button>
+              <button type="submit" className="loi-btn w-full justify-center">
+                enviar mensagem
+              </button>
             </form>
           </div>
         </div>
