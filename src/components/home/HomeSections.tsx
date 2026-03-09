@@ -44,7 +44,7 @@ const ProductCard = ({ product, addItem }: { product: typeof PRODUCTS[0]; addIte
         onClick={(e) => { e.preventDefault(); addItem(product); }}
         className="absolute bottom-0 left-0 right-0 py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-400"
         style={{
-          background: 'rgba(139,105,20,0.9)',
+          background: 'rgba(86,86,0,0.9)',
           color: '#fff',
           fontFamily: "'Montserrat', sans-serif",
           fontWeight: 300,
@@ -75,7 +75,7 @@ const ProductCard = ({ product, addItem }: { product: typeof PRODUCTS[0]; addIte
             fontFamily: "'Montserrat', sans-serif",
             fontWeight: 300,
             fontSize: '0.8rem',
-            color: '#8B6914',
+            color: '#565600',
           }}
         >
           R$ {product.price.toFixed(2)}
@@ -149,7 +149,7 @@ const ProductFocusBanner = ({ product, reverse = false }: { product: typeof PROD
             fontFamily: "'Montserrat', sans-serif",
             fontWeight: 300,
             fontSize: '0.85rem',
-            color: '#8B6914',
+            color: '#565600',
             marginBottom: '1.5rem',
           }}
         >
@@ -380,7 +380,7 @@ const HomeSections = () => {
               <details
                 key={i}
                 className="group"
-                style={{ borderBottom: '1px solid rgba(139,105,20,0.12)' }}
+                style={{ borderBottom: '1px solid rgba(86,86,0,0.12)' }}
               >
                 <summary
                   className="flex items-center justify-between py-5 cursor-pointer list-none"
@@ -394,7 +394,7 @@ const HomeSections = () => {
                   {faq.q}
                   <span
                     className="ml-4 flex-shrink-0 transition-transform duration-300 group-open:rotate-45"
-                    style={{ color: '#8B6914', fontSize: '1.5rem', fontWeight: 200 }}
+                    style={{ color: '#565600', fontSize: '1.5rem', fontWeight: 200 }}
                   >
                     +
                   </span>
@@ -458,7 +458,7 @@ const HomeSections = () => {
               placeholder="seu@email.com"
               className="flex-1 px-4 py-3 bg-transparent border text-sm"
               style={{
-                borderColor: 'rgba(139,105,20,0.25)',
+                borderColor: 'rgba(86,86,0,0.25)',
                 color: '#29241f',
                 fontFamily: "'Montserrat', sans-serif",
                 fontWeight: 300,

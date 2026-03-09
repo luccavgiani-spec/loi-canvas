@@ -76,7 +76,7 @@ const CollabDetailCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             fontFamily: "'Montserrat', sans-serif",
             fontWeight: 300,
             fontSize: '0.72rem',
-            color: '#8B6914',
+            color: '#565600',
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
             marginBottom: '1rem',
@@ -141,7 +141,7 @@ const Collabs = () => {
               <div
                 key={collab.slug}
                 id={collab.slug}
-                className={highlightedCollab === collab.slug ? 'ring-2 ring-[#8B6914]/20 rounded-lg p-4 -m-4' : ''}
+                className={highlightedCollab === collab.slug ? 'ring-2 ring-[#565600]/20 rounded-lg p-4 -m-4' : ''}
               >
                 <CollabDetailCard collab={collab} />
               </div>

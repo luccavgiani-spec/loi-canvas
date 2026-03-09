@@ -1,5 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Montserrat:wght@200;300;400&display=swap');
 
+/*
+ * ══════════════════════════════════════════════════════
+ * PALETA AROMÁTICA LOIÊ — Referência de cores
+ * ══════════════════════════════════════════════════════
+ * Herbal:          #565600
+ * Adocicado:       #A5812C
+ * Frutal Cítrico:  #B26A02
+ * Floral:          #950046
+ * Amadeirado:      #7F2700
+ * Especiarias:     #472300
+ *
+ * Cor primária:    #29241f
+ * Cor secundária:  #f4edd2
+ * Cor terciária:   #565600
+ *
+ * Tipografia:      Wagon / Sackers Gothic Std
+ * ══════════════════════════════════════════════════════
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,10 +27,19 @@
 @layer base {
   :root {
     --loi-dark: #29241f;
-    --loi-cream: #ffffff;
-    --loi-brown: #8B6914;
-    --loi-brown-dark: #6B4F10;
+    --loi-cream: #f4edd2;
+    --loi-tertiary: #565600;
+    --loi-brown: #565600;
+    --loi-brown-dark: #3d3d00;
     --loi-warm: #f5f0eb;
+
+    /* Paleta aromática */
+    --loi-herbal: #565600;
+    --loi-adocicado: #A5812C;
+    --loi-frutal: #B26A02;
+    --loi-floral: #950046;
+    --loi-amadeirado: #7F2700;
+    --loi-especiarias: #472300;
 
     /* shadcn semantic mapping — light-first */
     --background: 0 0% 100%;
@@ -32,7 +60,7 @@
     --muted: 30 15% 93%;
     --muted-foreground: 30 8% 45%;
 
-    --accent: 42 75% 31%;
+    --accent: 60 100% 17%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
@@ -40,7 +68,7 @@
 
     --border: 30 15% 88%;
     --input: 30 15% 88%;
-    --ring: 42 75% 31%;
+    --ring: 60 100% 17%;
 
     --radius: 0.375rem;
 
@@ -53,8 +81,8 @@
     --sidebar-border: 30 15% 88%;
     --sidebar-ring: 42 75% 31%;
 
-    --font-heading: 'Cormorant Garamond', serif;
-    --font-body: 'Montserrat', sans-serif;
+    --font-heading: 'Wagon', 'Cormorant Garamond', serif;
+    --font-body: 'Sackers Gothic Std', 'Montserrat', sans-serif;
 
     --badge-sale: 0 72% 51%;
     --badge-new: 42 75% 31%;
@@ -83,7 +111,7 @@
   }
 
   ::selection {
-    background: rgba(139, 105, 20, 0.2);
+    background: rgba(86, 86, 0, 0.2);
     color: #29241f;
   }
 }
@@ -374,7 +402,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: #8B6914;
+  background: #565600;
   transform: translateX(-101%);
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: -1;
@@ -433,6 +461,25 @@
 }
 .marquee-track:hover {
   animation-play-state: paused;
+}
+
+/* ── Loading screen — brand symbol fill animation ── */
+@keyframes symbolFillUp {
+  0%   { clip-path: inset(100% 0 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+@keyframes symbolPulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.8; }
+}
+.loading-symbol-outline {
+  opacity: 0.15;
+}
+.loading-symbol-fill {
+  animation: symbolFillUp 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.loading-pulse {
+  animation: symbolPulse 2.5s ease-in-out infinite;
 }
 
 /* ── Collabs rotating images ── */

@@ -66,47 +66,55 @@ const Index = () => {
         className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
         style={{ background: '#29241f' }}
       >
-        {/* Logo */}
-        <img
-          src="/hero/LOGO_BRANCA_t.png"
-          alt="Loiê"
-          style={{
-            width: 'clamp(100px, 12vw, 160px)',
-            height: 'auto',
-            marginBottom: '2.5rem',
-            opacity: 0.8,
-          }}
-        />
-
-        {/* Progress bar */}
+        {/* Brand symbol with fill-up animation */}
         <div
           style={{
-            width: 'clamp(140px, 20vw, 200px)',
-            height: 2,
-            background: 'rgba(244,237,210,0.1)',
-            overflow: 'hidden',
+            position: 'relative',
+            width: 'clamp(80px, 12vw, 140px)',
+            height: 'clamp(80px, 12vw, 140px)',
+            marginBottom: '1.5rem',
           }}
         >
-          <div
+          {/* Outline (dim) */}
+          <img
+            src="/hero/SIMBOLO_t.png"
+            alt=""
+            className="loading-symbol-outline"
             style={{
-              width: `${progress}%`,
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
               height: '100%',
-              background: '#8B6914',
-              transition: 'width 0.4s ease',
+              objectFit: 'contain',
+            }}
+          />
+          {/* Filled version — clips from bottom to top */}
+          <img
+            src="/hero/SIMBOLO_t.png"
+            alt="Loiê"
+            className="loading-symbol-fill"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              opacity: 0.85,
             }}
           />
         </div>
 
-        {/* Loading text */}
+        {/* Subtle loading text */}
         <p
+          className="loading-pulse"
           style={{
-            fontFamily: "'Montserrat', sans-serif",
+            fontFamily: "var(--font-body)",
             fontWeight: 300,
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
-            fontSize: '0.6rem',
-            color: 'rgba(244,237,210,0.3)',
-            marginTop: '1rem',
+            fontSize: '0.55rem',
+            color: 'rgba(244,237,210,0.25)',
+            marginTop: '0.5rem',
           }}
         >
           carregando experiência
