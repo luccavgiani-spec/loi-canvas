@@ -64,9 +64,15 @@ const About = () => {
                     marginBottom: '1rem',
                   }}
                 >
-                  A Loiê nasceu em 2023 da paixão por fragrâncias e do desejo de criar
-                  objetos que transformam ambientes em experiências sensoriais. Cada vela
-                  é produzida artesanalmente em nosso ateliê em São Paulo.
+                  Acendemos uma vela como quem abre uma porta. Uma porta para dentro. Pra memória. Pra beleza que mora no silêncio.
+                  {'\n\n'}
+                  A Loiê nasceu de uma casa antiga, de um ritual secreto, de um saber que se aprende com as mãos e os sentidos.
+                  {'\n\n'}
+                  Cada aroma é uma narrativa, cada frasco é um convite a ficar mais tempo com o que importa.
+                  {'\n\n'}
+                  Somos fogo, mas somos calma. Somos essência, mas somos presença. Somos brasileiros, feitos à mão, com técnica e com alma.
+                  {'\n\n'}
+                  Não vendemos velas. Criamos atmosferas.
                 </p>
                 <p
                   style={{
