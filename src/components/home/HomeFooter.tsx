@@ -102,7 +102,7 @@ const HomeFooter = () => {
                   color: 'rgba(244,237,210,0.4)',
                 }}
               >
-                contato@loie.com.br
+                loie.aromatica@gmail.com
               </li>
               <li
                 style={{
@@ -112,7 +112,27 @@ const HomeFooter = () => {
                   color: 'rgba(244,237,210,0.4)',
                 }}
               >
-                São Paulo, Brasil
+                (11) 99649-7672
+              </li>
+              <li
+                style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.8rem',
+                  color: 'rgba(244,237,210,0.4)',
+                }}
+              >
+                Rua Cel. João Leme, 688
+              </li>
+              <li
+                style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.8rem',
+                  color: 'rgba(244,237,210,0.4)',
+                }}
+              >
+                Bragança Paulista, SP 12900-161
               </li>
               <li className="pt-2">
                 <span className="loi-label" style={{ fontSize: '0.7rem' }}>@loie.velas</span>
@@ -160,14 +180,56 @@ const HomeFooter = () => {
         </div>
       </div>
 
-      {/* Brand symbol bottom */}
+      {/* Brand symbol bottom — same hover effect as hero */}
       <div className="flex justify-center pb-10">
-        <img
-          src="/hero/SIMBOLO_t.png"
-          alt=""
-          className="w-10 h-10 object-contain"
-          style={{ opacity: 0.2 }}
-        />
+        <div
+          className="relative group"
+          style={{ width: 40, height: 40 }}
+        >
+          {/* glow */}
+          <div
+            className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(244,237,210,0.15) 0%, transparent 70%)',
+              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
+            }}
+          />
+          <img
+            src="/hero/SIMBOLO_t.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-contain"
+            style={{
+              opacity: 0.2,
+              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
+            }}
+          />
+          <img
+            src="/hero/SIMBOLO_2_t.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+            style={{
+              opacity: 0,
+              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            onMouseEnter={(e) => {
+              const container = e.currentTarget.parentElement;
+              if (!container) return;
+              const imgs = container.querySelectorAll('img');
+              if (imgs[0]) { imgs[0].style.opacity = '0'; imgs[0].style.transform = 'scale(1.1) rotate(4deg)'; }
+              if (imgs[1]) { imgs[1].style.opacity = '0.4'; imgs[1].style.transform = 'scale(1) rotate(0deg)'; imgs[1].style.filter = 'drop-shadow(0 0 8px rgba(244,237,210,0.4))'; }
+            }}
+            onMouseLeave={(e) => {
+              const container = e.currentTarget.parentElement;
+              if (!container) return;
+              const imgs = container.querySelectorAll('img');
+              if (imgs[0]) { imgs[0].style.opacity = '0.2'; imgs[0].style.transform = 'scale(1) rotate(0deg)'; }
+              if (imgs[1]) { imgs[1].style.opacity = '0'; imgs[1].style.transform = ''; imgs[1].style.filter = ''; }
+            }}
+          />
+        </div>
       </div>
     </footer>
   );
