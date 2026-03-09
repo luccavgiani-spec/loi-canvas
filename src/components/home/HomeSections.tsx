@@ -268,6 +268,14 @@ const HomeSections = () => {
 
   return (
     <div ref={ref} style={{ background: '#ffffff' }}>
+      {/* ── Degradê de transição hero → conteúdo ── */}
+      <div
+        style={{
+          height: 'clamp(80px, 12vw, 160px)',
+          background: 'linear-gradient(to bottom, #29241f 0%, #ffffff 100%)',
+        }}
+      />
+
       {/* ── 1. Coleção 1 — Bestsellers ── */}
       <section className="py-16 md:py-20 px-6">
         <div className="max-w-[1400px] mx-auto">
