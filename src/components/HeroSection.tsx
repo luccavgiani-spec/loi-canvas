@@ -10,6 +10,7 @@ const VIDEOS = [
 ];
 
 const CROSSFADE_MS = 2000;
+const MAX_PLAY_SECONDS = 5;
 const NEUTRAL = { sat: 0.18, bri: 0.28, con: 1.00 };
 
 /* ─── pure helpers (module scope) ─── */
@@ -64,19 +65,16 @@ function doTransition(
   const inCfg = VIDEOS[toIdx];
   const half = CROSSFADE_MS / 2;
 
-  // fade out current → neutral
   animateFilter(outEl, { sat: outCfg.sat, bri: outCfg.bri, con: outCfg.con }, NEUTRAL, half, () => {
     outEl.style.opacity = '0';
     outEl.pause();
     outEl.currentTime = 0;
 
-    // prepare incoming
     inEl.style.filter = buildFilter(NEUTRAL.sat, NEUTRAL.bri, NEUTRAL.con);
     inEl.style.opacity = '1';
     inEl.playbackRate = inCfg.playbackRate;
     inEl.play().catch(() => {});
 
-    // fade in → target
     animateFilter(inEl, NEUTRAL, { sat: inCfg.sat, bri: inCfg.bri, con: inCfg.con }, half, onDone);
   });
 }
@@ -86,24 +84,30 @@ function scheduleNext(
   currentIdxRef: { current: number },
   isTransitioningRef: { current: boolean },
   timerRef: { current: number | null },
+  startTimeRef: { current: number },
 ) {
   const el = videos[currentIdxRef.current];
   if (!el) return;
 
   function check() {
     if (!el || el.paused) return;
+    const elapsed = (performance.now() - startTimeRef.current) / 1000;
     const remaining = el.duration - el.currentTime;
-    if (remaining <= 1) {
+    const shouldTransition = elapsed >= MAX_PLAY_SECONDS || remaining <= 1;
+
+    if (shouldTransition) {
       if (isTransitioningRef.current) return;
       isTransitioningRef.current = true;
       const nextIdx = (currentIdxRef.current + 1) % VIDEOS.length;
       doTransition(videos, currentIdxRef.current, nextIdx, () => {
         currentIdxRef.current = nextIdx;
         isTransitioningRef.current = false;
-        scheduleNext(videos, currentIdxRef, isTransitioningRef, timerRef);
+        startTimeRef.current = performance.now();
+        scheduleNext(videos, currentIdxRef, isTransitioningRef, timerRef, startTimeRef);
       });
     } else {
-      timerRef.current = window.setTimeout(check, Math.max(50, (remaining - 1.2) * 1000));
+      const nextCheck = Math.min(remaining - 1, MAX_PLAY_SECONDS - elapsed);
+      timerRef.current = window.setTimeout(check, Math.max(50, nextCheck * 1000));
     }
   }
   check();
@@ -118,9 +122,9 @@ const HeroSection = () => {
   const currentIdx = useRef(0);
   const isTransitioning = useRef(false);
   const timerRef = useRef<number | null>(null);
+  const startTimeRef = useRef(performance.now());
   const [activeScene, setActiveScene] = useState(0);
 
-  // sync activeScene with currentIdx for indicator
   useEffect(() => {
     const interval = window.setInterval(() => {
       setActiveScene(currentIdx.current);
@@ -131,7 +135,6 @@ const HeroSection = () => {
   useEffect(() => {
     const vids = videoRefs.current;
 
-    // wait for all loadedmetadata
     let mounted = true;
     const promises = vids.map(
       (v) =>
@@ -146,7 +149,6 @@ const HeroSection = () => {
     Promise.all(promises).then(() => {
       if (!mounted) return;
 
-      // apply initial filters & hide all
       vids.forEach((v, i) => {
         if (!v) return;
         const c = VIDEOS[i];
@@ -155,12 +157,12 @@ const HeroSection = () => {
         v.playbackRate = c.playbackRate;
       });
 
-      // start first
       const first = vids[0];
       if (first) {
         first.style.opacity = '1';
         first.play().catch(() => {});
-        scheduleNext(vids, currentIdx, isTransitioning, timerRef);
+        startTimeRef.current = performance.now();
+        scheduleNext(vids, currentIdx, isTransitioning, timerRef, startTimeRef);
       }
     });
 
@@ -179,7 +181,8 @@ const HeroSection = () => {
     doTransition(vids, currentIdx.current, idx, () => {
       currentIdx.current = idx;
       isTransitioning.current = false;
-      scheduleNext(vids, currentIdx, isTransitioning, timerRef);
+      startTimeRef.current = performance.now();
+      scheduleNext(vids, currentIdx, isTransitioning, timerRef, startTimeRef);
     });
   };
 
@@ -217,7 +220,6 @@ const HeroSection = () => {
 
       {/* ── navbar ── */}
       <nav className="absolute top-0 left-0 right-0 z-[5]">
-        {/* logo */}
         <div
           className="absolute hero-fadeDown"
           style={{ left: '45%', transform: 'translateX(-50%)', height: '5rem', display: 'flex', alignItems: 'center', animationDelay: '0.3s' }}
@@ -229,7 +231,6 @@ const HeroSection = () => {
           />
         </div>
 
-        {/* nav left */}
         <div
           className="absolute flex gap-8 hero-fadeDown"
           style={{ left: '5rem', top: 0, height: '5rem', alignItems: 'center', animationDelay: '0.5s' }}
@@ -238,7 +239,6 @@ const HeroSection = () => {
           <a href="/about" className="hero-nav-link">sobre</a>
         </div>
 
-        {/* nav right */}
         <div
           className="absolute flex gap-8 hero-fadeDown"
           style={{ right: '5rem', top: 0, height: '5rem', alignItems: 'center', animationDelay: '0.5s' }}
@@ -254,7 +254,6 @@ const HeroSection = () => {
         style={{ paddingTop: '5rem' }}
       >
         <div className="flex flex-col items-center text-center" style={{ maxWidth: 1000 }}>
-          {/* title h1 */}
           <h1
             style={{
               fontFamily: "'Cormorant Garamond', serif",
@@ -263,7 +262,6 @@ const HeroSection = () => {
               lineHeight: 0.88,
             }}
           >
-            {/* line 1 */}
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
@@ -272,16 +270,14 @@ const HeroSection = () => {
                 atmosferas
               </span>
             </span>
-            {/* line 2 */}
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
-                style={{ color: '#989857', fontStyle: 'italic', animationDelay: '1.20s' }}
+                style={{ color: '#8B6914', fontStyle: 'italic', animationDelay: '1.20s' }}
               >
                 que
               </span>
             </span>
-            {/* line 3 */}
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
@@ -292,7 +288,6 @@ const HeroSection = () => {
             </span>
           </h1>
 
-          {/* subtitle */}
           <p
             className="hero-fadeUp mt-8"
             style={{
@@ -310,9 +305,7 @@ const HeroSection = () => {
             Feitas à mão, com essência e intenção.
           </p>
 
-          {/* buttons */}
           <div className="flex items-center gap-8 mt-10">
-            {/* primary button */}
             <a
               href="/shop"
               className="hero-fadeUp hero-btn-primary"
@@ -321,7 +314,6 @@ const HeroSection = () => {
               explorar coleção
             </a>
 
-            {/* ghost button */}
             <a
               href="/about"
               className="hero-fadeUp hero-btn-ghost group"
@@ -335,98 +327,109 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* ── scene indicator ── */}
+      {/* ── bottom bar: cena + scroll + symbol ── */}
       <div
-        className="absolute z-[3] flex flex-col gap-2 hero-fadeUp"
-        style={{ bottom: '2.5rem', left: '5rem', animationDelay: '2.1s' }}
+        className="absolute z-[3] bottom-0 left-0 right-0 flex items-end justify-between px-[5rem] pb-[2.5rem]"
       >
-        <span
-          style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontWeight: 300,
-            letterSpacing: '0.3em',
-            textTransform: 'uppercase',
-            color: 'rgba(244,237,210,0.3)',
-            fontSize: '0.65rem',
-          }}
+        {/* scene indicator */}
+        <div
+          className="flex flex-col gap-2 hero-fadeUp"
+          style={{ animationDelay: '2.1s' }}
         >
-          cena
-        </span>
-        <div className="flex gap-1.5">
-          {VIDEOS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => jumpToScene(i)}
-              aria-label={`Cena ${i + 1}`}
-              style={{ paddingTop: 6, paddingBottom: 6, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-            >
-              <span
-                style={{
-                  display: 'block',
-                  height: 2,
-                  width: activeScene === i ? 36 : 20,
-                  borderRadius: 1,
-                  backgroundColor: activeScene === i ? 'rgba(152,152,87,0.9)' : 'rgba(152,152,87,0.3)',
-                  transition: 'all 0.4s ease',
-                }}
-                className="hover:!bg-[rgba(152,152,87,0.6)]"
-              />
-            </button>
-          ))}
+          <span
+            style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 300,
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: 'rgba(244,237,210,0.3)',
+              fontSize: '0.65rem',
+            }}
+          >
+            cena
+          </span>
+          <div className="flex gap-1.5">
+            {VIDEOS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => jumpToScene(i)}
+                aria-label={`Cena ${i + 1}`}
+                style={{ paddingTop: 6, paddingBottom: 6, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    height: 2,
+                    width: activeScene === i ? 36 : 20,
+                    borderRadius: 1,
+                    backgroundColor: activeScene === i ? 'rgba(139,105,20,0.9)' : 'rgba(139,105,20,0.3)',
+                    transition: 'all 0.4s ease',
+                  }}
+                />
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* ── brand symbol ── */}
-      <div
-        className="absolute z-[3] hero-fadeIn group"
-        style={{ bottom: '3rem', right: '5rem', width: 80, height: 80, animationDelay: '2.2s' }}
-      >
-        {/* glow */}
+        {/* scroll indicator (between cena and symbol) */}
         <div
-          className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, rgba(244,237,210,0.15) 0%, transparent 70%)',
-            transition: '550ms cubic-bezier(0.4,0,0.2,1)',
-          }}
-        />
-        <img
-          src="/hero/SIMBOLO_t.png"
-          alt=""
-          className="absolute inset-0 w-full h-full object-contain"
-          style={{
-            opacity: 1,
-            transition: '550ms cubic-bezier(0.4,0,0.2,1)',
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.opacity = '0'; e.currentTarget.style.transform = 'scale(1.1) rotate(4deg)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1) rotate(0deg)'; }}
-        />
-        <img
-          src="/hero/SIMBOLO_2_t.png"
-          alt=""
-          className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-          style={{
-            opacity: 0,
-            transition: '550ms cubic-bezier(0.4,0,0.2,1)',
-          }}
-        />
-        {/* hover controller on container */}
+          className="scroll-indicator flex flex-col items-center gap-2 hero-fadeUp"
+          style={{ color: 'rgba(244,237,210,0.3)', animationDelay: '2.15s' }}
+        >
+          <span className="loi-label" style={{ color: 'rgba(244,237,210,0.3)' }}>scroll</span>
+          <svg width="16" height="24" viewBox="0 0 16 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+            <path d="M8 4v12M4 12l4 4 4-4" />
+          </svg>
+        </div>
+
+        {/* brand symbol */}
         <div
-          className="absolute inset-0"
-          onMouseEnter={() => {
-            const container = document.querySelector('.hero-fadeIn.group') as HTMLElement;
-            if (!container) return;
-            const imgs = container.querySelectorAll('img');
-            if (imgs[0]) { imgs[0].style.opacity = '0'; imgs[0].style.transform = 'scale(1.1) rotate(4deg)'; }
-            if (imgs[1]) { imgs[1].style.opacity = '1'; imgs[1].style.transform = 'scale(1) rotate(0deg)'; imgs[1].style.filter = 'drop-shadow(0 0 8px rgba(244,237,210,0.4))'; }
-          }}
-          onMouseLeave={() => {
-            const container = document.querySelector('.hero-fadeIn.group') as HTMLElement;
-            if (!container) return;
-            const imgs = container.querySelectorAll('img');
-            if (imgs[0]) { imgs[0].style.opacity = '1'; imgs[0].style.transform = 'scale(1) rotate(0deg)'; }
-            if (imgs[1]) { imgs[1].style.opacity = '0'; imgs[1].style.transform = ''; imgs[1].style.filter = ''; }
-          }}
-        />
+          className="hero-fadeIn group"
+          style={{ width: 80, height: 80, animationDelay: '2.2s', position: 'relative' }}
+        >
+          <div
+            className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(244,237,210,0.15) 0%, transparent 70%)',
+              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
+            }}
+          />
+          <img
+            src="/hero/SIMBOLO_t.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-contain"
+            style={{
+              opacity: 1,
+              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
+            }}
+          />
+          <img
+            src="/hero/SIMBOLO_2_t.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+            style={{
+              opacity: 0,
+              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            onMouseEnter={() => {
+              const container = document.querySelector('.hero-fadeIn.group') as HTMLElement;
+              if (!container) return;
+              const imgs = container.querySelectorAll('img');
+              if (imgs[0]) { imgs[0].style.opacity = '0'; imgs[0].style.transform = 'scale(1.1) rotate(4deg)'; }
+              if (imgs[1]) { imgs[1].style.opacity = '1'; imgs[1].style.transform = 'scale(1) rotate(0deg)'; imgs[1].style.filter = 'drop-shadow(0 0 8px rgba(244,237,210,0.4))'; }
+            }}
+            onMouseLeave={() => {
+              const container = document.querySelector('.hero-fadeIn.group') as HTMLElement;
+              if (!container) return;
+              const imgs = container.querySelectorAll('img');
+              if (imgs[0]) { imgs[0].style.opacity = '1'; imgs[0].style.transform = 'scale(1) rotate(0deg)'; }
+              if (imgs[1]) { imgs[1].style.opacity = '0'; imgs[1].style.transform = ''; imgs[1].style.filter = ''; }
+            }}
+          />
+        </div>
       </div>
     </section>
   );

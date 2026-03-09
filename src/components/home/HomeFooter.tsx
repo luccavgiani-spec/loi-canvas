@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 
 const HomeFooter = () => {
   return (
-    <footer style={{ background: '#1e1a16' }}>
-      {/* Main footer */}
+    <footer style={{ background: '#29241f' }}>
       <div className="max-w-[1400px] mx-auto px-6 py-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
@@ -31,7 +30,7 @@ const HomeFooter = () => {
 
           {/* Shop */}
           <div>
-            <h4 className="loi-label mb-6">coleção</h4>
+            <h4 className="loi-label mb-6" style={{ color: 'rgba(244,237,210,0.5)' }}>coleção</h4>
             <ul className="space-y-3">
               {[
                 { to: '/shop', label: 'Todas as Velas' },
@@ -63,10 +62,11 @@ const HomeFooter = () => {
 
           {/* About */}
           <div>
-            <h4 className="loi-label mb-6">sobre</h4>
+            <h4 className="loi-label mb-6" style={{ color: 'rgba(244,237,210,0.5)' }}>sobre</h4>
             <ul className="space-y-3">
               {[
                 { to: '/about', label: 'Nossa História' },
+                { to: '/collabs', label: 'Collabs' },
                 { to: '/contact', label: 'Contato' },
                 { to: '/policies', label: 'Políticas' },
               ].map((link) => (
@@ -92,69 +92,32 @@ const HomeFooter = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="loi-label mb-6">contato</h4>
+            <h4 className="loi-label mb-6" style={{ color: 'rgba(244,237,210,0.5)' }}>contato</h4>
             <ul className="space-y-3">
-              <li
-                style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '0.8rem',
-                  color: 'rgba(244,237,210,0.4)',
-                }}
-              >
+              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 loie.aromatica@gmail.com
               </li>
-              <li
-                style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '0.8rem',
-                  color: 'rgba(244,237,210,0.4)',
-                }}
-              >
+              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 (11) 99649-7672
               </li>
-              <li
-                style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '0.8rem',
-                  color: 'rgba(244,237,210,0.4)',
-                }}
-              >
+              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 Rua Cel. João Leme, 688
               </li>
-              <li
-                style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '0.8rem',
-                  color: 'rgba(244,237,210,0.4)',
-                }}
-              >
+              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 Bragança Paulista, SP 12900-161
               </li>
               <li className="pt-2">
-                <span className="loi-label" style={{ fontSize: '0.7rem' }}>@loie.velas</span>
+                <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.7rem', color: 'rgba(244,237,210,0.5)' }}>@loie.velas</span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div
           className="mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
-          style={{ borderTop: '1px solid rgba(152,152,87,0.1)' }}
+          style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}
         >
-          <p
-            style={{
-              fontFamily: "'Montserrat', sans-serif",
-              fontWeight: 300,
-              fontSize: '0.7rem',
-              color: 'rgba(244,237,210,0.25)',
-              letterSpacing: '0.05em',
-            }}
-          >
+          <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', letterSpacing: '0.05em' }}>
             © {new Date().getFullYear()} Loiê. Todos os direitos reservados.
           </p>
           <div className="flex gap-8">
@@ -162,15 +125,7 @@ const HomeFooter = () => {
               <Link
                 key={label}
                 to="/policies"
-                style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '0.7rem',
-                  color: 'rgba(244,237,210,0.25)',
-                  textDecoration: 'none',
-                  letterSpacing: '0.05em',
-                  transition: 'color 0.3s ease',
-                }}
+                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
                 className="hover:!text-[rgba(244,237,210,0.5)]"
               >
                 {label}
@@ -180,13 +135,9 @@ const HomeFooter = () => {
         </div>
       </div>
 
-      {/* Brand symbol bottom — same hover effect as hero */}
+      {/* Brand symbol bottom */}
       <div className="flex justify-center pb-10">
-        <div
-          className="relative group"
-          style={{ width: 40, height: 40 }}
-        >
-          {/* glow */}
+        <div className="relative group" style={{ width: 40, height: 40 }}>
           <div
             className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
             style={{
@@ -194,24 +145,8 @@ const HomeFooter = () => {
               transition: '550ms cubic-bezier(0.4,0,0.2,1)',
             }}
           />
-          <img
-            src="/hero/SIMBOLO_t.png"
-            alt=""
-            className="absolute inset-0 w-full h-full object-contain"
-            style={{
-              opacity: 0.2,
-              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
-            }}
-          />
-          <img
-            src="/hero/SIMBOLO_2_t.png"
-            alt=""
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{
-              opacity: 0,
-              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
-            }}
-          />
+          <img src="/hero/SIMBOLO_t.png" alt="" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0.2, transition: '550ms cubic-bezier(0.4,0,0.2,1)' }} />
+          <img src="/hero/SIMBOLO_2_t.png" alt="" className="absolute inset-0 w-full h-full object-contain pointer-events-none" style={{ opacity: 0, transition: '550ms cubic-bezier(0.4,0,0.2,1)' }} />
           <div
             className="absolute inset-0"
             onMouseEnter={(e) => {

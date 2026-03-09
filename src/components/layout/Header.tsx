@@ -25,9 +25,9 @@ const Header = () => {
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
       style={{
-        background: scrolled ? 'rgba(41,36,31,0.92)' : 'transparent',
+        background: scrolled ? 'rgba(255,255,255,0.92)' : 'transparent',
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(152,152,87,0.1)' : '1px solid transparent',
+        borderBottom: scrolled ? '1px solid rgba(139,105,20,0.1)' : '1px solid transparent',
       }}
     >
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-6 md:px-10" style={{ height: '5rem' }}>
@@ -35,7 +35,7 @@ const Header = () => {
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="md:hidden"
-          style={{ color: 'rgba(244,237,210,0.6)' }}
+          style={{ color: scrolled ? 'rgba(41,36,31,0.6)' : 'rgba(244,237,210,0.6)' }}
           aria-label="Menu"
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
@@ -47,9 +47,11 @@ const Header = () => {
             <Link
               key={link.to}
               to={link.to}
-              className="loi-nav-link"
+              className={scrolled ? 'loi-nav-link' : 'hero-nav-link'}
               style={{
-                color: location.pathname === link.to ? '#f4edd2' : undefined,
+                color: location.pathname === link.to
+                  ? (scrolled ? '#29241f' : '#f4edd2')
+                  : undefined,
               }}
             >
               {link.label}
@@ -62,7 +64,12 @@ const Header = () => {
           <img
             src="/hero/LOGO_BRANCA_t.png"
             alt="Loiê"
-            style={{ width: 'clamp(70px, 8vw, 110px)', height: 'auto' }}
+            style={{
+              width: 'clamp(70px, 8vw, 110px)',
+              height: 'auto',
+              filter: scrolled ? 'invert(1) brightness(0.2)' : 'none',
+              transition: 'filter 0.5s ease',
+            }}
           />
         </Link>
 
@@ -73,33 +80,35 @@ const Header = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className="loi-nav-link"
+                className={scrolled ? 'loi-nav-link' : 'hero-nav-link'}
                 style={{
-                  color: location.pathname === link.to ? '#f4edd2' : undefined,
+                  color: location.pathname === link.to
+                    ? (scrolled ? '#29241f' : '#f4edd2')
+                    : undefined,
                 }}
               >
                 {link.label}
               </Link>
             ))}
-            <Link to="/shop" className="loi-nav-link">
+            <Link to="/shop" className={scrolled ? 'loi-nav-link' : 'hero-nav-link'}>
               loja
             </Link>
           </nav>
           <button
             onClick={() => setIsOpen(true)}
             className="relative"
-            style={{ color: 'rgba(244,237,210,0.5)', transition: 'color 0.3s ease' }}
+            style={{ color: scrolled ? 'rgba(41,36,31,0.5)' : 'rgba(244,237,210,0.5)', transition: 'color 0.3s ease' }}
             aria-label="Carrinho"
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#f4edd2')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(244,237,210,0.5)')}
+            onMouseEnter={(e) => (e.currentTarget.style.color = scrolled ? '#29241f' : '#f4edd2')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = scrolled ? 'rgba(41,36,31,0.5)' : 'rgba(244,237,210,0.5)')}
           >
             <ShoppingBag size={18} strokeWidth={1.5} />
             {count > 0 && (
               <span
                 className="absolute -top-1 -right-2 flex items-center justify-center w-4 h-4 rounded-full text-[9px]"
                 style={{
-                  background: '#989857',
-                  color: '#29241f',
+                  background: '#8B6914',
+                  color: '#fff',
                   fontFamily: "'Montserrat', sans-serif",
                   fontWeight: 400,
                 }}
@@ -116,8 +125,8 @@ const Header = () => {
         <nav
           className="md:hidden px-6 py-6 space-y-4"
           style={{
-            background: 'rgba(41,36,31,0.97)',
-            borderTop: '1px solid rgba(152,152,87,0.1)',
+            background: 'rgba(255,255,255,0.97)',
+            borderTop: '1px solid rgba(139,105,20,0.1)',
             backdropFilter: 'blur(12px)',
           }}
         >
