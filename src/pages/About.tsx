@@ -50,7 +50,7 @@ const About = () => {
                   className="heading-display mb-6"
                   style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#f4edd2', lineHeight: 1.15 }}
                 >
-                  De mãos que criam
+                  Manifesto
                 </h2>
                 <div className="loi-divider mb-6" />
                 <p
