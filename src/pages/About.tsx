@@ -17,7 +17,7 @@ const About = () => {
             className="absolute inset-0 w-full h-full object-cover"
             style={{ filter: 'saturate(0.5) brightness(0.4)' }}
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #29241f 0%, transparent 30%, transparent 70%, #29241f 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #fcf5e0 0%, transparent 30%, transparent 70%, #fcf5e0 100%)' }} />
           <div className="loi-grain" />
           <div className="relative z-[1] flex items-center justify-center h-full px-6">
             <div className="text-center">
@@ -48,7 +48,7 @@ const About = () => {
                 <span className="loi-label block mb-4">origem</span>
                 <h2
                   className="heading-display mb-6"
-                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#f4edd2', lineHeight: 1.15 }}
+                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#29241f', lineHeight: 1.15 }}
                 >
                   Manifesto
                 </h2>
@@ -59,7 +59,7 @@ const About = () => {
                     fontWeight: 300,
                     fontStyle: 'italic',
                     fontSize: '1.05rem',
-                    color: 'rgba(244,237,210,0.5)',
+                    color: 'rgba(41,36,31,0.55)',
                     lineHeight: 1.8,
                     marginBottom: '1rem',
                   }}
@@ -87,11 +87,11 @@ const About = () => {
                 <div
                   key={stat.label}
                   className="reveal py-10 px-6"
-                  style={{ border: '1px solid rgba(152,152,87,0.15)' }}
+                  style={{ border: '1px solid rgba(86,86,0,0.15)' }}
                 >
                   <p
                     className="heading-display mb-2"
-                    style={{ fontSize: '2.5rem', color: '#989857' }}
+                    style={{ fontSize: '2.5rem', color: '#565600' }}
                   >
                     {stat.num}
                   </p>
@@ -100,7 +100,7 @@ const About = () => {
                       fontFamily: "'Montserrat', sans-serif",
                       fontWeight: 300,
                       fontSize: '0.75rem',
-                      color: 'rgba(244,237,210,0.4)',
+                      color: 'rgba(41,36,31,0.45)',
                       letterSpacing: '0.15em',
                       textTransform: 'uppercase',
                     }}
@@ -116,10 +116,10 @@ const About = () => {
               <span className="loi-label block mb-6">manifesto</span>
               <h2
                 className="heading-display mb-8"
-                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#f4edd2', lineHeight: 1.2 }}
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#29241f', lineHeight: 1.2 }}
               >
                 A Loiê Sala Aromática é esse gesto poético, mas também é um ateliê real
-                <em style={{ color: '#989857' }}>— feito de tempo, matéria, escolhas e presença</em>
+                <em style={{ color: '#565600' }}>— feito de tempo, matéria, escolhas e presença</em>
               </h2>
               <p
                 style={{
@@ -127,7 +127,7 @@ const About = () => {
                   fontWeight: 300,
                   fontStyle: 'italic',
                   fontSize: '1.05rem',
-                  color: 'rgba(244,237,210,0.45)',
+                  color: 'rgba(41,36,31,0.5)',
                   lineHeight: 1.8,
                 }}
               >

@@ -17,7 +17,7 @@ const CartDrawer = () => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent
         className="w-full sm:max-w-md flex flex-col"
-        style={{ background: '#ffffff', borderLeft: '1px solid rgba(86,86,0,0.1)' }}
+        style={{ background: '#fcf5e0', borderLeft: '1px solid rgba(86,86,0,0.1)' }}
       >
         <SheetHeader>
           <SheetTitle

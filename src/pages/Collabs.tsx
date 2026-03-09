@@ -110,7 +110,7 @@ const Collabs = () => {
     <>
       <CartDrawer />
       <Header />
-      <main ref={ref} style={{ background: '#ffffff', paddingTop: '8rem' }}>
+      <main ref={ref} style={{ background: '#fcf5e0', paddingTop: '8rem' }}>
         <div className="max-w-[1200px] mx-auto px-6 pb-20">
           <div className="text-center mb-16">
             <span className="reveal loi-label block mb-4">parcerias</span>

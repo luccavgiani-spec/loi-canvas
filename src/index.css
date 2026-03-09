@@ -31,7 +31,7 @@
     --loi-tertiary: #565600;
     --loi-brown: #565600;
     --loi-brown-dark: #3d3d00;
-    --loi-warm: #f5f0eb;
+    --loi-warm: #fcf5e0;
 
     /* Paleta aromática */
     --loi-herbal: #565600;
@@ -42,13 +42,13 @@
     --loi-especiarias: #472300;
 
     /* shadcn semantic mapping — light-first */
-    --background: 0 0% 100%;
+    --background: 45 82% 93%;
     --foreground: 30 14% 14%;
 
     --card: 30 20% 96%;
     --card-foreground: 30 14% 14%;
 
-    --popover: 0 0% 100%;
+    --popover: 45 82% 93%;
     --popover-foreground: 30 14% 14%;
 
     --primary: 30 14% 14%;

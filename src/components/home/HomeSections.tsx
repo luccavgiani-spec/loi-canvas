@@ -112,12 +112,12 @@ const ProductFocusBanner = ({ product, reverse = false }: { product: typeof PROD
         className="absolute inset-0"
         style={{
           background: reverse
-            ? 'linear-gradient(to left, transparent 60%, #f5f0eb)'
-            : 'linear-gradient(to right, transparent 60%, #f5f0eb)',
+            ? 'linear-gradient(to left, transparent 60%, #f4edd2)'
+            : 'linear-gradient(to right, transparent 60%, #f4edd2)',
         }}
       />
     </div>
-    <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: '#f5f0eb' }}>
+    <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: '#f4edd2' }}>
       <div className="max-w-md">
         <span className="loi-label block mb-4">{product.collection}</span>
         <h3
@@ -267,12 +267,12 @@ const HomeSections = () => {
   const focusProduct2 = PRODUCTS.find((p) => p.slug === 'cedro-vetiver')!;
 
   return (
-    <div ref={ref} style={{ background: '#ffffff' }}>
+    <div ref={ref} style={{ background: '#fcf5e0' }}>
       {/* ── Degradê de transição hero → conteúdo ── */}
       <div
         style={{
           height: 'clamp(80px, 12vw, 160px)',
-          background: 'linear-gradient(to bottom, #29241f 0%, #ffffff 100%)',
+          background: 'linear-gradient(to bottom, #29241f 0%, #fcf5e0 100%)',
         }}
       />
 
@@ -339,7 +339,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 4. Collabs — Grid animado ── */}
-      <section className="py-16 md:py-20 px-6" style={{ background: '#f5f0eb' }}>
+      <section className="py-16 md:py-20 px-6" style={{ background: '#f4edd2' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
             <span className="reveal loi-label block mb-4">parcerias</span>
@@ -427,7 +427,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 6. Newsletter / CTA Section ── */}
-      <section className="py-16 md:py-20 px-6 relative overflow-hidden" style={{ background: '#f5f0eb' }}>
+      <section className="py-16 md:py-20 px-6 relative overflow-hidden" style={{ background: '#f4edd2' }}>
         <div className="loi-grain" />
         <div className="relative z-[1] max-w-lg mx-auto text-center">
           <span className="reveal loi-label block mb-6">exclusivo</span>

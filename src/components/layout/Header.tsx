@@ -80,7 +80,7 @@ const Header = () => {
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
       style={{
-        background: scrolled ? 'rgba(255,255,255,0.92)' : 'transparent',
+        background: scrolled ? 'rgba(252,245,224,0.92)' : 'transparent',
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
         borderBottom: scrolled ? '1px solid rgba(86,86,0,0.1)' : '1px solid transparent',
       }}
@@ -113,7 +113,7 @@ const Header = () => {
               <div
                 className="absolute top-full left-0 mt-3"
                 style={{
-                  background: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(41,36,31,0.95)',
+                  background: scrolled ? 'rgba(252,245,224,0.97)' : 'rgba(41,36,31,0.95)',
                   backdropFilter: 'blur(16px)',
                   border: `1px solid ${scrolled ? 'rgba(86,86,0,0.1)' : 'rgba(244,237,210,0.1)'}`,
                   padding: '12px 16px',
@@ -163,7 +163,7 @@ const Header = () => {
               <div
                 className="absolute top-full left-0 mt-3"
                 style={{
-                  background: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(41,36,31,0.95)',
+                  background: scrolled ? 'rgba(252,245,224,0.97)' : 'rgba(41,36,31,0.95)',
                   backdropFilter: 'blur(16px)',
                   border: `1px solid ${scrolled ? 'rgba(86,86,0,0.1)' : 'rgba(244,237,210,0.1)'}`,
                   padding: '16px 20px',
@@ -284,7 +284,7 @@ const Header = () => {
               <div
                 className="absolute top-full right-0 mt-3"
                 style={{
-                  background: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(41,36,31,0.95)',
+                  background: scrolled ? 'rgba(252,245,224,0.97)' : 'rgba(41,36,31,0.95)',
                   backdropFilter: 'blur(16px)',
                   border: `1px solid ${scrolled ? 'rgba(86,86,0,0.1)' : 'rgba(244,237,210,0.1)'}`,
                   padding: '16px 20px',
@@ -380,7 +380,7 @@ const Header = () => {
         <nav
           className="md:hidden px-6 py-6 space-y-4"
           style={{
-            background: 'rgba(255,255,255,0.97)',
+            background: 'rgba(252,245,224,0.97)',
             borderTop: '1px solid rgba(86,86,0,0.1)',
             backdropFilter: 'blur(12px)',
           }}
