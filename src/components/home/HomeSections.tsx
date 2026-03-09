@@ -44,7 +44,7 @@ const ProductCard = ({ product, addItem }: { product: typeof PRODUCTS[0]; addIte
         onClick={(e) => { e.preventDefault(); addItem(product); }}
         className="absolute bottom-0 left-0 right-0 py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-400"
         style={{
-          background: 'rgba(139,105,20,0.9)',
+          background: 'rgba(86,86,0,0.9)',
           color: '#fff',
           fontFamily: "'Montserrat', sans-serif",
           fontWeight: 300,
@@ -75,7 +75,7 @@ const ProductCard = ({ product, addItem }: { product: typeof PRODUCTS[0]; addIte
             fontFamily: "'Montserrat', sans-serif",
             fontWeight: 300,
             fontSize: '0.8rem',
-            color: '#8B6914',
+            color: '#565600',
           }}
         >
           R$ {product.price.toFixed(2)}
@@ -112,12 +112,12 @@ const ProductFocusBanner = ({ product, reverse = false }: { product: typeof PROD
         className="absolute inset-0"
         style={{
           background: reverse
-            ? 'linear-gradient(to left, transparent 60%, #f5f0eb)'
-            : 'linear-gradient(to right, transparent 60%, #f5f0eb)',
+            ? 'linear-gradient(to left, transparent 60%, #f4edd2)'
+            : 'linear-gradient(to right, transparent 60%, #f4edd2)',
         }}
       />
     </div>
-    <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: '#f5f0eb' }}>
+    <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: '#f4edd2' }}>
       <div className="max-w-md">
         <span className="loi-label block mb-4">{product.collection}</span>
         <h3
@@ -149,7 +149,7 @@ const ProductFocusBanner = ({ product, reverse = false }: { product: typeof PROD
             fontFamily: "'Montserrat', sans-serif",
             fontWeight: 300,
             fontSize: '0.85rem',
-            color: '#8B6914',
+            color: '#565600',
             marginBottom: '1.5rem',
           }}
         >
@@ -267,7 +267,15 @@ const HomeSections = () => {
   const focusProduct2 = PRODUCTS.find((p) => p.slug === 'cedro-vetiver')!;
 
   return (
-    <div ref={ref} style={{ background: '#ffffff' }}>
+    <div ref={ref} style={{ background: '#fcf5e0' }}>
+      {/* ── Degradê de transição hero → conteúdo ── */}
+      <div
+        style={{
+          height: 'clamp(80px, 12vw, 160px)',
+          background: 'linear-gradient(to bottom, #29241f 0%, #fcf5e0 100%)',
+        }}
+      />
+
       {/* ── 1. Coleção 1 — Bestsellers ── */}
       <section className="py-16 md:py-20 px-6">
         <div className="max-w-[1400px] mx-auto">
@@ -331,7 +339,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 4. Collabs — Grid animado ── */}
-      <section className="py-16 md:py-20 px-6" style={{ background: '#f5f0eb' }}>
+      <section className="py-16 md:py-20 px-6" style={{ background: '#f4edd2' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
             <span className="reveal loi-label block mb-4">parcerias</span>
@@ -380,7 +388,7 @@ const HomeSections = () => {
               <details
                 key={i}
                 className="group"
-                style={{ borderBottom: '1px solid rgba(139,105,20,0.12)' }}
+                style={{ borderBottom: '1px solid rgba(86,86,0,0.12)' }}
               >
                 <summary
                   className="flex items-center justify-between py-5 cursor-pointer list-none"
@@ -394,7 +402,7 @@ const HomeSections = () => {
                   {faq.q}
                   <span
                     className="ml-4 flex-shrink-0 transition-transform duration-300 group-open:rotate-45"
-                    style={{ color: '#8B6914', fontSize: '1.5rem', fontWeight: 200 }}
+                    style={{ color: '#565600', fontSize: '1.5rem', fontWeight: 200 }}
                   >
                     +
                   </span>
@@ -419,7 +427,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 6. Newsletter / CTA Section ── */}
-      <section className="py-16 md:py-20 px-6 relative overflow-hidden" style={{ background: '#f5f0eb' }}>
+      <section className="py-16 md:py-20 px-6 relative overflow-hidden" style={{ background: '#f4edd2' }}>
         <div className="loi-grain" />
         <div className="relative z-[1] max-w-lg mx-auto text-center">
           <span className="reveal loi-label block mb-6">exclusivo</span>
@@ -458,7 +466,7 @@ const HomeSections = () => {
               placeholder="seu@email.com"
               className="flex-1 px-4 py-3 bg-transparent border text-sm"
               style={{
-                borderColor: 'rgba(139,105,20,0.25)',
+                borderColor: 'rgba(86,86,0,0.25)',
                 color: '#29241f',
                 fontFamily: "'Montserrat', sans-serif",
                 fontWeight: 300,

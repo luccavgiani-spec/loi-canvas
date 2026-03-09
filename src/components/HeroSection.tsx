@@ -222,7 +222,7 @@ const HeroSection = () => {
       <nav className="absolute top-0 left-0 right-0 z-[5]">
         <div
           className="absolute hero-fadeDown"
-          style={{ left: '45%', transform: 'translateX(-50%)', height: '5rem', display: 'flex', alignItems: 'center', animationDelay: '0.3s' }}
+          style={{ left: '50%', transform: 'translateX(-50%)', height: '5rem', display: 'flex', alignItems: 'center', animationDelay: '0.3s' }}
         >
           <img
             src="/hero/LOGO_BRANCA_t.png"
@@ -235,16 +235,15 @@ const HeroSection = () => {
           className="absolute flex gap-8 hero-fadeDown"
           style={{ left: '5rem', top: 0, height: '5rem', alignItems: 'center', animationDelay: '0.5s' }}
         >
-          <a href="/shop" className="hero-nav-link">coleção</a>
+          <a href="/shop" className="hero-nav-link">coleções</a>
           <a href="/about" className="hero-nav-link">sobre</a>
+          <a href="/collabs" className="hero-nav-link">collabs</a>
         </div>
 
         <div
-          className="absolute flex gap-8 hero-fadeDown"
+          className="absolute flex gap-6 items-center hero-fadeDown"
           style={{ right: '5rem', top: 0, height: '5rem', alignItems: 'center', animationDelay: '0.5s' }}
         >
-          <a href="/shop" className="hero-nav-link">loja</a>
-          <a href="/contact" className="hero-nav-link">contato</a>
         </div>
       </nav>
 
@@ -273,7 +272,7 @@ const HeroSection = () => {
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
-                style={{ color: '#8B6914', fontStyle: 'italic', animationDelay: '1.20s' }}
+                style={{ color: '#565600', fontStyle: 'italic', animationDelay: '1.20s' }}
               >
                 que
               </span>
@@ -362,7 +361,7 @@ const HeroSection = () => {
                     height: 2,
                     width: activeScene === i ? 36 : 20,
                     borderRadius: 1,
-                    backgroundColor: activeScene === i ? 'rgba(139,105,20,0.9)' : 'rgba(139,105,20,0.3)',
+                    backgroundColor: activeScene === i ? 'rgba(86,86,0,0.9)' : 'rgba(86,86,0,0.3)',
                     transition: 'all 0.4s ease',
                   }}
                 />

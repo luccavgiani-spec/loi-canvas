@@ -41,11 +41,11 @@ const ProductDetail = () => {
       <Layout>
         <div className="max-w-[1400px] mx-auto px-6 py-16">
           <div className="grid md:grid-cols-2 gap-10">
-            <div className="aspect-square" style={{ background: 'rgba(244,237,210,0.05)' }} />
+            <div className="aspect-square" style={{ background: 'rgba(41,36,31,0.05)' }} />
             <div className="space-y-4">
-              <div className="h-8 w-3/4" style={{ background: 'rgba(244,237,210,0.05)' }} />
-              <div className="h-6 w-1/3" style={{ background: 'rgba(244,237,210,0.05)' }} />
-              <div className="h-32 w-full" style={{ background: 'rgba(244,237,210,0.05)' }} />
+              <div className="h-8 w-3/4" style={{ background: 'rgba(41,36,31,0.05)' }} />
+              <div className="h-6 w-1/3" style={{ background: 'rgba(41,36,31,0.05)' }} />
+              <div className="h-32 w-full" style={{ background: 'rgba(41,36,31,0.05)' }} />
             </div>
           </div>
         </div>
@@ -75,7 +75,7 @@ const ProductDetail = () => {
                     onClick={() => setSelectedImage(i)}
                     className="w-16 h-16 overflow-hidden transition-all"
                     style={{
-                      border: i === selectedImage ? '2px solid #989857' : '2px solid transparent',
+                      border: i === selectedImage ? '2px solid #565600' : '2px solid transparent',
                       opacity: i === selectedImage ? 1 : 0.5,
                     }}
                   >
@@ -102,8 +102,8 @@ const ProductDetail = () => {
                   letterSpacing: '0.2em',
                   textTransform: 'uppercase',
                   fontSize: '0.6rem',
-                  color: '#f4edd2',
-                  background: 'rgba(152,152,87,0.2)',
+                  color: '#29241f',
+                  background: 'rgba(86,86,0,0.12)',
                   padding: '4px 12px',
                 }}
               >
@@ -113,7 +113,7 @@ const ProductDetail = () => {
 
             <h1
               className="heading-display mb-3"
-              style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#f4edd2' }}
+              style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#29241f' }}
             >
               {product.name}
             </h1>
@@ -126,7 +126,7 @@ const ProductDetail = () => {
                     key={s}
                     size={14}
                     className={s <= Math.round(product.rating_avg) ? 'fill-current' : ''}
-                    style={{ color: s <= Math.round(product.rating_avg) ? '#989857' : 'rgba(244,237,210,0.15)' }}
+                    style={{ color: s <= Math.round(product.rating_avg) ? '#565600' : 'rgba(41,36,31,0.15)' }}
                   />
                 ))}
               </div>
@@ -135,7 +135,7 @@ const ProductDetail = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   fontWeight: 300,
                   fontSize: '0.75rem',
-                  color: 'rgba(244,237,210,0.4)',
+                  color: 'rgba(41,36,31,0.45)',
                 }}
               >
                 {product.rating_avg} ({product.rating_count} avaliações)
@@ -146,7 +146,7 @@ const ProductDetail = () => {
             <div className="flex items-center gap-3 mb-6">
               <span
                 className="heading-display"
-                style={{ fontSize: '1.8rem', color: '#989857' }}
+                style={{ fontSize: '1.8rem', color: '#565600' }}
               >
                 R$ {product.price.toFixed(2)}
               </span>
@@ -156,7 +156,7 @@ const ProductDetail = () => {
                     fontFamily: "'Montserrat', sans-serif",
                     fontWeight: 300,
                     fontSize: '1rem',
-                    color: 'rgba(244,237,210,0.3)',
+                    color: 'rgba(41,36,31,0.3)',
                     textDecoration: 'line-through',
                   }}
                 >
@@ -172,7 +172,7 @@ const ProductDetail = () => {
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: '1.05rem',
-                color: 'rgba(244,237,210,0.5)',
+                color: 'rgba(41,36,31,0.55)',
                 lineHeight: 1.8,
               }}
             >
@@ -183,13 +183,13 @@ const ProductDetail = () => {
             <div className="grid grid-cols-2 gap-3 mb-8">
               {benefits.map((b) => (
                 <div key={b.label} className="flex items-center gap-2">
-                  <b.icon size={14} style={{ color: '#989857' }} />
+                  <b.icon size={14} style={{ color: '#565600' }} />
                   <span
                     style={{
                       fontFamily: "'Montserrat', sans-serif",
                       fontWeight: 300,
                       fontSize: '0.72rem',
-                      color: 'rgba(244,237,210,0.4)',
+                      color: 'rgba(41,36,31,0.45)',
                     }}
                   >
                     {b.label}
@@ -209,7 +209,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Details */}
-            <div style={{ borderTop: '1px solid rgba(152,152,87,0.12)' }}>
+            <div style={{ borderTop: '1px solid rgba(86,86,0,0.12)' }}>
               {[
                 { title: 'Descrição', content: product.description },
                 product.details ? { title: 'Detalhes', content: product.details } : null,
@@ -218,18 +218,18 @@ const ProductDetail = () => {
               ]
                 .filter(Boolean)
                 .map((item) => (
-                  <details key={item!.title} style={{ borderBottom: '1px solid rgba(152,152,87,0.12)' }}>
+                  <details key={item!.title} style={{ borderBottom: '1px solid rgba(86,86,0,0.12)' }}>
                     <summary
                       className="flex items-center justify-between py-4 cursor-pointer list-none"
                       style={{
                         fontFamily: "'Cormorant Garamond', serif",
                         fontWeight: 400,
                         fontSize: '1rem',
-                        color: '#f4edd2',
+                        color: '#29241f',
                       }}
                     >
                       {item!.title}
-                      <span style={{ color: '#989857', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
+                      <span style={{ color: '#565600', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
                       className="pb-4"
@@ -237,7 +237,7 @@ const ProductDetail = () => {
                         fontFamily: "'Montserrat', sans-serif",
                         fontWeight: 300,
                         fontSize: '0.82rem',
-                        color: 'rgba(244,237,210,0.45)',
+                        color: 'rgba(41,36,31,0.5)',
                         lineHeight: 1.8,
                       }}
                     >
@@ -252,13 +252,13 @@ const ProductDetail = () => {
               <div className="mt-8">
                 <h3
                   className="heading-display mb-6"
-                  style={{ fontSize: '1.3rem', color: '#f4edd2' }}
+                  style={{ fontSize: '1.3rem', color: '#29241f' }}
                 >
                   Avaliações ({reviews.length})
                 </h3>
                 <div className="space-y-4">
                   {reviews.map((r) => (
-                    <div key={r.id} style={{ borderBottom: '1px solid rgba(152,152,87,0.08)', paddingBottom: 16 }}>
+                    <div key={r.id} style={{ borderBottom: '1px solid rgba(86,86,0,0.08)', paddingBottom: 16 }}>
                       <div className="flex items-center gap-2 mb-1">
                         <div className="flex">
                           {[1, 2, 3, 4, 5].map((s) => (
@@ -266,18 +266,18 @@ const ProductDetail = () => {
                               key={s}
                               size={12}
                               className={s <= r.rating ? 'fill-current' : ''}
-                              style={{ color: s <= r.rating ? '#989857' : 'rgba(244,237,210,0.15)' }}
+                              style={{ color: s <= r.rating ? '#565600' : 'rgba(41,36,31,0.15)' }}
                             />
                           ))}
                         </div>
-                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.4)' }}>
+                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(41,36,31,0.45)' }}>
                           {r.author}
                         </span>
                       </div>
-                      <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '0.95rem', color: '#f4edd2' }}>
+                      <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '0.95rem', color: '#29241f' }}>
                         {r.title}
                       </h4>
-                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: 'rgba(244,237,210,0.35)' }}>
+                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: 'rgba(41,36,31,0.4)' }}>
                         {r.body}
                       </p>
                     </div>
@@ -293,7 +293,7 @@ const ProductDetail = () => {
           <section className="mt-20 md:mt-28">
             <div className="text-center mb-12">
               <span className="loi-label block mb-4">recomendados</span>
-              <h2 className="heading-display" style={{ fontSize: '2rem', color: '#f4edd2' }}>
+              <h2 className="heading-display" style={{ fontSize: '2rem', color: '#29241f' }}>
                 Você também pode gostar
               </h2>
             </div>
@@ -310,10 +310,10 @@ const ProductDetail = () => {
                     />
                   </Link>
                   <Link to={`/product/${p.slug}`}>
-                    <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1rem', color: '#f4edd2', marginBottom: 4 }}>
+                    <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1rem', color: '#29241f', marginBottom: 4 }}>
                       {p.name}
                     </h3>
-                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#989857' }}>
+                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#565600' }}>
                       R$ {p.price.toFixed(2)}
                     </span>
                   </Link>

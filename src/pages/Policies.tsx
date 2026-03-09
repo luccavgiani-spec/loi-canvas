@@ -28,7 +28,7 @@ const Policies = () => {
             <span className="loi-label block mb-4">informações</span>
             <h1
               className="heading-display"
-              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#f4edd2' }}
+              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#29241f' }}
             >
               Políticas
             </h1>
@@ -38,7 +38,7 @@ const Policies = () => {
               <div key={s.title}>
                 <h2
                   className="heading-display mb-4"
-                  style={{ fontSize: '1.6rem', color: '#f4edd2' }}
+                  style={{ fontSize: '1.6rem', color: '#29241f' }}
                 >
                   {s.title}
                 </h2>
@@ -49,7 +49,7 @@ const Policies = () => {
                     fontWeight: 300,
                     fontStyle: 'italic',
                     fontSize: '1rem',
-                    color: 'rgba(244,237,210,0.45)',
+                    color: 'rgba(41,36,31,0.5)',
                     lineHeight: 1.8,
                   }}
                 >

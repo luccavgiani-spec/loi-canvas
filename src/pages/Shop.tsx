@@ -50,7 +50,7 @@ const Shop = () => {
               <span className="loi-label block mb-4">coleção</span>
               <h1
                 className="heading-display"
-                style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#f4edd2' }}
+                style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#29241f' }}
               >
                 Nossas Fragrâncias
               </h1>
@@ -71,9 +71,9 @@ const Shop = () => {
                       textTransform: 'uppercase',
                       fontSize: '0.68rem',
                       border: '1px solid',
-                      borderColor: collection === c ? '#989857' : 'rgba(152,152,87,0.2)',
-                      background: collection === c ? 'rgba(152,152,87,0.15)' : 'transparent',
-                      color: collection === c ? '#f4edd2' : 'rgba(244,237,210,0.4)',
+                      borderColor: collection === c ? '#565600' : 'rgba(86,86,0,0.2)',
+                      background: collection === c ? 'rgba(86,86,0,0.12)' : 'transparent',
+                      color: collection === c ? '#29241f' : 'rgba(41,36,31,0.45)',
                       transition: 'all 0.3s ease',
                       cursor: 'pointer',
                     }}
@@ -86,9 +86,9 @@ const Shop = () => {
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
                 style={{
-                  background: 'rgba(41,36,31,0.5)',
-                  border: '1px solid rgba(152,152,87,0.2)',
-                  color: 'rgba(244,237,210,0.5)',
+                  background: 'rgba(41,36,31,0.04)',
+                  border: '1px solid rgba(86,86,0,0.2)',
+                  color: 'rgba(41,36,31,0.55)',
                   fontFamily: "'Montserrat', sans-serif",
                   fontWeight: 300,
                   fontSize: '0.75rem',
@@ -107,15 +107,15 @@ const Shop = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i}>
-                    <div className="aspect-[3/4] mb-4" style={{ background: 'rgba(244,237,210,0.05)' }} />
-                    <div className="h-4 w-3/4 mb-2" style={{ background: 'rgba(244,237,210,0.05)' }} />
-                    <div className="h-3 w-1/2" style={{ background: 'rgba(244,237,210,0.05)' }} />
+                    <div className="aspect-[3/4] mb-4" style={{ background: 'rgba(41,36,31,0.05)' }} />
+                    <div className="h-4 w-3/4 mb-2" style={{ background: 'rgba(41,36,31,0.05)' }} />
+                    <div className="h-3 w-1/2" style={{ background: 'rgba(41,36,31,0.05)' }} />
                   </div>
                 ))}
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-20">
-                <p style={{ color: 'rgba(244,237,210,0.4)', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}>
+                <p style={{ color: 'rgba(41,36,31,0.4)', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}>
                   Nenhum produto encontrado.
                 </p>
               </div>
@@ -170,7 +170,7 @@ const Shop = () => {
                       </button>
                     </Link>
                     <Link to={`/product/${product.slug}`} className="block">
-                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#f4edd2', marginBottom: 4 }}>
+                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#29241f', marginBottom: 4 }}>
                         {product.name}
                       </h3>
                       <p
@@ -179,7 +179,7 @@ const Shop = () => {
                           fontWeight: 300,
                           fontStyle: 'italic',
                           fontSize: '0.82rem',
-                          color: 'rgba(244,237,210,0.35)',
+                          color: 'rgba(41,36,31,0.4)',
                           lineHeight: 1.5,
                           marginBottom: 8,
                           display: '-webkit-box',
@@ -191,11 +191,11 @@ const Shop = () => {
                         {product.description}
                       </p>
                       <div className="flex items-center gap-3">
-                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#989857' }}>
+                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#565600' }}>
                           R$ {product.price.toFixed(2)}
                         </span>
                         {product.compare_at_price && (
-                          <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.3)', textDecoration: 'line-through' }}>
+                          <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(41,36,31,0.3)', textDecoration: 'line-through' }}>
                             R$ {product.compare_at_price.toFixed(2)}
                           </span>
                         )}

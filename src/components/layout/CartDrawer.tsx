@@ -17,7 +17,7 @@ const CartDrawer = () => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent
         className="w-full sm:max-w-md flex flex-col"
-        style={{ background: '#ffffff', borderLeft: '1px solid rgba(139,105,20,0.1)' }}
+        style={{ background: '#fcf5e0', borderLeft: '1px solid rgba(86,86,0,0.1)' }}
       >
         <SheetHeader>
           <SheetTitle
@@ -54,7 +54,7 @@ const CartDrawer = () => {
               <div className="h-[2px] overflow-hidden" style={{ background: 'rgba(41,36,31,0.08)' }}>
                 <div
                   className="h-full transition-all duration-500"
-                  style={{ width: `${progress}%`, background: '#8B6914' }}
+                  style={{ width: `${progress}%`, background: '#565600' }}
                 />
               </div>
               <p
@@ -93,7 +93,7 @@ const CartDrawer = () => {
                     >
                       {item.product.name}
                     </h4>
-                    <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#8B6914' }}>
+                    <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#565600' }}>
                       R$ {item.product.price.toFixed(2)}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
@@ -131,7 +131,7 @@ const CartDrawer = () => {
 
             {/* Upsell */}
             {upsellProducts.length > 0 && (
-              <div className="pt-3" style={{ borderTop: '1px solid rgba(139,105,20,0.1)' }}>
+              <div className="pt-3" style={{ borderTop: '1px solid rgba(86,86,0,0.1)' }}>
                 <p className="loi-label mb-2">você também pode gostar</p>
                 <div className="flex gap-2">
                   {upsellProducts.map(p => (
@@ -142,7 +142,7 @@ const CartDrawer = () => {
             )}
 
             {/* Subtotal + CTA */}
-            <div className="pt-4 space-y-3" style={{ borderTop: '1px solid rgba(139,105,20,0.1)' }}>
+            <div className="pt-4 space-y-3" style={{ borderTop: '1px solid rgba(86,86,0,0.1)' }}>
               <div className="flex justify-between">
                 <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(41,36,31,0.4)' }}>
                   Subtotal
@@ -168,7 +168,7 @@ const CartDrawer = () => {
 function UpsellCard({ product }: { product: import('@/types').Product }) {
   const { addItem } = useCart();
   return (
-    <div className="flex-1 p-2" style={{ border: '1px solid rgba(139,105,20,0.12)' }}>
+    <div className="flex-1 p-2" style={{ border: '1px solid rgba(86,86,0,0.12)' }}>
       <img
         src={product.images[0]}
         alt={product.name}
@@ -178,7 +178,7 @@ function UpsellCard({ product }: { product: import('@/types').Product }) {
         {product.name}
       </p>
       <div className="flex items-center justify-between mt-1">
-        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: '#8B6914' }}>
+        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: '#565600' }}>
           R$ {product.price}
         </span>
         <button
