@@ -74,21 +74,6 @@ const About = () => {
                   {'\n\n'}
                   Não vendemos velas. Criamos atmosferas.
                 </p>
-                <p
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontWeight: 300,
-                    fontStyle: 'italic',
-                    fontSize: '1.05rem',
-                    color: 'rgba(244,237,210,0.5)',
-                    lineHeight: 1.8,
-                  }}
-                >
-                  Utilizamos exclusivamente cera de soja 100% vegetal, pavios de algodão
-                  sustentável e fragrâncias desenvolvidas em parceria com perfumistas
-                  brasileiros. Nosso compromisso é com a qualidade, a sustentabilidade e
-                  a beleza em cada detalhe.
-                </p>
               </div>
             </div>
 
