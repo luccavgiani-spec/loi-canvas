@@ -26,9 +26,9 @@ const Contact = () => {
               </h2>
               <div className="space-y-5 mb-8">
                 {[
-                  { icon: Mail, text: 'contato@loie.com.br' },
-                  { icon: Phone, text: '(11) 99999-0000' },
-                  { icon: MapPin, text: 'São Paulo, SP — Brasil' },
+                  { icon: Mail, text: 'loie.aromatica@gmail.com' },
+                  { icon: Phone, text: '(11) 99649-7672' },
+                  { icon: MapPin, text: 'Rua Cel. João Leme, 688 — Bragança Paulista, SP 12900-161' },
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-3">
                     <Icon size={16} style={{ color: '#989857' }} />
