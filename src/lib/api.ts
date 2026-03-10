@@ -25,7 +25,10 @@ export const getProducts = (params?: { collection?: string; tag?: string; minPri
   if (params?.maxPrice) query.set('maxPrice', String(params.maxPrice));
   if (params?.sort) query.set('sort', params.sort);
   const qs = query.toString();
-  return fetchApi<Product[]>(`/products${qs ? `?${qs}` : ''}`, undefined, mockProducts);
+  let fallback = mockProducts;
+  if (params?.collection) fallback = fallback.filter(p => p.collection === params.collection);
+  if (params?.tag) fallback = fallback.filter(p => p.tags.includes(params.tag!));
+  return fetchApi<Product[]>(`/products${qs ? `?${qs}` : ''}`, undefined, fallback);
 };
 
 export const getProductBySlug = (slug: string) =>

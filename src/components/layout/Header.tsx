@@ -4,8 +4,10 @@ import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect, useRef } from 'react';
 
 const COLLECTIONS = [
-  { slug: 'Clássicas', label: 'Clássicas', desc: 'Aromas clássicos e atemporais' },
-  { slug: 'Brown', label: 'Brown', desc: 'Fragrâncias intensas e sofisticadas' },
+  { slug: 'cotidianas', label: 'Cotidianas', desc: 'Latinha 160g · dois pavios' },
+  { slug: 'sala-ou-estar', label: 'Sala ou Estar', desc: 'Copo 200g · óleos essenciais puros' },
+  { slug: 'refugio', label: 'Refúgio', desc: 'Copo âmbar 300g · assinatura Loiê' },
+  { slug: 'botanicas-e-florais', label: 'Botânicas e Florais', desc: 'Copo 400g · dois pavios' },
 ];
 
 const Header = () => {
@@ -185,7 +187,7 @@ const Header = () => {
                   {COLLECTIONS.map((col) => (
                     <Link
                       key={col.slug}
-                      to={`/shop?collection=${col.slug}`}
+                      to={`/shop/${col.slug}`}
                       onClick={() => setCollectionsOpen(false)}
                       className="block py-2 group/item"
                       style={{ textDecoration: 'none' }}
@@ -341,7 +343,7 @@ const Header = () => {
             {COLLECTIONS.map((col) => (
               <li key={col.slug}>
                 <Link
-                  to={`/shop?collection=${col.slug}`}
+                  to={`/shop/${col.slug}`}
                   onClick={() => setMobileOpen(false)}
                   className="block py-2 pl-4"
                   style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.1em', fontSize: '0.7rem', color: 'rgba(244,237,210,0.6)', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.04)' }}
