@@ -176,10 +176,12 @@ const ProductFocusBanner = ({
   product,
   reverse = false,
   videoSrc,
+  dark = false,
 }: {
   product: typeof PRODUCTS[0];
   reverse?: boolean;
   videoSrc?: string;
+  dark?: boolean;
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -214,38 +216,38 @@ const ProductFocusBanner = ({
           className="absolute inset-0"
           style={{
             background: reverse
-              ? 'linear-gradient(to left, transparent 60%, #f4edd2)'
-              : 'linear-gradient(to right, transparent 60%, #f4edd2)',
+              ? `linear-gradient(to left, transparent 60%, ${dark ? '#29241f' : '#f4edd2'})`
+              : `linear-gradient(to right, transparent 60%, ${dark ? '#29241f' : '#f4edd2'})`,
           }}
         />
       </div>
-      <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: '#f4edd2' }}>
+      <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: dark ? '#29241f' : '#f4edd2' }}>
         <div className="max-w-md">
-          <span className="loi-label block mb-4">{product.collection}</span>
+          <span className="loi-label block mb-4" style={dark ? { color: 'rgba(244,237,210,0.4)' } : undefined}>{product.collection}</span>
           <h3
             className="heading-display mb-4"
-            style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: '#000', lineHeight: 1.15 }}
+            style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: dark ? '#f4edd2' : '#000', lineHeight: 1.15 }}
           >
             {product.name}
           </h3>
-          <div className="loi-divider mb-6" />
+          <div className="loi-divider mb-6" style={dark ? { background: 'rgba(244,237,210,0.3)' } : undefined} />
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: '1.05rem',
-              color: '#000',
+              color: dark ? 'rgba(244,237,210,0.8)' : '#000',
               lineHeight: 1.8,
               marginBottom: '1.5rem',
             }}
           >
             {product.description}
           </p>
-          <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.85rem', color: '#000', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.85rem', color: dark ? '#f4edd2' : '#000', marginBottom: '1.5rem' }}>
             R$ {product.price.toFixed(2)}
           </p>
-          <Link to={`/product/${product.slug}`} className="loi-btn-outline">
+          <Link to={`/product/${product.slug}`} className={dark ? 'hero-btn-primary' : 'loi-btn-outline'}>
             ver produto
           </Link>
         </div>
@@ -320,28 +322,28 @@ const HomeSections = () => {
 
   return (
     <div ref={ref} style={{ background: '#fcf5e0' }}>
-      {/* ── Degradê de transição hero → bestsellers (dark → dark) ── */}
+      {/* ── Degradê de transição hero → conteúdo ── */}
       <div
         style={{
-          height: 'clamp(60px, 8vw, 100px)',
-          background: '#29241f',
+          height: 'clamp(120px, 18vw, 240px)',
+          background: 'linear-gradient(to bottom, #29241f 0%, #3a3228 15%, #5c5040 30%, #8a7d6a 45%, #b8ad97 58%, #ddd5c0 72%, #efe9d3 85%, #fcf5e0 100%)',
         }}
       />
 
-      {/* ── 1. Bestsellers — Carousel (dark theme) ── */}
-      <section className="py-16 px-6 md:py-0" style={{ background: '#29241f' }}>
+      {/* ── 1. Bestsellers — Carousel ── */}
+      <section className="py-16 px-6 md:py-0">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4" style={{ color: 'rgba(244,237,210,0.4)' }}>mais amados</span>
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#f4edd2' }}>
+            <span className="reveal loi-label block mb-4">mais amados</span>
+            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
               Bestsellers
             </h2>
           </div>
-          <div className="reveal bestsellers-dark">
-            <ProductCarousel products={SALA_OU_ESTAR} addItem={addItem} dark />
+          <div className="reveal">
+            <ProductCarousel products={SALA_OU_ESTAR} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/shop/sala-ou-estar" className="loi-ghost group" style={{ color: 'rgba(244,237,210,0.5)' }}>
+            <Link to="/shop/sala-ou-estar" className="loi-ghost group">
               <span>ver toda a coleção</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -350,21 +352,31 @@ const HomeSections = () => {
         </div>
       </section>
 
-      {/* ── Degradê de transição bestsellers (dark) → conteúdo (cream) ── */}
+      {/* ── Degradê cream → dark (transição para produtos em destaque) ── */}
+      <div
+        style={{
+          height: 'clamp(120px, 18vw, 240px)',
+          background: 'linear-gradient(to bottom, #fcf5e0 0%, #efe9d3 15%, #ddd5c0 28%, #b8ad97 42%, #8a7d6a 55%, #5c5040 70%, #3a3228 85%, #29241f 100%)',
+        }}
+      />
+
+      {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) — DARK THEME ── */}
+      <section style={{ background: '#29241f' }}>
+        <div className="relative">
+          <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
+        </div>
+        <div className="relative">
+          <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} dark />
+        </div>
+      </section>
+
+      {/* ── Degradê dark → cream (transição para Descubra Novos Aromas) ── */}
       <div
         style={{
           height: 'clamp(120px, 18vw, 240px)',
           background: 'linear-gradient(to bottom, #29241f 0%, #3a3228 15%, #5c5040 30%, #8a7d6a 45%, #b8ad97 58%, #ddd5c0 72%, #efe9d3 85%, #fcf5e0 100%)',
         }}
       />
-
-      {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) ── */}
-      <section className="relative">
-        <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} />
-      </section>
-      <section className="relative">
-        <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} />
-      </section>
 
       {/* ── 3. Descubra Novos Aromas — Carousel ── */}
       <section className="py-16 md:py-20 px-6">
