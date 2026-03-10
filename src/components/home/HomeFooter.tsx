@@ -10,6 +10,9 @@ const HomeFooter = () => {
             <img
               src="/hero/LOGO_BRANCA_t.png"
               alt="Loiê"
+              width={110}
+              height={32}
+              loading="lazy"
               className="h-8 w-auto mb-6"
               style={{ opacity: 0.8 }}
             />
@@ -145,8 +148,8 @@ const HomeFooter = () => {
               transition: '550ms cubic-bezier(0.4,0,0.2,1)',
             }}
           />
-          <img src="/hero/SIMBOLO_t.png" alt="" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0.2, transition: '550ms cubic-bezier(0.4,0,0.2,1)' }} />
-          <img src="/hero/SIMBOLO_2_t.png" alt="" className="absolute inset-0 w-full h-full object-contain pointer-events-none" style={{ opacity: 0, transition: '550ms cubic-bezier(0.4,0,0.2,1)' }} />
+          <img src="/hero/SIMBOLO_t.png" alt="" width={40} height={40} loading="lazy" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0.2, transition: '550ms cubic-bezier(0.4,0,0.2,1)' }} />
+          <img src="/hero/SIMBOLO_2_t.png" alt="" width={40} height={40} loading="lazy" className="absolute inset-0 w-full h-full object-contain pointer-events-none" style={{ opacity: 0, transition: '550ms cubic-bezier(0.4,0,0.2,1)' }} />
           <div
             className="absolute inset-0"
             onMouseEnter={(e) => {

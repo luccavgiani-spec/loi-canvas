@@ -213,6 +213,7 @@ const CollabCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
               playsInline
               autoPlay
               loop
+              preload="none"
               className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
               style={{ opacity: currentImage === i ? 1 : 0 }}
             />

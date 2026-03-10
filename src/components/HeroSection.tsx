@@ -196,7 +196,7 @@ const HeroSection = () => {
           src={v.src}
           muted
           playsInline
-          preload="auto"
+          preload={i === 0 ? 'auto' : 'metadata'}
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: 0, transition: 'none' }}
         />
@@ -370,6 +370,8 @@ const HeroSection = () => {
           <img
             src="/hero/SIMBOLO_t.png"
             alt=""
+            width={120}
+            height={120}
             className="absolute inset-0 w-full h-full object-contain"
             style={{
               opacity: 1,
@@ -379,6 +381,9 @@ const HeroSection = () => {
           <img
             src="/hero/SIMBOLO_2_t.png"
             alt=""
+            width={120}
+            height={120}
+            loading="lazy"
             className="absolute inset-0 w-full h-full object-contain pointer-events-none"
             style={{
               opacity: 0,
