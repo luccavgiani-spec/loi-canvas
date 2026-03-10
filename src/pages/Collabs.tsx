@@ -91,7 +91,7 @@ const CollabDetailCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             fontWeight: 300,
             fontStyle: 'italic',
             fontSize: '1.05rem',
-            color: 'rgba(41,36,31,0.55)',
+            color: '#29241f',
             lineHeight: 1.8,
           }}
         >
@@ -128,7 +128,7 @@ const Collabs = () => {
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: '1.1rem',
-                color: 'rgba(41,36,31,0.5)',
+                color: '#29241f',
                 maxWidth: 500,
                 margin: '1rem auto 0',
               }}

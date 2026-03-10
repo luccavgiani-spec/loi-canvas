@@ -62,7 +62,7 @@ const About = () => {
                     fontWeight: 300,
                     fontStyle: 'italic',
                     fontSize: '1.05rem',
-                    color: 'rgba(41,36,31,0.55)',
+                    color: '#29241f',
                     lineHeight: 1.8,
                     marginBottom: '1rem',
                   }}
@@ -103,7 +103,7 @@ const About = () => {
                       fontFamily: "'Montserrat', sans-serif",
                       fontWeight: 300,
                       fontSize: '0.75rem',
-                      color: 'rgba(41,36,31,0.45)',
+                      color: '#29241f',
                       letterSpacing: '0.15em',
                       textTransform: 'uppercase',
                     }}
@@ -130,7 +130,7 @@ const About = () => {
                   fontWeight: 300,
                   fontStyle: 'italic',
                   fontSize: '1.05rem',
-                  color: 'rgba(41,36,31,0.5)',
+                  color: '#29241f',
                   lineHeight: 1.8,
                 }}
               >

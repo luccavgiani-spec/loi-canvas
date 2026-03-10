@@ -37,7 +37,7 @@ const Contact = () => {
                         fontFamily: "'Montserrat', sans-serif",
                         fontWeight: 300,
                         fontSize: '0.85rem',
-                        color: 'rgba(41,36,31,0.55)',
+                        color: '#29241f',
                       }}
                     >
                       {text}
@@ -51,7 +51,7 @@ const Contact = () => {
                   fontWeight: 300,
                   fontStyle: 'italic',
                   fontSize: '1rem',
-                  color: 'rgba(41,36,31,0.45)',
+                  color: '#29241f',
                   lineHeight: 1.7,
                 }}
               >
