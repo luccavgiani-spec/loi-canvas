@@ -193,33 +193,35 @@ const ProductFocusBanner = ({
 
   return (
     <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
-      <div className="md:w-1/2 relative overflow-hidden" style={{ minHeight: 350 }}>
-        {videoSrc ? (
-          <video
-            ref={videoRef}
-            src={videoSrc}
-            muted
-            playsInline
-            loop
-            preload="auto"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
-        )}
+      <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#29241f' : '#f4edd2' }}>
         <div
-          className="absolute inset-0"
+          className="relative overflow-hidden w-[92%] md:w-[85%] my-8 md:my-12"
           style={{
-            background: reverse
-              ? `linear-gradient(to left, transparent 60%, ${dark ? '#29241f' : '#f4edd2'})`
-              : `linear-gradient(to right, transparent 60%, ${dark ? '#29241f' : '#f4edd2'})`,
+            aspectRatio: '4 / 3',
+            transform: reverse ? 'rotate(-0.8deg)' : 'rotate(0.8deg)',
+            boxShadow: '0 8px 40px rgba(0,0,0,0.35), 0 2px 12px rgba(0,0,0,0.2)',
+            border: `1px solid ${dark ? 'rgba(244,237,210,0.08)' : 'rgba(0,0,0,0.06)'}`,
           }}
-        />
+        >
+          {videoSrc ? (
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              muted
+              playsInline
+              loop
+              preload="auto"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <img
+              src={product.images[0]}
+              alt={product.name}
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+            />
+          )}
+        </div>
       </div>
       <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: dark ? '#29241f' : '#f4edd2' }}>
         <div className="max-w-md">
