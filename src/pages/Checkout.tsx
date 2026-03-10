@@ -19,7 +19,7 @@ const inputStyle = {
   padding: '10px 14px',
   background: 'transparent',
   border: '1px solid rgba(86,86,0,0.2)',
-  color: '#29241f',
+  color: '#000',
   fontFamily: "'Montserrat', sans-serif",
   fontWeight: 300 as const,
   fontSize: '0.85rem',
@@ -80,15 +80,15 @@ const Checkout = () => {
       <div className="max-w-4xl mx-auto px-6 py-10 md:py-16">
         <div className="text-center mb-12">
           <span className="loi-label block mb-4">finalizar</span>
-          <h1 className="heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#29241f' }}>
+          <h1 className="heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
             Checkout
           </h1>
         </div>
 
         {state === 'success' ? (
           <div className="text-center py-16">
-            <CheckCircle size={48} className="mx-auto mb-4" style={{ color: '#565600' }} />
-            <h2 className="heading-display mb-3" style={{ fontSize: '2rem', color: '#29241f' }}>
+            <CheckCircle size={48} className="mx-auto mb-4" style={{ color: '#000' }} />
+            <h2 className="heading-display mb-3" style={{ fontSize: '2rem', color: '#000' }}>
               Pedido Confirmado!
             </h2>
             <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', color: 'rgba(41,36,31,0.45)' }}>
@@ -100,7 +100,7 @@ const Checkout = () => {
             {/* Form */}
             <div className="md:col-span-3 space-y-6">
               <div>
-                <h2 className="heading-display mb-6" style={{ fontSize: '1.4rem', color: '#29241f' }}>
+                <h2 className="heading-display mb-6" style={{ fontSize: '1.4rem', color: '#000' }}>
                   Seus dados
                 </h2>
                 <div className="space-y-4">
@@ -158,20 +158,20 @@ const Checkout = () => {
             {/* Order summary */}
             <div className="md:col-span-2">
               <div className="p-6 sticky top-24" style={{ border: '1px solid rgba(86,86,0,0.12)', background: 'rgba(41,36,31,0.02)' }}>
-                <h3 className="heading-display mb-6" style={{ fontSize: '1.2rem', color: '#29241f' }}>Resumo</h3>
+                <h3 className="heading-display mb-6" style={{ fontSize: '1.2rem', color: '#000' }}>Resumo</h3>
                 <div className="space-y-3 mb-4">
                   {items.map((item) => (
                     <div key={item.product.id} className="flex gap-3">
                       <img src={item.product.images[0]} alt={item.product.name} className="w-12 h-12 object-cover" style={{ filter: 'saturate(0.7) brightness(0.8)' }} />
                       <div className="flex-1 min-w-0">
-                        <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.9rem', color: '#29241f' }} className="truncate">
+                        <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.9rem', color: '#000' }} className="truncate">
                           {item.product.name}
                         </p>
                         <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(41,36,31,0.35)' }}>
                           Qtd: {item.quantity}
                         </p>
                       </div>
-                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#29241f' }}>
+                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
                         R$ {(item.product.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
@@ -180,15 +180,15 @@ const Checkout = () => {
                 <div className="pt-3 space-y-2" style={{ borderTop: '1px solid rgba(86,86,0,0.1)' }}>
                   <div className="flex justify-between">
                     <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(41,36,31,0.45)' }}>Subtotal</span>
-                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#29241f' }}>R$ {subtotal.toFixed(2)}</span>
+                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>R$ {subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(41,36,31,0.45)' }}>Frete</span>
-                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#29241f' }}>{shipping === 0 ? 'Grátis' : `R$ ${shipping.toFixed(2)}`}</span>
+                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>{shipping === 0 ? 'Grátis' : `R$ ${shipping.toFixed(2)}`}</span>
                   </div>
                   <div className="flex justify-between pt-2" style={{ borderTop: '1px solid rgba(86,86,0,0.1)' }}>
-                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.9rem', color: '#29241f' }}>Total</span>
-                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 400, fontSize: '1rem', color: '#565600' }}>R$ {total.toFixed(2)}</span>
+                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.9rem', color: '#000' }}>Total</span>
+                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 400, fontSize: '1rem', color: '#000' }}>R$ {total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

@@ -67,7 +67,7 @@ const CollabDetailCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
         <span className="loi-label block mb-4">collab</span>
         <h2
           className="heading-display mb-4"
-          style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: '#29241f', lineHeight: 1.15 }}
+          style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: '#000', lineHeight: 1.15 }}
         >
           {collab.name}
         </h2>
@@ -77,7 +77,7 @@ const CollabDetailCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             fontFamily: "'Montserrat', sans-serif",
             fontWeight: 300,
             fontSize: '0.72rem',
-            color: '#565600',
+            color: '#000',
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
             marginBottom: '1rem',
@@ -91,7 +91,7 @@ const CollabDetailCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             fontWeight: 300,
             fontStyle: 'italic',
             fontSize: '1.05rem',
-            color: '#29241f',
+            color: '#000',
             lineHeight: 1.8,
           }}
         >
@@ -117,7 +117,7 @@ const Collabs = () => {
             <span className="reveal loi-label block mb-4">parcerias</span>
             <h1
               className="reveal heading-display"
-              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#29241f' }}
+              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#000' }}
             >
               Collabs
             </h1>
@@ -128,7 +128,7 @@ const Collabs = () => {
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: '1.1rem',
-                color: '#29241f',
+                color: '#000',
                 maxWidth: 500,
                 margin: '1rem auto 0',
               }}

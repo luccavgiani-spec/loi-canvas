@@ -28,7 +28,7 @@ const Policies = () => {
             <span className="loi-label block mb-4">informações</span>
             <h1
               className="heading-display"
-              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#29241f' }}
+              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#000' }}
             >
               Políticas
             </h1>
@@ -38,7 +38,7 @@ const Policies = () => {
               <div key={s.title}>
                 <h2
                   className="heading-display mb-4"
-                  style={{ fontSize: '1.6rem', color: '#29241f' }}
+                  style={{ fontSize: '1.6rem', color: '#000' }}
                 >
                   {s.title}
                 </h2>

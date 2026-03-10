@@ -116,7 +116,7 @@ const About = () => {
                 <span className="loi-label block mb-4">origem</span>
                 <h2
                   className="heading-display mb-6"
-                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#29241f', lineHeight: 1.15 }}
+                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#000', lineHeight: 1.15 }}
                 >
                   Manifesto
                 </h2>
@@ -127,7 +127,7 @@ const About = () => {
                     fontWeight: 300,
                     fontStyle: 'italic',
                     fontSize: '1.05rem',
-                    color: '#29241f',
+                    color: '#000',
                     lineHeight: 1.8,
                     marginBottom: '1rem',
                   }}
@@ -159,7 +159,7 @@ const About = () => {
                 >
                   <p
                     className="heading-display mb-2"
-                    style={{ fontSize: '2.5rem', color: '#565600' }}
+                    style={{ fontSize: '2.5rem', color: '#000' }}
                   >
                     {stat.num}
                   </p>
@@ -168,7 +168,7 @@ const About = () => {
                       fontFamily: "'Montserrat', sans-serif",
                       fontWeight: 300,
                       fontSize: '0.75rem',
-                      color: '#29241f',
+                      color: '#000',
                       letterSpacing: '0.15em',
                       textTransform: 'uppercase',
                     }}
@@ -186,10 +186,10 @@ const About = () => {
                 <span className="loi-label block mb-6">manifesto</span>
                 <h2
                   className="heading-display mb-8"
-                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#29241f', lineHeight: 1.2, textAlign: 'left' }}
+                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#000', lineHeight: 1.2, textAlign: 'left' }}
                 >
                   A Loiê Sala Aromática é esse gesto poético, mas também é um ateliê real
-                  <em style={{ color: '#565600' }}>— feito de tempo, matéria, escolhas e presença</em>
+                  <em style={{ color: '#000' }}>— feito de tempo, matéria, escolhas e presença</em>
                 </h2>
                 <p
                   style={{
@@ -197,7 +197,7 @@ const About = () => {
                     fontWeight: 300,
                     fontStyle: 'italic',
                     fontSize: '1.05rem',
-                    color: '#29241f',
+                    color: '#000',
                     lineHeight: 1.8,
                     textAlign: 'left',
                   }}
