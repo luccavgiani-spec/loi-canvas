@@ -3,6 +3,7 @@ import HeroSection from '@/components/HeroSection';
 import HomeSections from '@/components/home/HomeSections';
 import HomeFooter from '@/components/home/HomeFooter';
 import CartDrawer from '@/components/layout/CartDrawer';
+import Header from '@/components/layout/Header';
 
 const HERO_VIDEOS = [
   '/hero/escritorio_cadeira__1_.mp4',
@@ -125,6 +126,7 @@ const Index = () => {
 
   return (
     <>
+      <Header />
       <CartDrawer />
       <HeroSection />
       <HomeSections />
