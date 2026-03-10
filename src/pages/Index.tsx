@@ -4,6 +4,7 @@ import HomeSections from '@/components/home/HomeSections';
 import HomeFooter from '@/components/home/HomeFooter';
 import CartDrawer from '@/components/layout/CartDrawer';
 import Header from '@/components/layout/Header';
+import { mockProducts } from '@/lib/mocks';
 
 const HERO_VIDEOS = [
   '/hero/escritorio_cadeira__1_.mp4',
@@ -13,15 +14,29 @@ const HERO_VIDEOS = [
   '/hero/Cartao_Postal_Loie_8.mp4',
 ];
 
+/* Collect all unique product images used on the homepage */
+const PRODUCT_IMAGES = Array.from(
+  new Set(mockProducts.flatMap((p) => p.images)),
+);
+
 const Index = () => {
-  const [videosReady, setVideosReady] = useState(false);
+  const [assetsReady, setAssetsReady] = useState(false);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     let mounted = true;
     let loaded = 0;
+    const totalAssets = HERO_VIDEOS.length + PRODUCT_IMAGES.length;
 
-    const promises = HERO_VIDEOS.map(
+    const tick = () => {
+      loaded++;
+      if (mounted) {
+        setProgress(Math.round((loaded / totalAssets) * 100));
+      }
+    };
+
+    /* ── Preload videos ── */
+    const videoPromises = HERO_VIDEOS.map(
       (src) =>
         new Promise<void>((resolve) => {
           const video = document.createElement('video');
@@ -29,31 +44,52 @@ const Index = () => {
           video.muted = true;
           video.playsInline = true;
 
+          let resolved = false;
           const onReady = () => {
-            loaded++;
-            if (mounted) {
-              setProgress(Math.round((loaded / HERO_VIDEOS.length) * 100));
-            }
+            if (resolved) return;
+            resolved = true;
+            tick();
             resolve();
           };
 
+          // Use 'loadeddata' instead of 'canplaythrough' — mobile browsers
+          // often refuse to buffer enough data for canplaythrough to fire,
+          // especially when preload="auto" is downgraded to "metadata".
+          video.addEventListener('loadeddata', onReady, { once: true });
           video.addEventListener('canplaythrough', onReady, { once: true });
 
-          // fallback: if loadedmetadata fires but canplaythrough doesn't within 8s
-          const timeout = setTimeout(() => {
-            video.removeEventListener('canplaythrough', onReady);
-            onReady();
-          }, 8000);
-
-          video.addEventListener('canplaythrough', () => clearTimeout(timeout), { once: true });
+          // Shorter fallback timeout (3s) — videos are small after compression
+          const timeout = setTimeout(onReady, 3000);
+          video.addEventListener('loadeddata', () => clearTimeout(timeout), { once: true });
 
           video.src = src;
           video.load();
         }),
     );
 
-    Promise.all(promises).then(() => {
-      if (mounted) setVideosReady(true);
+    /* ── Preload product images ── */
+    const imagePromises = PRODUCT_IMAGES.map(
+      (src) =>
+        new Promise<void>((resolve) => {
+          const img = new Image();
+          let resolved = false;
+          const onReady = () => {
+            if (resolved) return;
+            resolved = true;
+            tick();
+            resolve();
+          };
+          img.onload = onReady;
+          img.onerror = onReady; // don't block on broken images
+          // Fallback timeout for images too
+          const timeout = setTimeout(onReady, 4000);
+          img.onload = () => { clearTimeout(timeout); onReady(); };
+          img.src = src;
+        }),
+    );
+
+    Promise.all([...videoPromises, ...imagePromises]).then(() => {
+      if (mounted) setAssetsReady(true);
     });
 
     return () => {
@@ -61,7 +97,7 @@ const Index = () => {
     };
   }, []);
 
-  if (!videosReady) {
+  if (!assetsReady) {
     return (
       <div
         className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
