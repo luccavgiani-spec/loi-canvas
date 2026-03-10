@@ -44,7 +44,7 @@ const CollectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState('default');
   const { addItem } = useCart();
-  const ref = useReveal();
+  const ref = useReveal(0.15, [loading]);
 
   const collection = mockCollections.find(c => c.slug === slug);
 
