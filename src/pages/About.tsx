@@ -2,7 +2,10 @@ import Layout from '@/components/layout/Layout';
 import { storageUrl } from '@/lib/storage';
 
 const banner01 = storageUrl('loie_vela_campos_imagem.JPG');
-const videoSobre = storageUrl('video_sobre (1).mp4');
+const heroVideo = storageUrl('Cartao_Postal_Loie.mp4');
+
+/* grain SVG (same as home hero) */
+const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -12,16 +15,38 @@ const About = () => {
   return (
     <Layout>
       <div ref={ref}>
-        {/* Hero banner */}
-        <section className="relative w-full" style={{ height: 'clamp(350px, 60vh, 720px)' }}>
+        {/* Hero banner — same visual language as home hero */}
+        <section className="relative w-full overflow-hidden" style={{ height: 'clamp(350px, 60vh, 720px)', background: '#29241f' }}>
+          {/* video */}
           <video
-            src={videoSobre}
+            src={heroVideo}
             autoPlay
             muted
             loop
             playsInline
+            preload="auto"
             className="absolute inset-0 w-full h-full object-cover"
+            style={{ filter: 'saturate(0.65) brightness(0.60) contrast(1.05)' }}
           />
+
+          {/* overlay (radial vignette + top/bottom gradient — matches home hero) */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.60) 100%),
+                linear-gradient(to bottom, rgba(41,36,31,0.62) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 72%, rgba(41,36,31,0.72) 100%)
+              `,
+            }}
+          />
+
+          {/* grain */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ opacity: 0.04, backgroundImage: GRAIN_SVG, backgroundSize: '200px 200px' }}
+          />
+
+          {/* content */}
           <div className="relative z-[1] flex items-end justify-center h-full px-6 pb-12 md:pb-16">
             <div className="text-center">
               <span className="loi-label block mb-4">sobre a loiê</span>
