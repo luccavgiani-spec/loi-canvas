@@ -60,12 +60,25 @@ const ProductDetail = () => {
           {/* Gallery */}
           <div>
             <div className="aspect-square overflow-hidden mb-3">
-              <img
-                src={product.images[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-                style={{ filter: 'saturate(0.85) brightness(0.9)' }}
-              />
+              {product.images[selectedImage]?.match(/\.mp4$/i) ? (
+                <video
+                  key={selectedImage}
+                  src={product.images[selectedImage]}
+                  muted
+                  playsInline
+                  autoPlay
+                  loop
+                  className="w-full h-full object-cover"
+                  style={{ filter: 'saturate(0.85) brightness(0.9)' }}
+                />
+              ) : (
+                <img
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                  style={{ filter: 'saturate(0.85) brightness(0.9)' }}
+                />
+              )}
             </div>
             {product.images.length > 1 && (
               <div className="flex gap-2">
@@ -79,12 +92,22 @@ const ProductDetail = () => {
                       opacity: i === selectedImage ? 1 : 0.5,
                     }}
                   >
-                    <img
-                      src={img}
-                      alt=""
-                      className="w-full h-full object-cover"
-                      style={{ filter: 'saturate(0.7) brightness(0.8)' }}
-                    />
+                    {img.match(/\.mp4$/i) ? (
+                      <video
+                        src={img}
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover"
+                        style={{ filter: 'saturate(0.7) brightness(0.8)' }}
+                      />
+                    ) : (
+                      <img
+                        src={img}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        style={{ filter: 'saturate(0.7) brightness(0.8)' }}
+                      />
+                    )}
                   </button>
                 ))}
               </div>
@@ -301,13 +324,25 @@ const ProductDetail = () => {
               {related.map((p) => (
                 <div key={p.id} className="group">
                   <Link to={`/product/${p.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
-                    <img
-                      src={p.images[0]}
-                      alt={p.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      style={{ filter: 'saturate(0.85) brightness(0.9)' }}
-                      loading="lazy"
-                    />
+                    {p.images[0]?.match(/\.mp4$/i) ? (
+                      <video
+                        src={p.images[0]}
+                        muted
+                        playsInline
+                        autoPlay
+                        loop
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        style={{ filter: 'saturate(0.85) brightness(0.9)' }}
+                      />
+                    ) : (
+                      <img
+                        src={p.images[0]}
+                        alt={p.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        style={{ filter: 'saturate(0.85) brightness(0.9)' }}
+                        loading="lazy"
+                      />
+                    )}
                   </Link>
                   <Link to={`/product/${p.slug}`}>
                     <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1rem', color: '#29241f', marginBottom: 4 }}>
