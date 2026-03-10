@@ -7,7 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { useReveal } from '@/hooks/useReveal';
 
-const collections = ['Todas', 'Cítricos', 'Amadeirados', 'Herbais', 'Orientais', 'Gourmand'];
+const collections = ['Todas', 'Clássicas', 'Brown'];
 const sortOptions = [
   { value: 'bestsellers', label: 'Mais vendidos' },
   { value: 'newest', label: 'Novidades' },

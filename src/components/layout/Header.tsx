@@ -4,11 +4,8 @@ import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect, useRef } from 'react';
 
 const COLLECTIONS = [
-  { slug: 'Cítricos', label: 'Cítricos', desc: 'Notas frescas e vibrantes' },
-  { slug: 'Amadeirados', label: 'Amadeirados', desc: 'Aromas quentes e profundos' },
-  { slug: 'Herbais', label: 'Herbais', desc: 'Essências verdes e aromáticas' },
-  { slug: 'Orientais', label: 'Orientais', desc: 'Fragrâncias ricas e envolventes' },
-  { slug: 'Gourmand', label: 'Gourmand', desc: 'Notas doces e aconchegantes' },
+  { slug: 'Clássicas', label: 'Clássicas', desc: 'Aromas clássicos e atemporais' },
+  { slug: 'Brown', label: 'Brown', desc: 'Fragrâncias intensas e sofisticadas' },
 ];
 
 const Header = () => {
@@ -67,9 +64,10 @@ const Header = () => {
     setTrackingOpen(false);
   };
 
-  // Both scrolled (home) and non-home pages use dark navbar
-  const linkClass = scrolled ? 'loi-nav-link' : 'hero-nav-link';
-  const iconColor = scrolled ? '#fcf5e0' : 'rgba(244,237,210,0.5)';
+  // Non-home pages always use dark navbar; home uses dark only after scrolling past hero
+  const showDark = !isHome || scrolled;
+  const linkClass = showDark ? 'loi-nav-link' : 'hero-nav-link';
+  const iconColor = showDark ? '#fcf5e0' : 'rgba(244,237,210,0.5)';
   const iconHoverColor = '#f4edd2';
   const activeLinkColor = '#f4edd2';
 
@@ -117,9 +115,9 @@ const Header = () => {
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
       style={{
-        background: scrolled ? 'rgba(41,36,31,0.95)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(244,237,210,0.08)' : '1px solid transparent',
+        background: showDark ? 'rgba(41,36,31,0.95)' : 'transparent',
+        backdropFilter: showDark ? 'blur(12px)' : 'none',
+        borderBottom: showDark ? '1px solid rgba(244,237,210,0.08)' : '1px solid transparent',
       }}
     >
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-6 md:px-10" style={{ height: '5rem' }}>
