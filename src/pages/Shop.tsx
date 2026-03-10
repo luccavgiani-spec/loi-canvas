@@ -9,12 +9,6 @@ import { useCart } from '@/contexts/CartContext';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { storageUrl } from '@/lib/storage';
 
-const collectionMeta: Record<string, {numeral: string;detail: string;priceLabel: string;}> = {
-  'Cotidianas': { numeral: 'I', detail: 'Latinha 160g · dois pavios', priceLabel: 'a partir de R$ 72' },
-  'Sala ou Estar': { numeral: 'II', detail: 'Copo 200g transparente · um pavio', priceLabel: 'a partir de R$ 172' },
-  'Refúgio': { numeral: 'III', detail: 'Copo âmbar 300g · um pavio', priceLabel: 'a partir de R$ 260' },
-  'Botânicas e Florais': { numeral: 'IV', detail: 'Copo 400g · dois pavios', priceLabel: 'a partir de R$ 332' }
-};
 
 /* ── Horizontal carousel with snap scrolling ── */
 const ProductCarousel = ({
@@ -290,7 +284,6 @@ const Shop = () => {
 
         {/* Collection sections */}
         {collections.map((col, idx) => {
-          const meta = collectionMeta[col.name];
           const colProducts = getCollectionProducts(col.name);
           const isEven = idx % 2 === 0;
 
@@ -317,7 +310,7 @@ const Shop = () => {
                         marginBottom: 8
                       }}>
                       
-                      {meta?.numeral}
+                      {col.numeral}
                     </span>
                     <h2
                       className="heading-display"
@@ -354,7 +347,7 @@ const Shop = () => {
                         color: 'rgba(0,0,0,0.4)'
                       }}>
                       
-                      {meta?.detail}
+                      {col.detail}
                     </span>
                     <span
                       style={{
@@ -365,7 +358,7 @@ const Shop = () => {
                         color: '#000'
                       }}>
                       
-                      {meta?.priceLabel}
+                      {col.price_label}
                     </span>
                   </div>
                 </div>

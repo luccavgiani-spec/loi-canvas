@@ -4,40 +4,10 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
-import { storageUrl } from '@/lib/storage';
+import { getAdminCollabs } from '@/lib/api';
+import type { Collab } from '@/types';
 
-const COLLAB_ITEMS = [
-  {
-    name: 'Ateliê Cerâmica',
-    slug: 'atelie-ceramica',
-    images: [storageUrl('loie_vela_bosque_compress (1).mp4'), storageUrl('loie_vela_pomar.mp4')],
-    caption: 'Vasos artesanais × Loiê',
-    description: 'Uma colaboração que une a tradição da cerâmica artesanal com as fragrâncias da Loiê. Cada peça é feita à mão e carrega a essência de ambos os ateliês.',
-  },
-  {
-    name: 'Estúdio Botânico',
-    slug: 'estudio-botanico',
-    images: [storageUrl('Cartao_Postal_Loie.mp4'), storageUrl('loie_vela_estela (1).mp4')],
-    caption: 'Arranjos vivos × fragrâncias',
-    description: 'Plantas, flores e aromas se encontram nesta collab que celebra a natureza em sua forma mais pura. Cada arranjo é pensado para complementar nossas velas.',
-  },
-  {
-    name: 'Casa de Chá',
-    slug: 'casa-de-cha',
-    images: [storageUrl('escritorio_cadeira__1_.mp4'), storageUrl('loie_vela_bosque_compress (1).mp4')],
-    caption: 'Rituais de chá × velas',
-    description: 'Dois rituais que se complementam: o chá e a vela. Uma experiência sensorial completa, criada para momentos de pausa e contemplação.',
-  },
-  {
-    name: 'Galeria Têxtil',
-    slug: 'galeria-textil',
-    images: [storageUrl('loie_vela_estela (1).mp4'), storageUrl('Cartao_Postal_Loie.mp4')],
-    caption: 'Tecidos naturais × aromas',
-    description: 'Linho, algodão orgânico e fragrâncias exclusivas. Uma collab que transforma ambientes com texturas e aromas que contam histórias.',
-  },
-];
-
-const CollabDetailCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
+const CollabDetailCard = ({ collab }: { collab: Collab }) => {
   const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
@@ -106,6 +76,11 @@ const Collabs = () => {
   const ref = useReveal();
   const [searchParams] = useSearchParams();
   const highlightedCollab = searchParams.get('collab');
+  const [collabs, setCollabs] = useState<Collab[]>([]);
+
+  useEffect(() => {
+    getAdminCollabs().then(items => setCollabs(items.filter(c => c.is_active)));
+  }, []);
 
   return (
     <>
@@ -138,7 +113,7 @@ const Collabs = () => {
           </div>
 
           <div className="space-y-20">
-            {COLLAB_ITEMS.map((collab) => (
+            {collabs.map((collab) => (
               <div
                 key={collab.slug}
                 id={collab.slug}

@@ -96,6 +96,16 @@ export const getAdminNewsletter = () =>
 export const getAdminCoupons = () =>
   fetchApi<Coupon[]>('/admin/coupons', undefined, mockCoupons);
 
+// Coupons
+export const createAdminCoupon = (data: Partial<Coupon>) =>
+  fetchApi<Coupon>('/admin/coupons', { method: 'POST', body: JSON.stringify(data) });
+
+export const updateAdminCoupon = (id: string, data: Partial<Coupon>) =>
+  fetchApi<Coupon>(`/admin/coupons/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+
+export const deleteAdminCoupon = (id: string) =>
+  fetchApi<void>(`/admin/coupons/${id}`, { method: 'DELETE' });
+
 // Collections
 export const getAdminCollections = () =>
   fetchApi<Collection[]>('/admin/collections', undefined, mockCollections);

@@ -110,6 +110,7 @@ export interface Coupon {
   discount_percent: number;
   is_active: boolean;
   uses: number;
+  max_uses?: number;
   created_at: string;
 }
 
@@ -119,6 +120,10 @@ export interface Collection {
   name: string;
   description?: string;
   cover_image?: string;
+  numeral?: string;
+  detail?: string;
+  story?: string;
+  price_label?: string;
   is_active: boolean;
   sort_order: number;
   created_at: string;
