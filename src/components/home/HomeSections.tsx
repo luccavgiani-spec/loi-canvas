@@ -6,8 +6,8 @@ import { storageUrl } from '@/lib/storage';
 import { useState, useEffect, useRef } from 'react';
 
 const PRODUCTS = mockProducts;
-const CLASSICAS = PRODUCTS.filter((p) => p.collection === 'Clássicas').slice(0, 6);
-const BROWN = PRODUCTS.filter((p) => p.collection === 'Brown').slice(0, 4);
+const SALA_OU_ESTAR = PRODUCTS.filter((p) => p.collection === 'Sala ou Estar').slice(0, 6);
+const REFUGIO = PRODUCTS.filter((p) => p.collection === 'Refúgio').slice(0, 4);
 
 /* ── Reusable product card (light theme) ── */
 const ProductCard = ({ product, addItem }: {product: typeof PRODUCTS[0];addItem: (p: typeof PRODUCTS[0]) => void;}) =>
@@ -332,12 +332,12 @@ const HomeSections = () => {
             </h2>
           </div>
           <div className="reveal-stagger grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-            {CLASSICAS.map((product) =>
+            {SALA_OU_ESTAR.map((product) =>
             <ProductCard key={product.id} product={product} addItem={addItem} />
             )}
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/shop" className="loi-ghost group">
+            <Link to="/shop/sala-ou-estar" className="loi-ghost group">
               <span>ver toda a coleção</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -354,25 +354,25 @@ const HomeSections = () => {
         <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} />
       </section>
 
-      {/* ── 3. Coleção Brown — Descubra Novos Aromas ── */}
+      {/* ── 3. Coleção Refúgio — Descubra Novos Aromas ── */}
       <section className="py-16 md:py-20 px-6">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            
+
             <h2
               className="reveal heading-display"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#29241f' }}>
-              
+
               Descubra Novos Aromas
             </h2>
           </div>
           <div className="reveal-stagger grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-            {BROWN.map((product) =>
+            {REFUGIO.map((product) =>
             <ProductCard key={product.id} product={product} addItem={addItem} />
             )}
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/shop" className="loi-ghost group">
+            <Link to="/shop/refugio" className="loi-ghost group">
               <span>ver toda a coleção</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -426,7 +426,7 @@ const HomeSections = () => {
             { q: 'As velas são veganas e cruelty-free?', a: 'Sim! Utilizamos cera de soja 100% vegetal, pavios de algodão e fragrâncias livres de testes em animais. Nosso compromisso com a sustentabilidade é total.' },
             { q: 'Como funciona o frete?', a: 'Frete grátis para compras acima de R$ 299. Para pedidos menores, calculamos o frete no checkout com as melhores opções de envio para a sua região.' },
             { q: 'Posso trocar ou devolver?', a: 'Aceitamos trocas e devoluções em até 7 dias após o recebimento, desde que o produto não tenha sido usado. Sua satisfação é nossa prioridade.' },
-            { q: 'Qual a diferença entre as coleções?', a: 'Cada coleção agrupa fragrâncias por família olfativa: Cítricos (frescos e vibrantes), Amadeirados (quentes e envolventes), Herbais (aromáticos e verdes), Orientais (intensos e sofisticados) e Gourmand (doces e aconchegantes).' }].
+            { q: 'Qual a diferença entre as coleções?', a: 'Temos quatro coleções: Cotidianas (latinhas 160g, aromas básicos perfeitos como lembrança), Sala ou Estar (copo 200g, criações autorais com óleos essenciais puros), Refúgio (copo âmbar 300g, composições exclusivas com assinatura Loiê) e Botânicas e Florais (copo 400g, dois pavios, aromas exclusivos para queimas longas).' }].
             map((faq, i) =>
             <details
               key={i}
