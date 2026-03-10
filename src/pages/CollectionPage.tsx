@@ -74,7 +74,6 @@ const CollectionPage = () => {
       <div ref={ref}>
         {/* Hero */}
         <section className="relative overflow-hidden" style={{ background: '#29241f' }}>
-          {/* Cover image */}
           {collection.cover_image && (
             <div className="absolute inset-0">
               <img
@@ -88,7 +87,6 @@ const CollectionPage = () => {
           )}
 
           <div className="relative z-10 max-w-[1400px] mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24">
-            {/* Back link */}
             <Link
               to="/shop"
               className="reveal-fade inline-flex items-center gap-2 mb-10 group/back"
@@ -161,7 +159,7 @@ const CollectionPage = () => {
         </section>
 
         {/* Products */}
-        <section className="py-16 md:py-24 px-6" style={{ background: '#fcf5e0' }}>
+        <section className="py-24 md:py-40 px-6" style={{ background: '#fcf5e0' }}>
           <div className="max-w-[1400px] mx-auto">
             {/* Sort */}
             <div className="flex justify-between items-center mb-12">
@@ -172,7 +170,7 @@ const CollectionPage = () => {
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
                   fontSize: '0.65rem',
-                  color: 'rgba(41,36,31,0.4)',
+                  color: 'rgba(0,0,0,0.4)',
                 }}
               >
                 {sorted.length} {sorted.length === 1 ? 'produto' : 'produtos'}
@@ -181,9 +179,9 @@ const CollectionPage = () => {
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
                 style={{
-                  background: 'rgba(41,36,31,0.04)',
-                  border: '1px solid rgba(86,86,0,0.15)',
-                  color: '#29241f',
+                  background: 'rgba(0,0,0,0.04)',
+                  border: '1px solid rgba(0,0,0,0.12)',
+                  color: '#000',
                   fontFamily: "var(--font-body)",
                   fontWeight: 300,
                   fontSize: '0.72rem',
@@ -203,15 +201,15 @@ const CollectionPage = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i}>
-                    <div className="aspect-[3/4] mb-4" style={{ background: 'rgba(41,36,31,0.05)' }} />
-                    <div className="h-4 w-3/4 mb-2" style={{ background: 'rgba(41,36,31,0.05)' }} />
-                    <div className="h-3 w-1/2" style={{ background: 'rgba(41,36,31,0.05)' }} />
+                    <div className="aspect-[3/4] mb-4" style={{ background: 'rgba(0,0,0,0.05)' }} />
+                    <div className="h-4 w-3/4 mb-2" style={{ background: 'rgba(0,0,0,0.05)' }} />
+                    <div className="h-3 w-1/2" style={{ background: 'rgba(0,0,0,0.05)' }} />
                   </div>
                 ))}
               </div>
             ) : sorted.length === 0 ? (
               <div className="text-center py-20">
-                <p style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(41,36,31,0.5)' }}>
+                <p style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
                   Nenhum produto encontrado nesta coleção.
                 </p>
               </div>
@@ -228,20 +226,18 @@ const CollectionPage = () => {
                           autoPlay
                           loop
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          style={{ filter: 'saturate(0.85) brightness(0.9)' }}
                         />
                       ) : (
                         <img
                           src={product.images[0]}
                           alt={product.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          style={{ filter: 'saturate(0.85) brightness(0.9)' }}
                           loading="lazy"
                         />
                       )}
                       <div
                         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                        style={{ background: 'linear-gradient(to top, rgba(41,36,31,0.7) 0%, transparent 50%)' }}
+                        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }}
                       />
                       {product.badge && (
                         <span
@@ -253,7 +249,7 @@ const CollectionPage = () => {
                             textTransform: 'uppercase',
                             fontSize: '0.6rem',
                             color: '#f4edd2',
-                            background: 'rgba(41,36,31,0.7)',
+                            background: 'rgba(0,0,0,0.6)',
                             padding: '4px 10px',
                             backdropFilter: 'blur(4px)',
                           }}
@@ -278,7 +274,7 @@ const CollectionPage = () => {
                       </button>
                     </Link>
                     <Link to={`/product/${product.slug}`} className="block">
-                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#29241f', marginBottom: 4 }}>
+                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
                         {product.name}
                       </h3>
                       <p
@@ -287,7 +283,7 @@ const CollectionPage = () => {
                           fontWeight: 300,
                           fontStyle: 'italic',
                           fontSize: '0.82rem',
-                          color: 'rgba(41,36,31,0.6)',
+                          color: 'rgba(0,0,0,0.55)',
                           lineHeight: 1.5,
                           marginBottom: 8,
                           display: '-webkit-box',
@@ -299,11 +295,11 @@ const CollectionPage = () => {
                         {product.description}
                       </p>
                       <div className="flex items-center gap-3">
-                        <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#565600' }}>
+                        <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
                           R$ {product.price.toFixed(2)}
                         </span>
                         {product.compare_at_price && (
-                          <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.7rem', color: '#29241f', textDecoration: 'line-through' }}>
+                          <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(0,0,0,0.4)', textDecoration: 'line-through' }}>
                             R$ {product.compare_at_price.toFixed(2)}
                           </span>
                         )}
@@ -318,7 +314,7 @@ const CollectionPage = () => {
 
         {/* Other collections */}
         {otherCollections.length > 0 && (
-          <section className="py-16 md:py-24 px-6" style={{ background: '#f5ecd0' }}>
+          <section className="py-24 md:py-40 px-6" style={{ background: '#f5ecd0' }}>
             <div className="max-w-[1400px] mx-auto">
               <div className="text-center mb-14">
                 <span
@@ -329,7 +325,7 @@ const CollectionPage = () => {
                     letterSpacing: '0.3em',
                     textTransform: 'uppercase',
                     fontSize: '0.6rem',
-                    color: 'rgba(41,36,31,0.35)',
+                    color: 'rgba(0,0,0,0.35)',
                   }}
                 >
                   explorar
@@ -338,7 +334,7 @@ const CollectionPage = () => {
                   className="reveal-fade heading-display"
                   style={{
                     fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
-                    color: '#29241f',
+                    color: '#000',
                   }}
                 >
                   Outras Coleções
@@ -365,7 +361,7 @@ const CollectionPage = () => {
                       )}
                       <div
                         className="absolute inset-0 transition-opacity duration-500 group-hover:opacity-80"
-                        style={{ background: 'linear-gradient(to top, rgba(41,36,31,0.9) 0%, rgba(41,36,31,0.3) 100%)', opacity: 0.7 }}
+                        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 100%)', opacity: 0.7 }}
                       />
                       <div className="relative z-10 h-full flex flex-col justify-end p-6 md:p-8">
                         <span

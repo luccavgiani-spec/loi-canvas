@@ -10,7 +10,7 @@ const Contact = () => {
             <span className="loi-label block mb-4">fale conosco</span>
             <h1
               className="heading-display"
-              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#29241f' }}
+              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#000' }}
             >
               Contato
             </h1>
@@ -20,7 +20,7 @@ const Contact = () => {
             <div>
               <h2
                 className="heading-display mb-6"
-                style={{ fontSize: '1.8rem', color: '#29241f' }}
+                style={{ fontSize: '1.8rem', color: '#000' }}
               >
                 Adoramos ouvir você
               </h2>
@@ -31,13 +31,13 @@ const Contact = () => {
                   { icon: MapPin, text: 'Rua Cel. João Leme, 688 — Bragança Paulista, SP 12900-161' },
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-3">
-                    <Icon size={16} style={{ color: '#565600' }} />
+                    <Icon size={16} style={{ color: '#000' }} />
                     <span
                       style={{
                         fontFamily: "'Montserrat', sans-serif",
                         fontWeight: 300,
                         fontSize: '0.85rem',
-                        color: '#29241f',
+                        color: '#000',
                       }}
                     >
                       {text}
@@ -51,7 +51,7 @@ const Contact = () => {
                   fontWeight: 300,
                   fontStyle: 'italic',
                   fontSize: '1rem',
-                  color: '#29241f',
+                  color: '#000',
                   lineHeight: 1.7,
                 }}
               >
@@ -72,7 +72,7 @@ const Contact = () => {
                     className="w-full px-4 py-3 bg-transparent text-sm"
                     style={{
                       border: '1px solid rgba(86,86,0,0.2)',
-                      color: '#29241f',
+                      color: '#000',
                       fontFamily: "'Montserrat', sans-serif",
                       fontWeight: 300,
                       outline: 'none',
@@ -87,7 +87,7 @@ const Contact = () => {
                   className="w-full px-4 py-3 bg-transparent text-sm resize-none"
                   style={{
                     border: '1px solid rgba(86,86,0,0.2)',
-                    color: '#29241f',
+                    color: '#000',
                     fontFamily: "'Montserrat', sans-serif",
                     fontWeight: 300,
                     outline: 'none',

@@ -115,8 +115,8 @@
   }
 
   ::selection {
-    background: rgba(86, 86, 0, 0.2);
-    color: #29241f;
+    background: rgba(0, 0, 0, 0.15);
+    color: #000;
   }
 }
 
@@ -138,7 +138,7 @@
     letter-spacing: 0.3em;
     text-transform: uppercase;
     font-size: 0.65rem;
-    color: var(--loi-brown);
+    color: #000;
   }
 
   /* ─── Loiê elegant button ─── */
@@ -181,8 +181,8 @@
     align-items: center;
     padding: 0.85rem 2.2rem;
     background: transparent;
-    color: var(--loi-dark);
-    border: 1px solid rgba(41, 36, 31, 0.2);
+    color: #000;
+    border: 1px solid rgba(0, 0, 0, 0.2);
     font-family: 'Montserrat', sans-serif;
     font-weight: 300;
     letter-spacing: 0.28em;
@@ -192,8 +192,8 @@
     transition: all 0.4s ease;
   }
   .loi-btn-outline:hover {
-    background: rgba(41, 36, 31, 0.05);
-    border-color: rgba(41, 36, 31, 0.4);
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.4);
   }
 
   /* ─── Ghost link ─── */
@@ -201,7 +201,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: rgba(41, 36, 31, 0.5);
+    color: rgba(0, 0, 0, 0.5);
     font-family: 'Montserrat', sans-serif;
     font-weight: 300;
     letter-spacing: 0.28em;
@@ -211,7 +211,7 @@
     transition: color 0.3s ease;
   }
   .loi-ghost:hover {
-    color: #29241f;
+    color: #000;
   }
   .loi-ghost-dash {
     display: inline-block;
@@ -222,6 +222,25 @@
   }
   .loi-ghost:hover .loi-ghost-dash {
     width: 36px;
+  }
+
+  /* ─── Carousel item sizing ─── */
+  [data-carousel-item] {
+    width: calc(50% - 8px);
+  }
+  @media (min-width: 768px) {
+    [data-carousel-item] {
+      width: calc(25% - 18px);
+    }
+  }
+
+  /* ─── Scrollbar hide utility ─── */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   /* ─── Nav link ─── */
