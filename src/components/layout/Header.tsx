@@ -25,11 +25,19 @@ const Header = () => {
   const searchRef = useRef<HTMLDivElement>(null);
   const trackingRef = useRef<HTMLDivElement>(null);
 
+  const isHome = location.pathname === '/';
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => {
+      // On homepage, only transition after fully leaving the hero section (100vh)
+      const threshold = isHome ? window.innerHeight : 20;
+      setScrolled(window.scrollY > threshold);
+    };
+    // Run immediately to set correct initial state
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [isHome]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -212,6 +220,9 @@ const Header = () => {
           <img
             src={scrolled ? '/hero/Logo_Marrom.jpg' : '/hero/LOGO_BRANCA_t.png'}
             alt="Loiê"
+            width={110}
+            height={40}
+            fetchPriority="high"
             style={{
               width: 'clamp(70px, 8vw, 110px)',
               height: 'auto',
