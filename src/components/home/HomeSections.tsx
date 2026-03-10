@@ -271,8 +271,8 @@ const HomeSections = () => {
       {/* ── Degradê de transição hero → conteúdo ── */}
       <div
         style={{
-          height: 'clamp(80px, 12vw, 160px)',
-          background: 'linear-gradient(to bottom, #29241f 0%, #fcf5e0 100%)',
+          height: 'clamp(120px, 18vw, 240px)',
+          background: 'linear-gradient(to bottom, #29241f 0%, #3a3228 15%, #5c5040 30%, #8a7d6a 45%, #b8ad97 58%, #ddd5c0 72%, #efe9d3 85%, #fcf5e0 100%)',
         }}
       />
 

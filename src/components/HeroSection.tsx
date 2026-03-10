@@ -218,34 +218,7 @@ const HeroSection = () => {
         style={{ opacity: 0.04, backgroundImage: GRAIN_SVG, backgroundSize: '200px 200px' }}
       />
 
-      {/* ── navbar ── */}
-      <nav className="absolute top-0 left-0 right-0 z-[5]">
-        <div
-          className="absolute hero-fadeDown"
-          style={{ left: '50%', transform: 'translateX(-50%)', height: '5rem', display: 'flex', alignItems: 'center', animationDelay: '0.3s' }}
-        >
-          <img
-            src="/hero/LOGO_BRANCA_t.png"
-            alt="Loie"
-            style={{ width: 'clamp(80px, 9vw, 130px)', height: 'auto' }}
-          />
-        </div>
-
-        <div
-          className="absolute flex gap-8 hero-fadeDown"
-          style={{ left: '5rem', top: 0, height: '5rem', alignItems: 'center', animationDelay: '0.5s' }}
-        >
-          <a href="/shop" className="hero-nav-link">coleções</a>
-          <a href="/about" className="hero-nav-link">sobre</a>
-          <a href="/collabs" className="hero-nav-link">collabs</a>
-        </div>
-
-        <div
-          className="absolute flex gap-6 items-center hero-fadeDown"
-          style={{ right: '5rem', top: 0, height: '5rem', alignItems: 'center', animationDelay: '0.5s' }}
-        >
-        </div>
-      </nav>
+      {/* navbar is now handled by the global Header component */}
 
       {/* ── central content ── */}
       <div
