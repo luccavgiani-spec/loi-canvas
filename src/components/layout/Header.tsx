@@ -60,14 +60,14 @@ const Header = () => {
   };
 
   const linkClass = scrolled ? 'loi-nav-link' : 'hero-nav-link';
-  const iconColor = scrolled ? 'rgba(41,36,31,0.5)' : 'rgba(244,237,210,0.5)';
+  const iconColor = scrolled ? '#29241f' : 'rgba(244,237,210,0.5)';
   const iconHoverColor = scrolled ? '#29241f' : '#f4edd2';
   const activeLinkColor = scrolled ? '#29241f' : '#f4edd2';
 
   const dropdownBg = scrolled ? 'rgba(252,245,224,0.97)' : 'rgba(41,36,31,0.95)';
   const dropdownBorder = scrolled ? 'rgba(86,86,0,0.1)' : 'rgba(244,237,210,0.1)';
   const dropdownText = scrolled ? '#29241f' : '#f4edd2';
-  const dropdownMuted = scrolled ? 'rgba(41,36,31,0.3)' : 'rgba(244,237,210,0.3)';
+  const dropdownMuted = scrolled ? 'rgba(41,36,31,0.45)' : 'rgba(244,237,210,0.3)';
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,7 +171,7 @@ const Header = () => {
                     to="/shop"
                     onClick={() => setCollectionsOpen(false)}
                     className="block mb-3 pb-3"
-                    style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.68rem', color: scrolled ? '#565600' : '#f4edd2', textDecoration: 'none', borderBottom: `1px solid ${dropdownBorder}` }}
+                    style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.68rem', color: scrolled ? '#29241f' : '#f4edd2', textDecoration: 'none', borderBottom: `1px solid ${dropdownBorder}` }}
                   >
                     ver todas
                   </Link>
@@ -184,7 +184,7 @@ const Header = () => {
                       style={{ textDecoration: 'none' }}
                     >
                       <span
-                        style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.68rem', color: scrolled ? 'rgba(41,36,31,0.6)' : 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'block' }}
+                        style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.68rem', color: scrolled ? '#29241f' : 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'block', opacity: scrolled ? 0.75 : 1 }}
                         className="group-hover/item:!text-[#565600]"
                       >
                         {col.label}
@@ -210,13 +210,13 @@ const Header = () => {
         {/* Logo center */}
         <Link to="/" className="absolute left-1/2 -translate-x-1/2">
           <img
-            src="/hero/LOGO_BRANCA_t.png"
+            src={scrolled ? '/hero/Logo Marrom.jpg' : '/hero/LOGO_BRANCA_t.png'}
             alt="Loiê"
             style={{
               width: 'clamp(70px, 8vw, 110px)',
               height: 'auto',
-              filter: scrolled ? 'invert(1) brightness(0.2)' : 'none',
-              transition: 'filter 0.5s ease',
+              mixBlendMode: scrolled ? 'multiply' : 'normal',
+              transition: 'opacity 0.5s ease',
             }}
           />
         </Link>
@@ -276,7 +276,7 @@ const Header = () => {
             {count > 0 && (
               <span
                 className="absolute -top-1 -right-2 flex items-center justify-center w-4 h-4 rounded-full text-[9px]"
-                style={{ background: '#565600', color: '#f4edd2', fontFamily: "var(--font-body)", fontWeight: 400 }}
+                style={{ background: '#29241f', color: '#f4edd2', fontFamily: "var(--font-body)", fontWeight: 400 }}
               >
                 {count}
               </span>
