@@ -2,7 +2,7 @@ import Layout from '@/components/layout/Layout';
 import { storageUrl } from '@/lib/storage';
 
 const banner01 = storageUrl('loie_vela_campos_imagem.JPG');
-const banner02 = storageUrl('loie_vela_estela_imagem.JPG');
+const videoSobre = storageUrl('video_sobre (1).mp4');
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -13,16 +13,16 @@ const About = () => {
     <Layout>
       <div ref={ref}>
         {/* Hero banner */}
-        <section className="relative" style={{ height: '60vh', minHeight: 350 }}>
-          <img
-            src={banner02}
-            alt="Ateliê Loiê"
+        <section className="relative w-full" style={{ height: 'clamp(350px, 60vh, 720px)' }}>
+          <video
+            src={videoSobre}
+            autoPlay
+            muted
+            loop
+            playsInline
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: 'saturate(0.5) brightness(0.4)' }}
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, #fcf5e0 0%, transparent 30%, transparent 70%, #fcf5e0 100%)' }} />
-          <div className="loi-grain" />
-          <div className="relative z-[1] flex items-center justify-center h-full px-6">
+          <div className="relative z-[1] flex items-end justify-center h-full px-6 pb-12 md:pb-16">
             <div className="text-center">
               <span className="loi-label block mb-4">sobre a loiê</span>
               <h1
