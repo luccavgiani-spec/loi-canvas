@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
 import { mockProducts } from '@/lib/mocks';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const PRODUCTS = mockProducts;
-const FEATURED = PRODUCTS.filter((p) => p.is_bestseller).slice(0, 4);
-const COLLECTION_2 = PRODUCTS.filter((p) => !p.is_bestseller).slice(0, 4);
+const CLASSICAS = PRODUCTS.filter((p) => p.collection === 'Clássicas').slice(0, 6);
+const BROWN = PRODUCTS.filter((p) => p.collection === 'Brown').slice(0, 4);
 
 /* ── Reusable product card (light theme) ── */
 const ProductCard = ({ product, addItem }: { product: typeof PRODUCTS[0]; addItem: (p: typeof PRODUCTS[0]) => void }) => (
@@ -98,70 +98,100 @@ const ProductCard = ({ product, addItem }: { product: typeof PRODUCTS[0]; addIte
   </div>
 );
 
-/* ── Reusable product focus banner (light theme) ── */
-const ProductFocusBanner = ({ product, reverse = false }: { product: typeof PRODUCTS[0]; reverse?: boolean }) => (
-  <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
-    <div className="md:w-1/2 relative overflow-hidden" style={{ minHeight: 350 }}>
-      <img
-        src={product.images[0]}
-        alt={product.name}
-        className="absolute inset-0 w-full h-full object-cover"
-        loading="lazy"
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background: reverse
-            ? 'linear-gradient(to left, transparent 60%, #f4edd2)'
-            : 'linear-gradient(to right, transparent 60%, #f4edd2)',
-        }}
-      />
-    </div>
-    <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: '#f4edd2' }}>
-      <div className="max-w-md">
-        <span className="loi-label block mb-4">{product.collection}</span>
-        <h3
-          className="heading-display mb-4"
+/* ── Product focus banner with video support ── */
+const ProductFocusBanner = ({
+  product,
+  reverse = false,
+  videoSrc,
+}: {
+  product: typeof PRODUCTS[0];
+  reverse?: boolean;
+  videoSrc?: string;
+}) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, []);
+
+  return (
+    <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
+      <div className="md:w-1/2 relative overflow-hidden" style={{ minHeight: 350 }}>
+        {videoSrc ? (
+          <video
+            ref={videoRef}
+            src={videoSrc}
+            muted
+            playsInline
+            loop
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+        )}
+        <div
+          className="absolute inset-0"
           style={{
-            fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
-            color: '#29241f',
-            lineHeight: 1.15,
+            background: reverse
+              ? 'linear-gradient(to left, transparent 60%, #f4edd2)'
+              : 'linear-gradient(to right, transparent 60%, #f4edd2)',
           }}
-        >
-          {product.name}
-        </h3>
-        <div className="loi-divider mb-6" />
-        <p
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontWeight: 300,
-            fontStyle: 'italic',
-            fontSize: '1.05rem',
-            color: 'rgba(41,36,31,0.5)',
-            lineHeight: 1.8,
-            marginBottom: '1.5rem',
-          }}
-        >
-          {product.description}
-        </p>
-        <p
-          style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontWeight: 300,
-            fontSize: '0.85rem',
-            color: '#565600',
-            marginBottom: '1.5rem',
-          }}
-        >
-          R$ {product.price.toFixed(2)}
-        </p>
-        <Link to={`/product/${product.slug}`} className="loi-btn-outline">
-          ver produto
-        </Link>
+        />
+      </div>
+      <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: '#f4edd2' }}>
+        <div className="max-w-md">
+          <span className="loi-label block mb-4">{product.collection}</span>
+          <h3
+            className="heading-display mb-4"
+            style={{
+              fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
+              color: '#29241f',
+              lineHeight: 1.15,
+            }}
+          >
+            {product.name}
+          </h3>
+          <div className="loi-divider mb-6" />
+          <p
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 300,
+              fontStyle: 'italic',
+              fontSize: '1.05rem',
+              color: 'rgba(41,36,31,0.5)',
+              lineHeight: 1.8,
+              marginBottom: '1.5rem',
+            }}
+          >
+            {product.description}
+          </p>
+          <p
+            style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.85rem',
+              color: '#565600',
+              marginBottom: '1.5rem',
+            }}
+          >
+            R$ {product.price.toFixed(2)}
+          </p>
+          <Link to={`/product/${product.slug}`} className="loi-btn-outline">
+            ver produto
+          </Link>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 /* ── Collabs grid item with rotating images ── */
 const COLLAB_ITEMS = [
@@ -264,8 +294,8 @@ const HomeSections = () => {
   const ref = useReveal();
   const { addItem } = useCart();
 
-  const focusProduct1 = PRODUCTS.find((p) => p.slug === 'rosa-oud')!;
-  const focusProduct2 = PRODUCTS.find((p) => p.slug === 'cedro-vetiver')!;
+  const focusBosque = PRODUCTS.find((p) => p.slug === 'bosque')!;
+  const focusPomar = PRODUCTS.find((p) => p.slug === 'pomar')!;
 
   return (
     <div ref={ref} style={{ background: '#fcf5e0' }}>
@@ -277,7 +307,7 @@ const HomeSections = () => {
         }}
       />
 
-      {/* ── 1. Coleção 1 — Bestsellers ── */}
+      {/* ── 1. Coleção Clássicas — Bestsellers ── */}
       <section className="py-16 md:py-20 px-6">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
@@ -289,8 +319,8 @@ const HomeSections = () => {
               Bestsellers
             </h2>
           </div>
-          <div className="reveal-stagger grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-            {FEATURED.map((product) => (
+          <div className="reveal-stagger grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+            {CLASSICAS.map((product) => (
               <ProductCard key={product.id} product={product} addItem={addItem} />
             ))}
           </div>
@@ -304,15 +334,15 @@ const HomeSections = () => {
         </div>
       </section>
 
-      {/* ── 2. Banner de Produto Foco 1 / 2 ── */}
+      {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) ── */}
       <section className="relative">
-        <ProductFocusBanner product={focusProduct1} />
+        <ProductFocusBanner product={focusBosque} videoSrc="/hero/loie_vela_bosque_compress (1).mp4" />
       </section>
       <section className="relative">
-        <ProductFocusBanner product={focusProduct2} reverse />
+        <ProductFocusBanner product={focusPomar} reverse videoSrc="/hero/loie_vela_pomar.mp4" />
       </section>
 
-      {/* ── 3. Coleção 2 — Destaques ── */}
+      {/* ── 3. Coleção Brown — Descubra Novos Aromas ── */}
       <section className="py-16 md:py-20 px-6">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
@@ -324,8 +354,8 @@ const HomeSections = () => {
               Descubra Novos Aromas
             </h2>
           </div>
-          <div className="reveal-stagger grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-            {COLLECTION_2.map((product) => (
+          <div className="reveal-stagger grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+            {BROWN.map((product) => (
               <ProductCard key={product.id} product={product} addItem={addItem} />
             ))}
           </div>
