@@ -19,7 +19,7 @@ const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
-  const ref = useReveal();
+  const ref = useReveal(0.15, [loading]);
 
   useEffect(() => {
     getProducts().then(setProducts).finally(() => setLoading(false));
