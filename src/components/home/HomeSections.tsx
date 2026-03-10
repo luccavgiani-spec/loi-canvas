@@ -456,7 +456,7 @@ const HomeSections = () => {
             além de novidades e lançamentos em primeira mão.
           </p>
           <form
-            className="reveal flex gap-3"
+            className="reveal flex flex-col sm:flex-row gap-3"
             onSubmit={(e) => {
               e.preventDefault();
             }}
@@ -474,7 +474,7 @@ const HomeSections = () => {
                 outline: 'none',
               }}
             />
-            <button type="submit" className="loi-btn" style={{ padding: '0.75rem 1.8rem' }}>
+            <button type="submit" className="loi-btn w-full sm:w-auto justify-center" style={{ padding: '0.75rem 1.8rem' }}>
               cadastrar
             </button>
           </form>

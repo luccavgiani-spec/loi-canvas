@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '@/config';
-import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon } from '@/types';
-import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons } from '@/lib/mocks';
+import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
+import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections, mockCollabs } from '@/lib/mocks';
 
 async function fetchApi<T>(path: string, options?: RequestInit, fallback?: T): Promise<T> {
   try {
@@ -92,3 +92,29 @@ export const getAdminNewsletter = () =>
 
 export const getAdminCoupons = () =>
   fetchApi<Coupon[]>('/admin/coupons', undefined, mockCoupons);
+
+// Collections
+export const getAdminCollections = () =>
+  fetchApi<Collection[]>('/admin/collections', undefined, mockCollections);
+
+export const createAdminCollection = (data: Partial<Collection>) =>
+  fetchApi<Collection>('/admin/collections', { method: 'POST', body: JSON.stringify(data) });
+
+export const updateAdminCollection = (id: string, data: Partial<Collection>) =>
+  fetchApi<Collection>(`/admin/collections/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+
+export const deleteAdminCollection = (id: string) =>
+  fetchApi<void>(`/admin/collections/${id}`, { method: 'DELETE' });
+
+// Collabs
+export const getAdminCollabs = () =>
+  fetchApi<Collab[]>('/admin/collabs', undefined, mockCollabs);
+
+export const createAdminCollab = (data: Partial<Collab>) =>
+  fetchApi<Collab>('/admin/collabs', { method: 'POST', body: JSON.stringify(data) });
+
+export const updateAdminCollab = (id: string, data: Partial<Collab>) =>
+  fetchApi<Collab>(`/admin/collabs/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+
+export const deleteAdminCollab = (id: string) =>
+  fetchApi<void>(`/admin/collabs/${id}`, { method: 'DELETE' });

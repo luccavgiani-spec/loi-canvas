@@ -1,4 +1,4 @@
-import type { Product, Review, Order, Customer, KPIs, SalesTimeseriesPoint, TopProduct, NewsletterSubscriber, Coupon } from '@/types';
+import type { Product, Review, Order, Customer, KPIs, SalesTimeseriesPoint, TopProduct, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
 import {
   imgFlorDeLaranjeira,
   imgCedroVetiver,
@@ -95,4 +95,19 @@ export const mockNewsletterSubs: NewsletterSubscriber[] = [
 export const mockCoupons: Coupon[] = [
   { id: 'cp1', code: 'LOIE15', discount_percent: 15, is_active: true, uses: 45, created_at: '2025-01-01' },
   { id: 'cp2', code: 'BEMVINDO10', discount_percent: 10, is_active: true, uses: 120, created_at: '2025-01-01' },
+];
+
+export const mockCollections: Collection[] = [
+  { id: 'col1', slug: 'citricos', name: 'Cítricos', description: 'Notas frescas e vibrantes', cover_image: imgFlorDeLaranjeira, is_active: true, sort_order: 0, created_at: '2025-01-01' },
+  { id: 'col2', slug: 'amadeirados', name: 'Amadeirados', description: 'Aromas quentes e profundos', cover_image: imgCedroVetiver, is_active: true, sort_order: 1, created_at: '2025-01-01' },
+  { id: 'col3', slug: 'herbais', name: 'Herbais', description: 'Essências verdes e aromáticas', cover_image: imgLavandaProvencal, is_active: true, sort_order: 2, created_at: '2025-01-01' },
+  { id: 'col4', slug: 'orientais', name: 'Orientais', description: 'Fragrâncias ricas e envolventes', cover_image: imgRosaOud, is_active: true, sort_order: 3, created_at: '2025-01-01' },
+  { id: 'col5', slug: 'gourmand', name: 'Gourmand', description: 'Notas doces e aconchegantes', cover_image: imgBaunilhaTonka, is_active: true, sort_order: 4, created_at: '2025-01-01' },
+];
+
+export const mockCollabs: Collab[] = [
+  { id: 'cb1', slug: 'atelie-ceramica', name: 'Ateliê Cerâmica', caption: 'Vasos artesanais × Loiê', description: 'Uma colaboração que une a tradição da cerâmica artesanal com as fragrâncias da Loiê.', images: ['/hero/Cartao_Postal_Loie_1.mp4', '/hero/Cartao_Postal_Loie_5.mp4'], is_active: true, sort_order: 0, created_at: '2025-01-15' },
+  { id: 'cb2', slug: 'estudio-botanico', name: 'Estúdio Botânico', caption: 'Arranjos vivos × fragrâncias', description: 'Plantas, flores e aromas se encontram nesta collab que celebra a natureza.', images: ['/hero/Cartao_Postal_Loie.mp4', '/hero/Cartao_Postal_Loie_8.mp4'], is_active: true, sort_order: 1, created_at: '2025-02-01' },
+  { id: 'cb3', slug: 'casa-de-cha', name: 'Casa de Chá', caption: 'Rituais de chá × velas', description: 'Dois rituais que se complementam: o chá e a vela.', images: ['/hero/escritorio_cadeira__1_.mp4', '/hero/Cartao_Postal_Loie_1.mp4'], is_active: true, sort_order: 2, created_at: '2025-02-15' },
+  { id: 'cb4', slug: 'galeria-textil', name: 'Galeria Têxtil', caption: 'Tecidos naturais × aromas', description: 'Linho, algodão orgânico e fragrâncias exclusivas.', images: ['/hero/Cartao_Postal_Loie_5.mp4', '/hero/Cartao_Postal_Loie.mp4'], is_active: true, sort_order: 3, created_at: '2025-03-01' },
 ];
