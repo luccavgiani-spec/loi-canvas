@@ -292,6 +292,12 @@
     background: var(--loi-brown);
     opacity: 0.4;
   }
+
+  /* ─── Below-fold section rendering optimization ─── */
+  .loi-section-lazy {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
 }
 
 /* ── Scroll reveal animations ── */

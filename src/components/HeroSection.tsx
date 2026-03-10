@@ -14,11 +14,20 @@ const HeroSection = () => {
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    v.play().catch(() => {});
+    // Start playback as soon as enough data is buffered
+    const tryPlay = () => { v.play().catch(() => {}); };
+    if (v.readyState >= 3) {
+      tryPlay();
+    } else {
+      v.addEventListener('canplay', tryPlay, { once: true });
+    }
   }, []);
 
   return (
-    <section className="relative w-full h-screen overflow-hidden" style={{ background: '#29241f' }}>
+    <section
+      className="relative w-full h-screen overflow-hidden"
+      style={{ background: '#29241f' }}
+    >
       {/* ── video ── */}
       <video
         ref={videoRef}
@@ -26,7 +35,10 @@ const HeroSection = () => {
         muted
         playsInline
         loop
-        preload="auto"
+        preload="metadata"
+        poster="/hero/hero-poster.jpg"
+        width={1920}
+        height={1080}
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           filter: 'saturate(0.65) brightness(0.60) contrast(1.05)',
@@ -67,7 +79,7 @@ const HeroSection = () => {
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
-                style={{ color: '#f4edd2', animationDelay: '1.05s' }}
+                style={{ color: '#f4edd2', animationDelay: '0.3s' }}
               >
                 atmosferas
               </span>
@@ -75,7 +87,7 @@ const HeroSection = () => {
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
-                style={{ color: '#565600', fontStyle: 'italic', animationDelay: '1.20s' }}
+                style={{ color: '#565600', fontStyle: 'italic', animationDelay: '0.45s' }}
               >
                 que
               </span>
@@ -83,7 +95,7 @@ const HeroSection = () => {
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
-                style={{ color: '#f4edd2', animationDelay: '1.35s' }}
+                style={{ color: '#f4edd2', animationDelay: '0.6s' }}
               >
                 ficam.
               </span>
@@ -99,7 +111,7 @@ const HeroSection = () => {
               fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
               color: 'rgba(244,237,210,0.6)',
               lineHeight: 1.7,
-              animationDelay: '1.6s',
+              animationDelay: '0.85s',
             }}
           >
             Cada vela é uma narrativa. Cada aroma, uma porta.
@@ -111,7 +123,7 @@ const HeroSection = () => {
             <a
               href="/shop"
               className="hero-fadeUp hero-btn-primary"
-              style={{ animationDelay: '1.75s' }}
+              style={{ animationDelay: '1.0s' }}
             >
               explorar coleção
             </a>
@@ -119,7 +131,7 @@ const HeroSection = () => {
             <a
               href="/about"
               className="hero-fadeUp hero-btn-ghost group"
-              style={{ animationDelay: '1.85s' }}
+              style={{ animationDelay: '1.1s' }}
             >
               <span>nossa história</span>
               <span className="hero-btn-ghost-dash" />
@@ -139,7 +151,7 @@ const HeroSection = () => {
         {/* scroll indicator */}
         <div
           className="scroll-indicator flex flex-col items-center gap-2 hero-fadeUp"
-          style={{ color: 'rgba(244,237,210,0.3)', animationDelay: '2.15s' }}
+          style={{ color: 'rgba(244,237,210,0.3)', animationDelay: '1.4s' }}
         >
           <span className="loi-label" style={{ color: 'rgba(244,237,210,0.3)' }}>scroll</span>
           <svg width="16" height="24" viewBox="0 0 16 24" fill="none" stroke="currentColor" strokeWidth="1.2">
@@ -150,7 +162,7 @@ const HeroSection = () => {
         {/* brand symbol */}
         <div
           className="hero-fadeIn hero-symbol-wrapper group md:!m-0"
-          style={{ width: 80, height: 80, animationDelay: '2.2s', position: 'relative', margin: '0 auto' }}
+          style={{ width: 80, height: 80, animationDelay: '1.5s', position: 'relative', margin: '0 auto' }}
         >
           {/* Glow - desktop: hover, mobile: constant pulse */}
           <div
@@ -173,6 +185,8 @@ const HeroSection = () => {
             alt=""
             width={80}
             height={80}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-contain md:opacity-100 opacity-0"
             style={{
               transition: '550ms cubic-bezier(0.4,0,0.2,1)',
@@ -185,6 +199,7 @@ const HeroSection = () => {
             width={80}
             height={80}
             loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-contain pointer-events-none md:opacity-0 hero-symbol-green"
             style={{
               transition: '550ms cubic-bezier(0.4,0,0.2,1)',

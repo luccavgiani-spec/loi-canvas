@@ -3,15 +3,16 @@ import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
 import { mockProducts } from '@/lib/mocks';
 import { storageUrl } from '@/lib/storage';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import LazyVideo from '@/components/LazyVideo';
 
 const PRODUCTS = mockProducts;
 const SALA_OU_ESTAR = PRODUCTS.filter((p) => p.collection === 'Sala ou Estar').slice(0, 6);
 const REFUGIO = PRODUCTS.filter((p) => p.collection === 'Refúgio').slice(0, 4);
 
 /* ── Horizontal carousel with snap scrolling ── */
-const ProductCarousel = ({
+const ProductCarousel = memo(({
   products,
   addItem,
   dark = false,
@@ -84,15 +85,12 @@ const ProductCarousel = ({
             data-carousel-item
             className="group flex-shrink-0 snap-start"
           >
-            <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
+            <Link to={`/product/${product.slug}`} className="block relative overflow-hidden mb-4" style={{ aspectRatio: '3/4' }}>
               {product.images[0]?.match(/\.mp4$/i) ? (
-                <video
+                <LazyVideo
                   src={product.images[0]}
-                  muted
-                  playsInline
-                  autoPlay
-                  loop
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="relative w-full h-full"
+                  rootMargin="100px 0px"
                 />
               ) : (
                 <img
@@ -100,6 +98,9 @@ const ProductCarousel = ({
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
+                  decoding="async"
+                  width={400}
+                  height={533}
                 />
               )}
               <div
@@ -169,10 +170,12 @@ const ProductCarousel = ({
       )}
     </div>
   );
-};
+});
 
-/* ── Product focus banner with video support ── */
-const ProductFocusBanner = ({
+ProductCarousel.displayName = 'ProductCarousel';
+
+/* ── Product focus banner with lazy video ── */
+const ProductFocusBanner = memo(({
   product,
   reverse = false,
   videoSrc,
@@ -183,14 +186,6 @@ const ProductFocusBanner = ({
   videoSrc?: string;
   dark?: boolean;
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {});
-    }
-  }, []);
-
   return (
     <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
       <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#29241f' : '#f4edd2' }}>
@@ -204,14 +199,11 @@ const ProductFocusBanner = ({
           }}
         >
           {videoSrc ? (
-            <video
-              ref={videoRef}
+            <LazyVideo
               src={videoSrc}
-              muted
-              playsInline
-              loop
-              preload="auto"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="relative w-full h-full"
+              style={{ aspectRatio: '4/3' }}
+              rootMargin="300px 0px"
             />
           ) : (
             <img
@@ -219,6 +211,7 @@ const ProductFocusBanner = ({
               alt={product.name}
               className="absolute inset-0 w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
             />
           )}
         </div>
@@ -256,9 +249,11 @@ const ProductFocusBanner = ({
       </div>
     </div>
   );
-};
+});
 
-/* ── Collabs grid item with rotating images ── */
+ProductFocusBanner.displayName = 'ProductFocusBanner';
+
+/* ── Collabs grid item with lazy rotating videos ── */
 const COLLAB_ITEMS = [
   { name: 'Ateliê Cerâmica', slug: 'atelie-ceramica', images: [storageUrl('loie_vela_bosque_compress (1).mp4'), storageUrl('loie_vela_pomar.mp4')], caption: 'Vasos artesanais × Loiê' },
   { name: 'Estúdio Botânico', slug: 'estudio-botanico', images: [storageUrl('Cartao_Postal_Loie.mp4'), storageUrl('loie_vela_estela (1).mp4')], caption: 'Arranjos vivos × fragrâncias' },
@@ -266,21 +261,38 @@ const COLLAB_ITEMS = [
   { name: 'Galeria Têxtil', slug: 'galeria-textil', images: [storageUrl('loie_vela_estela (1).mp4'), storageUrl('Cartao_Postal_Loie.mp4')], caption: 'Tecidos naturais × aromas' },
 ];
 
-const CollabCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
+const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
   const [currentImage, setCurrentImage] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
+  /* Only mount videos when the card is near the viewport */
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: '200px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  /* Rotate images only when visible */
+  useEffect(() => {
+    if (!isVisible) return;
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % collab.images.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [collab.images.length]);
+  }, [collab.images.length, isVisible]);
 
   return (
-    <div className="reveal group">
+    <div className="reveal group" ref={containerRef}>
       <Link to={`/collabs?collab=${collab.slug}`} className="block">
-        <div className="relative overflow-hidden aspect-[4/5] mb-3">
-          {collab.images.map((src, i) => (
+        <div className="relative overflow-hidden mb-3" style={{ aspectRatio: '4/5' }}>
+          {isVisible && collab.images.map((src, i) => (
             <video
               key={src}
               src={src}
@@ -288,7 +300,7 @@ const CollabCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
               playsInline
               autoPlay
               loop
-              preload="none"
+              preload="metadata"
               className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
               style={{ opacity: currentImage === i ? 1 : 0 }}
             />
@@ -312,7 +324,9 @@ const CollabCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
       </Link>
     </div>
   );
-};
+});
+
+CollabCard.displayName = 'CollabCard';
 
 /* ────────────────────────────────────────────────────────────── */
 const HomeSections = () => {
@@ -333,7 +347,7 @@ const HomeSections = () => {
       />
 
       {/* ── 1. Bestsellers — Carousel ── */}
-      <section className="py-16 px-6 md:py-0">
+      <section className="py-16 px-6 md:py-0 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
             <span className="reveal loi-label block mb-4">mais amados</span>
@@ -363,7 +377,7 @@ const HomeSections = () => {
       />
 
       {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) — DARK THEME ── */}
-      <section style={{ background: '#29241f' }}>
+      <section style={{ background: '#29241f' }} className="loi-section-lazy">
         <div className="relative">
           <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
         </div>
@@ -381,7 +395,7 @@ const HomeSections = () => {
       />
 
       {/* ── 3. Descubra Novos Aromas — Carousel ── */}
-      <section className="py-16 md:py-20 px-6">
+      <section className="py-16 md:py-20 px-6 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
             <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
@@ -402,7 +416,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 4. Collabs — Grid animado ── */}
-      <section className="py-16 px-6 md:py-[5px]" style={{ background: '#f4edd2' }}>
+      <section className="py-16 px-6 md:py-[5px] loi-section-lazy" style={{ background: '#f4edd2' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
             <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
@@ -425,7 +439,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 5. FAQ Section ── */}
-      <section className="py-16 md:py-20 px-6">
+      <section className="py-16 md:py-20 px-6 loi-section-lazy">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
             <span className="reveal loi-label block mb-4">dúvidas</span>
@@ -461,7 +475,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 6. Newsletter / CTA Section ── */}
-      <section className="py-16 px-6 relative overflow-hidden md:py-[40px]" style={{ background: '#f4edd2' }}>
+      <section className="py-16 px-6 relative overflow-hidden md:py-[40px] loi-section-lazy" style={{ background: '#f4edd2' }}>
         <div className="loi-grain" />
         <div className="relative z-[1] max-w-lg mx-auto text-center">
           <span className="reveal loi-label block mb-6">exclusivo</span>
