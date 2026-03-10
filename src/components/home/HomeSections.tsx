@@ -470,7 +470,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 6. Newsletter / CTA Section ── */}
-      <section className="py-16 md:py-20 px-6 relative overflow-hidden" style={{ background: '#f4edd2' }}>
+      <section className="py-16 px-6 relative overflow-hidden md:py-[40px]" style={{ background: '#f4edd2' }}>
         <div className="loi-grain" />
         <div className="relative z-[1] max-w-lg mx-auto text-center">
           <span className="reveal loi-label block mb-6">exclusivo</span>
