@@ -357,7 +357,7 @@ const HeroSection = () => {
         {/* brand symbol */}
         <div
           className="hero-fadeIn group"
-          style={{ width: 80, height: 80, animationDelay: '2.2s', position: 'relative' }}
+          style={{ width: 120, height: 120, animationDelay: '2.2s', position: 'relative' }}
         >
           <div
             className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
