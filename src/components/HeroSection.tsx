@@ -149,7 +149,7 @@ const HeroSection = () => {
 
         {/* brand symbol */}
         <div
-          className="hero-fadeIn hero-symbol-wrapper group"
+          className="hero-fadeIn hero-symbol-wrapper group md:!m-0"
           style={{ width: 80, height: 80, animationDelay: '2.2s', position: 'relative', margin: '0 auto' }}
         >
           {/* Glow - desktop: hover, mobile: constant pulse */}
