@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const HomeFooter = () => {
   return (
     <footer style={{ background: '#29241f' }}>
-      <div className="max-w-[1400px] mx-auto px-6 py-20">
+      <div className="max-w-[1400px] mx-auto px-6 py-[16px]">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
@@ -14,8 +14,8 @@ const HomeFooter = () => {
               height={32}
               loading="lazy"
               className="h-8 w-auto mb-6"
-              style={{ opacity: 0.8 }}
-            />
+              style={{ opacity: 0.8 }} />
+            
             <p
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
@@ -23,9 +23,9 @@ const HomeFooter = () => {
                 fontStyle: 'italic',
                 fontSize: '0.95rem',
                 color: 'rgba(244,237,210,0.4)',
-                lineHeight: 1.7,
-              }}
-            >
+                lineHeight: 1.7
+              }}>
+              
               Atmosferas que ficam. Velas artesanais feitas à mão com cera de soja
               100% natural e fragrâncias exclusivas.
             </p>
@@ -36,30 +36,30 @@ const HomeFooter = () => {
             <h4 className="loi-label mb-6" style={{ color: 'rgba(244,237,210,0.5)' }}>coleção</h4>
             <ul className="space-y-3">
               {[
-                { to: '/shop', label: 'Todas as Velas' },
-                { to: '/shop?collection=Cítricos', label: 'Cítricos' },
-                { to: '/shop?collection=Amadeirados', label: 'Amadeirados' },
-                { to: '/shop?collection=Orientais', label: 'Orientais' },
-                { to: '/shop?collection=Herbais', label: 'Herbais' },
-                { to: '/shop?collection=Gourmand', label: 'Gourmand' },
-              ].map((link) => (
-                <li key={link.to}>
+              { to: '/shop', label: 'Todas as Velas' },
+              { to: '/shop?collection=Cítricos', label: 'Cítricos' },
+              { to: '/shop?collection=Amadeirados', label: 'Amadeirados' },
+              { to: '/shop?collection=Orientais', label: 'Orientais' },
+              { to: '/shop?collection=Herbais', label: 'Herbais' },
+              { to: '/shop?collection=Gourmand', label: 'Gourmand' }].
+              map((link) =>
+              <li key={link.to}>
                   <Link
-                    to={link.to}
-                    style={{
-                      fontFamily: "'Montserrat', sans-serif",
-                      fontWeight: 300,
-                      fontSize: '0.8rem',
-                      color: 'rgba(244,237,210,0.4)',
-                      textDecoration: 'none',
-                      transition: 'color 0.3s ease',
-                    }}
-                    className="hover:!text-[#f4edd2]"
-                  >
+                  to={link.to}
+                  style={{
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.8rem',
+                    color: 'rgba(244,237,210,0.4)',
+                    textDecoration: 'none',
+                    transition: 'color 0.3s ease'
+                  }}
+                  className="hover:!text-[#f4edd2]">
+                  
                     {link.label}
                   </Link>
                 </li>
-              ))}
+              )}
             </ul>
           </div>
 
@@ -68,28 +68,28 @@ const HomeFooter = () => {
             <h4 className="loi-label mb-6" style={{ color: 'rgba(244,237,210,0.5)' }}>sobre</h4>
             <ul className="space-y-3">
               {[
-                { to: '/about', label: 'Nossa História' },
-                { to: '/collabs', label: 'Collabs' },
-                { to: '/contact', label: 'Contato' },
-                { to: '/policies', label: 'Políticas' },
-              ].map((link) => (
-                <li key={link.to}>
+              { to: '/about', label: 'Nossa História' },
+              { to: '/collabs', label: 'Collabs' },
+              { to: '/contact', label: 'Contato' },
+              { to: '/policies', label: 'Políticas' }].
+              map((link) =>
+              <li key={link.to}>
                   <Link
-                    to={link.to}
-                    style={{
-                      fontFamily: "'Montserrat', sans-serif",
-                      fontWeight: 300,
-                      fontSize: '0.8rem',
-                      color: 'rgba(244,237,210,0.4)',
-                      textDecoration: 'none',
-                      transition: 'color 0.3s ease',
-                    }}
-                    className="hover:!text-[#f4edd2]"
-                  >
+                  to={link.to}
+                  style={{
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.8rem',
+                    color: 'rgba(244,237,210,0.4)',
+                    textDecoration: 'none',
+                    transition: 'color 0.3s ease'
+                  }}
+                  className="hover:!text-[#f4edd2]">
+                  
                     {link.label}
                   </Link>
                 </li>
-              ))}
+              )}
             </ul>
           </div>
 
@@ -118,22 +118,22 @@ const HomeFooter = () => {
 
         <div
           className="mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
-          style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}
-        >
+          style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}>
+          
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', letterSpacing: '0.05em' }}>
             © {new Date().getFullYear()} Loiê. Todos os direitos reservados.
           </p>
           <div className="flex gap-8">
-            {['Termos', 'Privacidade', 'Trocas'].map((label) => (
-              <Link
-                key={label}
-                to="/policies"
-                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
-                className="hover:!text-[rgba(244,237,210,0.5)]"
-              >
+            {['Termos', 'Privacidade', 'Trocas'].map((label) =>
+            <Link
+              key={label}
+              to="/policies"
+              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
+              className="hover:!text-[rgba(244,237,210,0.5)]">
+              
                 {label}
               </Link>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -145,9 +145,9 @@ const HomeFooter = () => {
             className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
             style={{
               background: 'radial-gradient(circle, rgba(244,237,210,0.15) 0%, transparent 70%)',
-              transition: '550ms cubic-bezier(0.4,0,0.2,1)',
-            }}
-          />
+              transition: '550ms cubic-bezier(0.4,0,0.2,1)'
+            }} />
+          
           <img src="/hero/SIMBOLO_t.png" alt="" width={40} height={40} loading="lazy" className="absolute inset-0 w-full h-full object-contain" style={{ opacity: 0.2, transition: '550ms cubic-bezier(0.4,0,0.2,1)' }} />
           <img src="/hero/SIMBOLO_2_t.png" alt="" width={40} height={40} loading="lazy" className="absolute inset-0 w-full h-full object-contain pointer-events-none" style={{ opacity: 0, transition: '550ms cubic-bezier(0.4,0,0.2,1)' }} />
           <div
@@ -156,21 +156,21 @@ const HomeFooter = () => {
               const container = e.currentTarget.parentElement;
               if (!container) return;
               const imgs = container.querySelectorAll('img');
-              if (imgs[0]) { imgs[0].style.opacity = '0'; imgs[0].style.transform = 'scale(1.1) rotate(4deg)'; }
-              if (imgs[1]) { imgs[1].style.opacity = '0.4'; imgs[1].style.transform = 'scale(1) rotate(0deg)'; imgs[1].style.filter = 'drop-shadow(0 0 8px rgba(244,237,210,0.4))'; }
+              if (imgs[0]) {imgs[0].style.opacity = '0';imgs[0].style.transform = 'scale(1.1) rotate(4deg)';}
+              if (imgs[1]) {imgs[1].style.opacity = '0.4';imgs[1].style.transform = 'scale(1) rotate(0deg)';imgs[1].style.filter = 'drop-shadow(0 0 8px rgba(244,237,210,0.4))';}
             }}
             onMouseLeave={(e) => {
               const container = e.currentTarget.parentElement;
               if (!container) return;
               const imgs = container.querySelectorAll('img');
-              if (imgs[0]) { imgs[0].style.opacity = '0.2'; imgs[0].style.transform = 'scale(1) rotate(0deg)'; }
-              if (imgs[1]) { imgs[1].style.opacity = '0'; imgs[1].style.transform = ''; imgs[1].style.filter = ''; }
-            }}
-          />
+              if (imgs[0]) {imgs[0].style.opacity = '0.2';imgs[0].style.transform = 'scale(1) rotate(0deg)';}
+              if (imgs[1]) {imgs[1].style.opacity = '0';imgs[1].style.transform = '';imgs[1].style.filter = '';}
+            }} />
+          
         </div>
       </div>
-    </footer>
-  );
+    </footer>);
+
 };
 
 export default HomeFooter;
