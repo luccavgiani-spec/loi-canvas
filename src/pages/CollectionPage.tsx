@@ -8,28 +8,6 @@ import { useCart } from '@/contexts/CartContext';
 import { useReveal } from '@/hooks/useReveal';
 import { ArrowLeft } from 'lucide-react';
 
-const collectionMeta: Record<string, { numeral: string; detail: string; story: string }> = {
-  'Cotidianas': {
-    numeral: 'I',
-    detail: 'Latinha de 160g · dois pavios',
-    story: 'Uma breve apresentação da marca com um básico muito bem feito numa latinha aesthetic. Os aromas mais essenciais para o dia a dia. Um presente muito bom como lembrança.',
-  },
-  'Sala ou Estar': {
-    numeral: 'II',
-    detail: 'Copo transparente de 200g · um pavio',
-    story: 'Criações autorais com óleos essenciais puros. Cada fragrância foi desenvolvida para transformar a sala em um ambiente de presença e acolhimento.',
-  },
-  'Refúgio': {
-    numeral: 'III',
-    detail: 'Copo âmbar de 300g · um pavio',
-    story: 'Um copo com presença e composições aromáticas exclusivas. Algumas criações autorais e outras com fragrâncias encomendadas e modificadas para ter a assinatura Loiê.',
-  },
-  'Botânicas e Florais': {
-    numeral: 'IV',
-    detail: 'Copo de 400g · dois pavios',
-    story: 'Aromas que consideramos exclusivos e ideais para queimas de dois pavios. Fragrâncias botânicas e florais que preenchem espaços maiores com sofisticação.',
-  },
-};
 
 const sortOptions = [
   { value: 'default', label: 'Destaque' },
@@ -66,7 +44,6 @@ const CollectionPage = () => {
 
   if (!collection) return <Navigate to="/shop" replace />;
 
-  const meta = collectionMeta[collection.name];
   const otherCollections = mockCollections.filter(c => c.slug !== slug && c.is_active);
 
   return (
@@ -116,7 +93,7 @@ const CollectionPage = () => {
                   color: 'rgba(244,237,210,0.35)',
                 }}
               >
-                {meta?.numeral}
+                {collection.numeral}
               </span>
               <h1
                 className="reveal-fade heading-display mb-5"
@@ -139,7 +116,7 @@ const CollectionPage = () => {
                   lineHeight: 1.8,
                 }}
               >
-                {meta?.story}
+                {collection.story}
               </p>
               <span
                 className="reveal-fade"
@@ -152,7 +129,7 @@ const CollectionPage = () => {
                   color: 'rgba(244,237,210,0.3)',
                 }}
               >
-                {meta?.detail}
+                {collection.detail}
               </span>
             </div>
           </div>
@@ -342,7 +319,6 @@ const CollectionPage = () => {
               </div>
               <div className="reveal-stagger grid grid-cols-1 md:grid-cols-3 gap-6">
                 {otherCollections.map((other) => {
-                  const otherMeta = collectionMeta[other.name];
                   return (
                     <Link
                       key={other.id}
@@ -374,7 +350,7 @@ const CollectionPage = () => {
                             marginBottom: 4,
                           }}
                         >
-                          {otherMeta?.numeral}
+                          {other.numeral}
                         </span>
                         <h3
                           className="heading-display"
@@ -396,7 +372,7 @@ const CollectionPage = () => {
                             color: 'rgba(244,237,210,0.35)',
                           }}
                         >
-                          {otherMeta?.detail}
+                          {other.detail}
                         </span>
                       </div>
                     </Link>

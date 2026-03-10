@@ -7,6 +7,7 @@ import {
   createAdminProduct, updateAdminProduct, deleteAdminProduct,
   createAdminCollection, updateAdminCollection, deleteAdminCollection,
   createAdminCollab, updateAdminCollab, deleteAdminCollab,
+  createAdminCoupon, updateAdminCoupon, deleteAdminCoupon,
 } from '@/lib/api';
 import { mockProducts } from '@/lib/mocks';
 import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Product, Collection, Collab } from '@/types';
@@ -15,13 +16,50 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
-import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package } from 'lucide-react';
 
 /* ─────────── Shared styles ─────────── */
 const cardCls = 'bg-card border border-border rounded-lg p-4';
 const tableCls = 'w-full text-sm';
 const thCls = 'py-3 pr-4 text-left text-xs text-muted-foreground uppercase tracking-wider';
 const tdCls = 'py-3 pr-4';
+
+/* ─────────── Confirm Delete Dialog ─────────── */
+function ConfirmDeleteDialog({ open, onOpenChange, title, description, onConfirm }: {
+  open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; onConfirm: () => void;
+}) {
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            Excluir
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+/* ─────────── Empty State ─────────── */
+function EmptyState({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <Package size={40} className="text-muted-foreground/40 mb-4" />
+      <p className="text-sm text-muted-foreground">Nenhum(a) {label} encontrado(a).</p>
+    </div>
+  );
+}
 
 /* ─────────── Modal ─────────── */
 function Modal({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
@@ -137,6 +175,7 @@ const Admin = () => {
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="collections">Coleções</TabsTrigger>
             <TabsTrigger value="collabs">Collabs</TabsTrigger>
+            <TabsTrigger value="coupons">Cupons</TabsTrigger>
             <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
           </TabsList>
 
@@ -146,6 +185,7 @@ const Admin = () => {
           <TabsContent value="products"><ProductsTab /></TabsContent>
           <TabsContent value="collections"><CollectionsTab /></TabsContent>
           <TabsContent value="collabs"><CollabsTab /></TabsContent>
+          <TabsContent value="coupons"><CouponsTab /></TabsContent>
           <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
         </Tabs>
       </div>
@@ -301,10 +341,12 @@ function CustomersTab() {
 
 /* ═══════════ PRODUCTS ═══════════ */
 function ProductsTab() {
+  const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   useEffect(() => { getAdminCollections().then(setCollections); }, []);
 
@@ -314,21 +356,27 @@ function ProductsTab() {
   const openEdit = (p: Product) => { setEditing(p); setModalOpen(true); };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Excluir este produto?')) return;
     try { await deleteAdminProduct(id); } catch { /* mock */ }
     setProducts(prev => prev.filter(p => p.id !== id));
+    setDeleteTarget(null);
+    toast({ title: 'Produto excluído com sucesso.' });
   };
 
   const handleSave = async (data: Partial<Product>) => {
-    if (editing) {
-      try { await updateAdminProduct(editing.id, data); } catch { /* mock */ }
-      setProducts(prev => prev.map(p => p.id === editing.id ? { ...p, ...data } as Product : p));
-    } else {
-      const newP = { ...emptyProduct, ...data, id: `new-${Date.now()}`, rating_avg: 0, rating_count: 0, created_at: new Date().toISOString().split('T')[0] } as Product;
-      try { await createAdminProduct(data); } catch { /* mock */ }
-      setProducts(prev => [...prev, newP]);
+    try {
+      if (editing) {
+        try { await updateAdminProduct(editing.id, data); } catch { /* mock */ }
+        setProducts(prev => prev.map(p => p.id === editing.id ? { ...p, ...data } as Product : p));
+      } else {
+        const newP = { ...emptyProduct, ...data, id: `new-${Date.now()}`, rating_avg: 0, rating_count: 0, created_at: new Date().toISOString().split('T')[0] } as Product;
+        try { await createAdminProduct(data); } catch { /* mock */ }
+        setProducts(prev => [...prev, newP]);
+      }
+      setModalOpen(false);
+      toast({ title: editing ? 'Produto atualizado com sucesso.' : 'Produto criado com sucesso.' });
+    } catch {
+      toast({ title: 'Erro ao salvar produto.', variant: 'destructive' });
     }
-    setModalOpen(false);
   };
 
   return (
@@ -337,46 +385,57 @@ function ProductsTab() {
         <h3 className="text-sm font-medium">Produtos ({products.length})</h3>
         <Button size="sm" onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1"><Plus size={14} /> Novo Produto</Button>
       </div>
-      <div className="overflow-x-auto">
-        <table className={tableCls}>
-          <thead>
-            <tr className="border-b border-border">
-              <th className={thCls}>Produto</th>
-              <th className={thCls}>Coleção</th>
-              <th className={thCls}>Preço</th>
-              <th className={thCls}>Badge</th>
-              <th className={thCls}>Bestseller</th>
-              <th className={thCls}>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map(p => (
-              <tr key={p.id} className="border-b border-border">
-                <td className={tdCls}>
-                  <div className="flex items-center gap-2">
-                    <img src={p.images[0]} alt={p.name} className="w-8 h-8 rounded object-cover" />
-                    <span className="font-medium">{p.name}</span>
-                  </div>
-                </td>
-                <td className={`${tdCls} text-muted-foreground`}>{p.collection}</td>
-                <td className={tdCls}>R$ {p.price.toFixed(2)}</td>
-                <td className={tdCls}>{p.badge && <span className={`badge-product badge-${p.badge} rounded-sm`}>{p.badge}</span>}</td>
-                <td className={tdCls}>{p.is_bestseller ? 'Sim' : '—'}</td>
-                <td className={tdCls}>
-                  <div className="flex gap-2">
-                    <button onClick={() => openEdit(p)} className="text-accent hover:text-accent/80"><Pencil size={14} /></button>
-                    <button onClick={() => handleDelete(p.id)} className="text-destructive hover:text-destructive/80"><Trash2 size={14} /></button>
-                  </div>
-                </td>
+
+      {products.length === 0 ? <EmptyState label="produto" /> : (
+        <div className="overflow-x-auto">
+          <table className={tableCls}>
+            <thead>
+              <tr className="border-b border-border">
+                <th className={thCls}>Produto</th>
+                <th className={thCls}>Coleção</th>
+                <th className={thCls}>Preço</th>
+                <th className={thCls}>Badge</th>
+                <th className={thCls}>Bestseller</th>
+                <th className={thCls}>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {products.map(p => (
+                <tr key={p.id} className="border-b border-border">
+                  <td className={tdCls}>
+                    <div className="flex items-center gap-2">
+                      <img src={p.images[0]} alt={p.name} className="w-8 h-8 rounded object-cover" />
+                      <span className="font-medium">{p.name}</span>
+                    </div>
+                  </td>
+                  <td className={`${tdCls} text-muted-foreground`}>{p.collection}</td>
+                  <td className={tdCls}>R$ {p.price.toFixed(2)}</td>
+                  <td className={tdCls}>{p.badge && <span className={`badge-product badge-${p.badge} rounded-sm`}>{p.badge}</span>}</td>
+                  <td className={tdCls}>{p.is_bestseller ? 'Sim' : '—'}</td>
+                  <td className={tdCls}>
+                    <div className="flex gap-2">
+                      <button onClick={() => openEdit(p)} className="text-accent hover:text-accent/80"><Pencil size={14} /></button>
+                      <button onClick={() => setDeleteTarget(p.id)} className="text-destructive hover:text-destructive/80"><Trash2 size={14} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Produto' : 'Novo Produto'}>
         <ProductForm product={editing} collections={collections} onSave={handleSave} onCancel={() => setModalOpen(false)} />
       </Modal>
+
+      <ConfirmDeleteDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Excluir produto"
+        description="Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita."
+        onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
+      />
     </div>
   );
 }
@@ -495,9 +554,11 @@ function ProductForm({ product, collections, onSave, onCancel }: { product: Prod
 
 /* ═══════════ COLLECTIONS ═══════════ */
 function CollectionsTab() {
+  const { toast } = useToast();
   const [collections, setCollections] = useState<Collection[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Collection | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   useEffect(() => { getAdminCollections().then(setCollections); }, []);
 
@@ -505,21 +566,27 @@ function CollectionsTab() {
   const openEdit = (c: Collection) => { setEditing(c); setModalOpen(true); };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Excluir esta coleção?')) return;
     try { await deleteAdminCollection(id); } catch { /* mock */ }
     setCollections(prev => prev.filter(c => c.id !== id));
+    setDeleteTarget(null);
+    toast({ title: 'Coleção excluída com sucesso.' });
   };
 
   const handleSave = async (data: Partial<Collection>) => {
-    if (editing) {
-      try { await updateAdminCollection(editing.id, data); } catch { /* mock */ }
-      setCollections(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Collection : c));
-    } else {
-      const newC = { ...data, id: `col-${Date.now()}`, is_active: true, sort_order: collections.length, created_at: new Date().toISOString().split('T')[0] } as Collection;
-      try { await createAdminCollection(data); } catch { /* mock */ }
-      setCollections(prev => [...prev, newC]);
+    try {
+      if (editing) {
+        try { await updateAdminCollection(editing.id, data); } catch { /* mock */ }
+        setCollections(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Collection : c));
+      } else {
+        const newC = { ...data, id: `col-${Date.now()}`, is_active: true, sort_order: collections.length, created_at: new Date().toISOString().split('T')[0] } as Collection;
+        try { await createAdminCollection(data); } catch { /* mock */ }
+        setCollections(prev => [...prev, newC]);
+      }
+      setModalOpen(false);
+      toast({ title: editing ? 'Coleção atualizada com sucesso.' : 'Coleção criada com sucesso.' });
+    } catch {
+      toast({ title: 'Erro ao salvar coleção.', variant: 'destructive' });
     }
-    setModalOpen(false);
   };
 
   return (
@@ -528,33 +595,46 @@ function CollectionsTab() {
         <h3 className="text-sm font-medium">Coleções ({collections.length})</h3>
         <Button size="sm" onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1"><Plus size={14} /> Nova Coleção</Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {collections.map(c => (
-          <div key={c.id} className={`${cardCls} relative overflow-hidden`}>
-            {c.cover_image && (
-              <img src={c.cover_image} alt={c.name} className="w-full h-32 object-cover rounded mb-3" />
-            )}
-            <div className="flex items-start justify-between">
-              <div>
-                <h4 className="font-medium text-sm">{c.name}</h4>
-                <p className="text-xs text-muted-foreground mt-1">{c.description}</p>
-                <p className="text-xs text-muted-foreground mt-1">slug: <code className="font-mono">{c.slug}</code></p>
+
+      {collections.length === 0 ? <EmptyState label="coleção" /> : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {collections.map(c => (
+            <div key={c.id} className={`${cardCls} relative overflow-hidden`}>
+              {c.cover_image && (
+                <img src={c.cover_image} alt={c.name} className="w-full h-32 object-cover rounded mb-3" />
+              )}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-medium text-sm">{c.numeral && <span className="text-muted-foreground mr-1">{c.numeral}</span>}{c.name}</h4>
+                  <p className="text-xs text-muted-foreground mt-1">{c.description}</p>
+                  {c.detail && <p className="text-xs text-muted-foreground mt-1">{c.detail}</p>}
+                  {c.price_label && <p className="text-xs font-medium mt-1">{c.price_label}</p>}
+                  <p className="text-xs text-muted-foreground mt-1">slug: <code className="font-mono">{c.slug}</code></p>
+                </div>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 ${c.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {c.is_active ? 'Ativa' : 'Inativa'}
+                </span>
               </div>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 ${c.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {c.is_active ? 'Ativa' : 'Inativa'}
-              </span>
+              <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+                <button onClick={() => openEdit(c)} className="text-xs text-accent hover:underline flex items-center gap-1"><Pencil size={12} /> Editar</button>
+                <button onClick={() => setDeleteTarget(c.id)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
+              </div>
             </div>
-            <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-              <button onClick={() => openEdit(c)} className="text-xs text-accent hover:underline flex items-center gap-1"><Pencil size={12} /> Editar</button>
-              <button onClick={() => handleDelete(c.id)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Coleção' : 'Nova Coleção'}>
         <CollectionForm collection={editing} onSave={handleSave} onCancel={() => setModalOpen(false)} />
       </Modal>
+
+      <ConfirmDeleteDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Excluir coleção"
+        description="Tem certeza que deseja excluir esta coleção? Esta ação não pode ser desfeita."
+        onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
+      />
     </div>
   );
 }
@@ -565,6 +645,10 @@ function CollectionForm({ collection, onSave, onCancel }: { collection: Collecti
     slug: collection?.slug || '',
     description: collection?.description || '',
     cover_image: collection?.cover_image || '',
+    numeral: collection?.numeral || '',
+    detail: collection?.detail || '',
+    story: collection?.story || '',
+    price_label: collection?.price_label || '',
     is_active: collection?.is_active ?? true,
     sort_order: collection?.sort_order ?? 0,
   });
@@ -587,9 +671,27 @@ function CollectionForm({ collection, onSave, onCancel }: { collection: Collecti
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Slug</label>
         <Input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} required />
       </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Numeral</label>
+          <Input value={form.numeral} onChange={e => setForm(f => ({ ...f, numeral: e.target.value }))} placeholder="ex: I, II, III" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Detalhe</label>
+          <Input value={form.detail} onChange={e => setForm(f => ({ ...f, detail: e.target.value }))} placeholder="ex: Latinha 160g · dois pavios" />
+        </div>
+      </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Descrição</label>
         <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Story (texto da hero)</label>
+        <textarea value={form.story} onChange={e => setForm(f => ({ ...f, story: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={3} placeholder="Texto descritivo longo para a hero da página da coleção" />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Faixa de preço</label>
+        <Input value={form.price_label} onChange={e => setForm(f => ({ ...f, price_label: e.target.value }))} placeholder="ex: a partir de R$ 72" />
       </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Imagem de capa</label>
@@ -615,9 +717,11 @@ function CollectionForm({ collection, onSave, onCancel }: { collection: Collecti
 
 /* ═══════════ COLLABS ═══════════ */
 function CollabsTab() {
+  const { toast } = useToast();
   const [collabs, setCollabs] = useState<Collab[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Collab | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   useEffect(() => { getAdminCollabs().then(setCollabs); }, []);
 
@@ -625,21 +729,27 @@ function CollabsTab() {
   const openEdit = (c: Collab) => { setEditing(c); setModalOpen(true); };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Excluir esta collab?')) return;
     try { await deleteAdminCollab(id); } catch { /* mock */ }
     setCollabs(prev => prev.filter(c => c.id !== id));
+    setDeleteTarget(null);
+    toast({ title: 'Collab excluída com sucesso.' });
   };
 
   const handleSave = async (data: Partial<Collab>) => {
-    if (editing) {
-      try { await updateAdminCollab(editing.id, data); } catch { /* mock */ }
-      setCollabs(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Collab : c));
-    } else {
-      const newC = { ...data, id: `cb-${Date.now()}`, is_active: true, sort_order: collabs.length, created_at: new Date().toISOString().split('T')[0] } as Collab;
-      try { await createAdminCollab(data); } catch { /* mock */ }
-      setCollabs(prev => [...prev, newC]);
+    try {
+      if (editing) {
+        try { await updateAdminCollab(editing.id, data); } catch { /* mock */ }
+        setCollabs(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Collab : c));
+      } else {
+        const newC = { ...data, id: `cb-${Date.now()}`, is_active: true, sort_order: collabs.length, created_at: new Date().toISOString().split('T')[0] } as Collab;
+        try { await createAdminCollab(data); } catch { /* mock */ }
+        setCollabs(prev => [...prev, newC]);
+      }
+      setModalOpen(false);
+      toast({ title: editing ? 'Collab atualizada com sucesso.' : 'Collab criada com sucesso.' });
+    } catch {
+      toast({ title: 'Erro ao salvar collab.', variant: 'destructive' });
     }
-    setModalOpen(false);
   };
 
   return (
@@ -648,44 +758,55 @@ function CollabsTab() {
         <h3 className="text-sm font-medium">Collabs ({collabs.length})</h3>
         <Button size="sm" onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1"><Plus size={14} /> Nova Collab</Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {collabs.map(c => (
-          <div key={c.id} className={cardCls}>
-            <div className="flex gap-3">
-              <div className="flex-shrink-0 flex gap-1">
-                {c.images.slice(0, 2).map((src, i) => (
-                  <div key={i} className="w-16 h-20 overflow-hidden rounded border border-border">
-                    {src.endsWith('.mp4') ? (
-                      <video src={src} className="w-full h-full object-cover" muted />
-                    ) : (
-                      <img src={src} alt="" className="w-full h-full object-cover" />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between">
-                  <h4 className="font-medium text-sm">{c.name}</h4>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 ${c.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {c.is_active ? 'Ativa' : 'Inativa'}
-                  </span>
+
+      {collabs.length === 0 ? <EmptyState label="collab" /> : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {collabs.map(c => (
+            <div key={c.id} className={cardCls}>
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 flex gap-1">
+                  {c.images.slice(0, 2).map((src, i) => (
+                    <div key={i} className="w-16 h-20 overflow-hidden rounded border border-border">
+                      {src.endsWith('.mp4') ? (
+                        <video src={src} className="w-full h-full object-cover" muted />
+                      ) : (
+                        <img src={src} alt="" className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                  ))}
                 </div>
-                {c.caption && <p className="text-xs text-accent mt-0.5">{c.caption}</p>}
-                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{c.description}</p>
-                <p className="text-xs text-muted-foreground mt-1">slug: <code className="font-mono">{c.slug}</code> · {c.images.length} mídia(s)</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between">
+                    <h4 className="font-medium text-sm">{c.name}</h4>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 ${c.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {c.is_active ? 'Ativa' : 'Inativa'}
+                    </span>
+                  </div>
+                  {c.caption && <p className="text-xs text-accent mt-0.5">{c.caption}</p>}
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{c.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1">slug: <code className="font-mono">{c.slug}</code> · {c.images.length} mídia(s)</p>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+                <button onClick={() => openEdit(c)} className="text-xs text-accent hover:underline flex items-center gap-1"><Pencil size={12} /> Editar</button>
+                <button onClick={() => setDeleteTarget(c.id)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
               </div>
             </div>
-            <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-              <button onClick={() => openEdit(c)} className="text-xs text-accent hover:underline flex items-center gap-1"><Pencil size={12} /> Editar</button>
-              <button onClick={() => handleDelete(c.id)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Collab' : 'Nova Collab'}>
         <CollabForm collab={editing} onSave={handleSave} onCancel={() => setModalOpen(false)} />
       </Modal>
+
+      <ConfirmDeleteDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Excluir collab"
+        description="Tem certeza que deseja excluir esta collab? Esta ação não pode ser desfeita."
+        onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
+      />
     </div>
   );
 }
@@ -748,20 +869,166 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
   );
 }
 
+/* ═══════════ COUPONS ═══════════ */
+function CouponsTab() {
+  const { toast } = useToast();
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState<Coupon | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
+  useEffect(() => { getAdminCoupons().then(setCoupons); }, []);
+
+  const openNew = () => { setEditing(null); setModalOpen(true); };
+  const openEdit = (c: Coupon) => { setEditing(c); setModalOpen(true); };
+
+  const handleToggleActive = async (coupon: Coupon) => {
+    const updated = { ...coupon, is_active: !coupon.is_active };
+    try { await updateAdminCoupon(coupon.id, { is_active: updated.is_active }); } catch { /* mock */ }
+    setCoupons(prev => prev.map(c => c.id === coupon.id ? updated : c));
+    toast({ title: updated.is_active ? 'Cupom ativado.' : 'Cupom desativado.' });
+  };
+
+  const handleDelete = async (id: string) => {
+    try { await deleteAdminCoupon(id); } catch { /* mock */ }
+    setCoupons(prev => prev.filter(c => c.id !== id));
+    setDeleteTarget(null);
+    toast({ title: 'Cupom excluído com sucesso.' });
+  };
+
+  const handleSave = async (data: Partial<Coupon>) => {
+    try {
+      if (editing) {
+        try { await updateAdminCoupon(editing.id, data); } catch { /* mock */ }
+        setCoupons(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Coupon : c));
+      } else {
+        const newC = { ...data, id: `cp-${Date.now()}`, uses: 0, created_at: new Date().toISOString().split('T')[0] } as Coupon;
+        try { await createAdminCoupon(data); } catch { /* mock */ }
+        setCoupons(prev => [...prev, newC]);
+      }
+      setModalOpen(false);
+      toast({ title: editing ? 'Cupom atualizado com sucesso.' : 'Cupom criado com sucesso.' });
+    } catch {
+      toast({ title: 'Erro ao salvar cupom.', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-sm font-medium">Cupons ({coupons.length})</h3>
+        <Button size="sm" onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1"><Plus size={14} /> Novo Cupom</Button>
+      </div>
+
+      {coupons.length === 0 ? <EmptyState label="cupom" /> : (
+        <div className="overflow-x-auto">
+          <table className={tableCls}>
+            <thead>
+              <tr className="border-b border-border">
+                <th className={thCls}>Código</th>
+                <th className={thCls}>Desconto</th>
+                <th className={thCls}>Usos</th>
+                <th className={thCls}>Máx. Usos</th>
+                <th className={thCls}>Status</th>
+                <th className={thCls}>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {coupons.map(c => (
+                <tr key={c.id} className="border-b border-border">
+                  <td className={`${tdCls} font-mono`}>{c.code}</td>
+                  <td className={tdCls}>{c.discount_percent}%</td>
+                  <td className={tdCls}>{c.uses}</td>
+                  <td className={tdCls}>{c.max_uses ?? '—'}</td>
+                  <td className={tdCls}>
+                    <Switch checked={c.is_active} onCheckedChange={() => handleToggleActive(c)} />
+                  </td>
+                  <td className={tdCls}>
+                    <div className="flex gap-2">
+                      <button onClick={() => openEdit(c)} className="text-accent hover:text-accent/80"><Pencil size={14} /></button>
+                      <button onClick={() => setDeleteTarget(c.id)} className="text-destructive hover:text-destructive/80"><Trash2 size={14} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Cupom' : 'Novo Cupom'}>
+        <CouponForm coupon={editing} onSave={handleSave} onCancel={() => setModalOpen(false)} />
+      </Modal>
+
+      <ConfirmDeleteDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Excluir cupom"
+        description="Tem certeza que deseja excluir este cupom? Esta ação não pode ser desfeita."
+        onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
+      />
+    </div>
+  );
+}
+
+function CouponForm({ coupon, onSave, onCancel }: { coupon: Coupon | null; onSave: (data: Partial<Coupon>) => void; onCancel: () => void }) {
+  const [form, setForm] = useState({
+    code: coupon?.code || '',
+    discount_percent: coupon?.discount_percent || 0,
+    is_active: coupon?.is_active ?? true,
+    max_uses: coupon?.max_uses ?? '',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave({
+      code: form.code.toUpperCase(),
+      discount_percent: Number(form.discount_percent),
+      is_active: form.is_active,
+      max_uses: form.max_uses !== '' ? Number(form.max_uses) : undefined,
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Código</label>
+        <Input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="ex: LOIE15" required />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Desconto (%)</label>
+          <Input type="number" min="1" max="100" value={form.discount_percent} onChange={e => setForm(f => ({ ...f, discount_percent: Number(e.target.value) }))} required />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Máx. usos (opcional)</label>
+          <Input type="number" min="0" value={form.max_uses} onChange={e => setForm(f => ({ ...f, max_uses: e.target.value === '' ? '' : Number(e.target.value) }))} placeholder="Ilimitado" />
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch checked={form.is_active} onCheckedChange={v => setForm(f => ({ ...f, is_active: v }))} />
+        <label className="text-sm">Ativo</label>
+      </div>
+      <div className="flex gap-2 pt-2">
+        <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{coupon ? 'Salvar' : 'Criar'}</Button>
+        <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
+      </div>
+    </form>
+  );
+}
+
 /* ═══════════ NEWSLETTER ═══════════ */
 function NewsletterTab() {
   const [subs, setSubs] = useState<NewsletterSubscriber[]>([]);
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
 
   useEffect(() => {
     getAdminNewsletter().then(setSubs);
-    getAdminCoupons().then(setCoupons);
   }, []);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h3 className="text-sm font-medium mb-4">Assinantes Newsletter ({subs.length})</h3>
+    <div>
+      <h3 className="text-sm font-medium mb-4">Assinantes Newsletter ({subs.length})</h3>
+      {subs.length === 0 ? <EmptyState label="assinante" /> : (
         <div className="overflow-x-auto">
           <table className={tableCls}>
             <thead><tr className="border-b border-border"><th className={thCls}>E-mail</th><th className={thCls}>Cupom</th><th className={thCls}>Data</th></tr></thead>
@@ -776,26 +1043,7 @@ function NewsletterTab() {
             </tbody>
           </table>
         </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium mb-4">Cupons</h3>
-        <div className="overflow-x-auto">
-          <table className={tableCls}>
-            <thead><tr className="border-b border-border"><th className={thCls}>Código</th><th className={thCls}>Desconto</th><th className={thCls}>Usos</th><th className={thCls}>Status</th></tr></thead>
-            <tbody>
-              {coupons.map(c => (
-                <tr key={c.id} className="border-b border-border">
-                  <td className={`${tdCls} font-mono`}>{c.code}</td>
-                  <td className={tdCls}>{c.discount_percent}%</td>
-                  <td className={tdCls}>{c.uses}</td>
-                  <td className={tdCls}>{c.is_active ? <span className="text-green-600 text-xs">Ativo</span> : <span className="text-muted-foreground text-xs">Inativo</span>}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
