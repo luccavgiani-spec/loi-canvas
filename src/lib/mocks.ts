@@ -44,6 +44,35 @@ export const mockProducts: Product[] = [
   {
     id: '8', slug: 'alecrim-salvia', name: 'Alecrim & Sálvia', description: 'Herbáceo vibrante com alecrim fresco, sálvia e um fundo de musgo de carvalho.', details: 'Cera de soja. Pavio de algodão. Duração aprox. 50h. Peso: 250g.', how_to_use: 'Perfeita para energizar o ambiente.', care_instructions: 'Não deixe sem supervisão.', price: 169, images: [imgAlecrimSalvia, imgLavandaProvencal], collection: 'Herbais', tags: ['herbal', 'energizante'], rating_avg: 4.5, rating_count: 29, is_bestseller: false, created_at: '2025-02-20'
   },
+  /* ── Brown collection ── */
+  {
+    id: '9', slug: 'caramelo', name: 'Caramelo', description: 'Notas envolventes de caramelo, baunilha e um toque de especiarias. Uma fragrância quente e acolhedora.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 60h. Peso: 300g.', how_to_use: 'Acenda por no mínimo 1 hora na primeira utilização.', care_instructions: 'Mantenha longe de correntes de ar.', price: 259.90, images: ['/hero/loie_vela_CARAMELO_imagem.JPG', '/hero/loie_vela_caramelo_última.JPG'], collection: 'Brown', tags: ['doce', 'especiado'], rating_avg: 4.9, rating_count: 12, is_bestseller: false, created_at: '2025-06-01'
+  },
+  {
+    id: '10', slug: 'bosque', name: 'Bosque', description: 'Imersão olfativa em madeiras nobres, folhas secas e um fundo terroso de musgo. Profundidade e elegância.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 60h. Peso: 300g.', how_to_use: 'Perfeita para criar atmosferas envolventes.', care_instructions: 'Armazene com tampa em local fresco.', price: 259.90, images: ['/hero/loie_vela_BOSQUE_imagem.JPG', '/hero/loie_vela_bosque_última.JPG'], collection: 'Brown', tags: ['amadeirado', 'terroso'], rating_avg: 5.0, rating_count: 8, is_bestseller: false, created_at: '2025-06-01'
+  },
+  {
+    id: '11', slug: 'ritual', name: 'Ritual', description: 'Blend intenso de incenso, âmbar e resinas. Uma experiência sensorial que convida à introspecção.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 60h. Peso: 300g.', how_to_use: 'Ideal para momentos de meditação e relaxamento.', care_instructions: 'Não queime por mais de 4 horas seguidas.', price: 259.90, images: ['/hero/loie_vela_RITUAL_imagem.JPG', '/hero/loie_vela_ritual_última.JPG'], collection: 'Brown', tags: ['oriental', 'resinoso'], rating_avg: 4.8, rating_count: 15, is_bestseller: false, created_at: '2025-06-01'
+  },
+  /* ── Clássicas collection ── */
+  {
+    id: '12', slug: 'campos', name: 'Campos', description: 'Frescor herbáceo de campos abertos, com lavanda selvagem, alecrim e um toque de feno seco.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 45h. Peso: 200g.', how_to_use: 'Acenda e deixe o aroma preencher o ambiente.', care_instructions: 'Mantenha em local ventilado.', price: 174.90, images: ['/hero/loie_vela_campos_principal.JPG', '/hero/loie_vela_campos_imagem.JPG', '/hero/loie_vela_campos_imagem_2.JPG', '/hero/loie_vela_campos_última.JPG'], collection: 'Clássicas', tags: ['herbal', 'fresco'], rating_avg: 4.7, rating_count: 22, is_bestseller: true, created_at: '2025-06-01'
+  },
+  {
+    id: '13', slug: 'icaro', name: 'Ícaro', description: 'Notas solares de bergamota, neroli e almíscar branco. Uma fragrância luminosa e elevada.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 45h. Peso: 200g.', how_to_use: 'Perfeita para escritórios e salas de estar.', care_instructions: 'Evite exposição direta ao sol.', price: 174.90, images: ['/hero/loie_vela_icaro_principal.JPG', '/hero/loie_vela_icaro_última.JPG'], collection: 'Clássicas', tags: ['cítrico', 'solar'], rating_avg: 4.6, rating_count: 18, is_bestseller: true, created_at: '2025-06-01'
+  },
+  {
+    id: '14', slug: 'gin', name: 'Gin', description: 'Blend refrescante de zimbro, limão siciliano e canela. Inspirado nos melhores gin tônicos.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 45h. Peso: 200g.', how_to_use: 'Ideal para receber convidados.', care_instructions: 'Armazene em local fresco e seco.', price: 184.90, images: ['/hero/loie_vela_gin_canela_principal.jpg', '/hero/loie_vela_gin_última.JPG'], collection: 'Clássicas', tags: ['fresco', 'especiado'], rating_avg: 4.8, rating_count: 31, is_bestseller: true, created_at: '2025-06-01'
+  },
+  {
+    id: '15', slug: 'dulce', name: 'Dulce', description: 'Doçura delicada de baunilha, leite de coco e um toque sutil de flor de sal. Aconchego puro.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 45h. Peso: 200g.', how_to_use: 'Acenda em ambientes aconchegantes.', care_instructions: 'Mantenha longe de crianças e pets.', price: 184.90, images: ['/hero/loie_vela_DULCE_imagem.JPG', '/hero/loie_vela_dulce_última.JPG'], collection: 'Clássicas', tags: ['doce', 'gourmand'], rating_avg: 4.9, rating_count: 27, is_bestseller: true, created_at: '2025-06-01'
+  },
+  {
+    id: '16', slug: 'pomar', name: 'Pomar', description: 'Frutas maduras, folhas verdes e madeira de macieira. Um passeio por um pomar ensolarado.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 45h. Peso: 200g.', how_to_use: 'Perfeita para criar atmosferas vibrantes.', care_instructions: 'Não deixe sem supervisão.', price: 184.90, images: ['/hero/loie_vela_pomar_principal.JPG', '/hero/loie_vela_pomar_imagem.JPG', '/hero/loie_vela_pomar_imagem_2.JPG', '/hero/loie_vela_pomar_imagem_3.JPG', '/hero/loie_vela_pomar_última.JPG'], collection: 'Clássicas', tags: ['frutado', 'verde'], rating_avg: 4.7, rating_count: 20, is_bestseller: true, created_at: '2025-06-01'
+  },
+  {
+    id: '17', slug: 'estela', name: 'Estela', description: 'Elegância floral de jasmim, peônia e sândalo. Uma fragrância sofisticada e atemporal.', details: 'Cera de soja 100% natural. Pavio de algodão. Duração aprox. 45h. Peso: 200g.', how_to_use: 'Ideal para quartos e espaços íntimos.', care_instructions: 'Mantenha o pavio centralizado.', price: 184.90, images: ['/hero/loie_vela_estela_principal.JPG', '/hero/loie_vela_estela_imagem.JPG', '/hero/loie_vela_estela_última.JPG', '/hero/loie_vela_estela (1).mp4'], collection: 'Clássicas', tags: ['floral', 'sofisticado'], rating_avg: 4.8, rating_count: 14, is_bestseller: true, created_at: '2025-06-01'
+  },
 ];
 
 export const mockReviews: Review[] = [
@@ -103,6 +132,8 @@ export const mockCollections: Collection[] = [
   { id: 'col3', slug: 'herbais', name: 'Herbais', description: 'Essências verdes e aromáticas', cover_image: imgLavandaProvencal, is_active: true, sort_order: 2, created_at: '2025-01-01' },
   { id: 'col4', slug: 'orientais', name: 'Orientais', description: 'Fragrâncias ricas e envolventes', cover_image: imgRosaOud, is_active: true, sort_order: 3, created_at: '2025-01-01' },
   { id: 'col5', slug: 'gourmand', name: 'Gourmand', description: 'Notas doces e aconchegantes', cover_image: imgBaunilhaTonka, is_active: true, sort_order: 4, created_at: '2025-01-01' },
+  { id: 'col6', slug: 'brown', name: 'Brown', description: 'Fragrâncias intensas e sofisticadas', cover_image: '/hero/loie_vela_BOSQUE_imagem.JPG', is_active: true, sort_order: 5, created_at: '2025-06-01' },
+  { id: 'col7', slug: 'classicas', name: 'Clássicas', description: 'Aromas clássicos e atemporais', cover_image: '/hero/loie_vela_campos_principal.JPG', is_active: true, sort_order: 6, created_at: '2025-06-01' },
 ];
 
 export const mockCollabs: Collab[] = [
