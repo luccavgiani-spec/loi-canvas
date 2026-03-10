@@ -1,21 +1,52 @@
+import { useRef, useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { storageUrl } from '@/lib/storage';
 
 const banner01 = storageUrl('loie_vela_campos_imagem.JPG');
 const heroVideo = storageUrl('Cartao_Postal_Loie.mp4');
+const manifestoVideo = storageUrl('video_sobre (1).mp4');
 
 /* grain SVG (same as home hero) */
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 
+/** Hook: play video when it scrolls into view */
+function useScrollVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          el.play().catch(() => {});
+        } else {
+          el.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { videoRef, isVisible };
+}
+
 const About = () => {
   const ref = useReveal();
+  const { videoRef, isVisible } = useScrollVideo();
 
   return (
     <Layout>
       <div ref={ref}>
-        {/* Hero banner — same visual language as home hero */}
+        {/* Hero banner */}
         <section className="relative w-full overflow-hidden" style={{ height: 'clamp(350px, 60vh, 720px)', background: '#29241f' }}>
           {/* video */}
           <video
@@ -29,14 +60,23 @@ const About = () => {
             style={{ filter: 'saturate(0.70) brightness(0.72) contrast(1.05)' }}
           />
 
-          {/* overlay (radial vignette + top/bottom gradient — matches home hero) */}
+          {/* overlay (radial vignette + top/bottom gradient) */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               background: `
                 radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.02) 0%, rgba(41,36,31,0.35) 100%),
-                linear-gradient(to bottom, rgba(41,36,31,0.40) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 72%, rgba(41,36,31,0.45) 100%)
+                linear-gradient(to bottom, rgba(41,36,31,0.40) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 55%, rgba(41,36,31,0.70) 100%)
               `,
+            }}
+          />
+
+          {/* bottom fade into cream — seamless transition */}
+          <div
+            className="absolute bottom-0 left-0 right-0 pointer-events-none"
+            style={{
+              height: '40%',
+              background: 'linear-gradient(to bottom, transparent 0%, rgba(244,237,210,0.15) 40%, rgba(244,237,210,0.5) 70%, #f4edd2 100%)',
             }}
           />
 
@@ -59,9 +99,6 @@ const About = () => {
             </div>
           </div>
         </section>
-
-        {/* Gradient transition from hero to content */}
-        <div className="w-full h-24 md:h-32" style={{ background: 'linear-gradient(to bottom, #29241f 0%, #f4edd2 100%)' }} />
 
         {/* Story */}
         <section className="py-12 md:py-16 px-6">
@@ -142,34 +179,54 @@ const About = () => {
               ))}
             </div>
 
-            {/* Manifesto */}
-            <div className="reveal text-center max-w-2xl mx-auto">
-              <span className="loi-label block mb-6">manifesto</span>
-              <h2
-                className="heading-display mb-8"
-                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#29241f', lineHeight: 1.2 }}
-              >
-                A Loiê Sala Aromática é esse gesto poético, mas também é um ateliê real
-                <em style={{ color: '#565600' }}>— feito de tempo, matéria, escolhas e presença</em>
-              </h2>
-              <p
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontWeight: 300,
-                  fontStyle: 'italic',
-                  fontSize: '1.05rem',
-                  color: '#29241f',
-                  lineHeight: 1.8,
-                }}
-              >
-                {'\n'}A Loiê Sala Aromática é esse gesto poético, mas também é um ateliê real — feito de tempo, matéria, escolhas e presença
-                {'\n'}A Loiê nasceu em 2015, a partir de pequenos experimentos realizados pelo artista e fundador André Magalhães Liza. Desde o início, o gesto de acender uma vela esteve ligado ao desejo de qualificar o tempo — dentro de casa, no cotidiano, no silêncio entre as tarefas.
-                {'\n\n'}O ateliê tomou forma com a ocupação de uma casa antiga de família, no interior de São Paulo. Reativar esse espaço foi também um exercício de memória: recuperar valores, ritmos e afetos que atravessam gerações. A casa moldou a Loiê tanto quanto a Loiê passou a habitar a casa.
-                {'\n\n'}Ao longo de sua trajetória, a marca foi construída em diferentes etapas e parcerias, sempre guiada pela atenção às matérias-primas, ao fazer manual e à experiência sensível do aroma. Trabalhamos com ceras vegetais, óleos essenciais e processos cuidadosos, respeitando o tempo de cada criação.
-                {'\n\n'}Hoje a Loiê Sala Aromática segue como um ateliê autoral dedicado à criação de atmosferas — objetos que convidam à presença, ao cuidado e a uma relação mais consciente com o espaço e consigo mesmo. Acreditamos que habitar o agora, com atenção e delicadeza, também é uma forma de transformar o mundo.
-              </p>
-              <div className="mt-10">
-                <Link to="/shop" className="loi-btn">explorar coleção</Link>
+            {/* Manifesto — left text + right video */}
+            <div className="reveal grid md:grid-cols-2 gap-12 items-start">
+              {/* Left: text */}
+              <div className="text-left">
+                <span className="loi-label block mb-6">manifesto</span>
+                <h2
+                  className="heading-display mb-8"
+                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#29241f', lineHeight: 1.2, textAlign: 'left' }}
+                >
+                  A Loiê Sala Aromática é esse gesto poético, mas também é um ateliê real
+                  <em style={{ color: '#565600' }}>— feito de tempo, matéria, escolhas e presença</em>
+                </h2>
+                <p
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontWeight: 300,
+                    fontStyle: 'italic',
+                    fontSize: '1.05rem',
+                    color: '#29241f',
+                    lineHeight: 1.8,
+                    textAlign: 'left',
+                  }}
+                >
+                  A Loiê nasceu em 2015, a partir de pequenos experimentos realizados pelo artista e fundador André Magalhães Liza. Desde o início, o gesto de acender uma vela esteve ligado ao desejo de qualificar o tempo — dentro de casa, no cotidiano, no silêncio entre as tarefas.
+                  {'\n\n'}O ateliê tomou forma com a ocupação de uma casa antiga de família, no interior de São Paulo. Reativar esse espaço foi também um exercício de memória: recuperar valores, ritmos e afetos que atravessam gerações. A casa moldou a Loiê tanto quanto a Loiê passou a habitar a casa.
+                  {'\n\n'}Ao longo de sua trajetória, a marca foi construída em diferentes etapas e parcerias, sempre guiada pela atenção às matérias-primas, ao fazer manual e à experiência sensível do aroma. Trabalhamos com ceras vegetais, óleos essenciais e processos cuidadosos, respeitando o tempo de cada criação.
+                  {'\n\n'}Hoje a Loiê Sala Aromática segue como um ateliê autoral dedicado à criação de atmosferas — objetos que convidam à presença, ao cuidado e a uma relação mais consciente com o espaço e consigo mesmo. Acreditamos que habitar o agora, com atenção e delicadeza, também é uma forma de transformar o mundo.
+                </p>
+                <div className="mt-10">
+                  <Link to="/shop" className="loi-btn">explorar coleção</Link>
+                </div>
+              </div>
+
+              {/* Right: scroll-triggered video */}
+              <div className="relative">
+                <video
+                  ref={videoRef}
+                  src={manifestoVideo}
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  className="w-full aspect-[9/16] object-cover transition-opacity duration-700"
+                  style={{
+                    opacity: isVisible ? 1 : 0.3,
+                    filter: 'saturate(0.7) brightness(0.85)',
+                  }}
+                />
               </div>
             </div>
           </div>
