@@ -210,7 +210,7 @@ const Header = () => {
         {/* Logo center */}
         <Link to="/" className="absolute left-1/2 -translate-x-1/2">
           <img
-            src={scrolled ? '/hero/Logo Marrom.jpg' : '/hero/LOGO_BRANCA_t.png'}
+            src={scrolled ? '/hero/Logo_Marrom.jpg' : '/hero/LOGO_BRANCA_t.png'}
             alt="Loiê"
             style={{
               width: 'clamp(70px, 8vw, 110px)',
