@@ -158,7 +158,7 @@ const ProductDetail = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   fontWeight: 300,
                   fontSize: '0.75rem',
-                  color: 'rgba(41,36,31,0.45)',
+                  color: '#29241f',
                 }}
               >
                 {product.rating_avg} ({product.rating_count} avaliações)
@@ -179,7 +179,7 @@ const ProductDetail = () => {
                     fontFamily: "'Montserrat', sans-serif",
                     fontWeight: 300,
                     fontSize: '1rem',
-                    color: 'rgba(41,36,31,0.3)',
+                    color: '#29241f',
                     textDecoration: 'line-through',
                   }}
                 >
@@ -195,7 +195,7 @@ const ProductDetail = () => {
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: '1.05rem',
-                color: 'rgba(41,36,31,0.55)',
+                color: '#29241f',
                 lineHeight: 1.8,
               }}
             >
@@ -212,7 +212,7 @@ const ProductDetail = () => {
                       fontFamily: "'Montserrat', sans-serif",
                       fontWeight: 300,
                       fontSize: '0.72rem',
-                      color: 'rgba(41,36,31,0.45)',
+                      color: '#29241f',
                     }}
                   >
                     {b.label}
@@ -260,7 +260,7 @@ const ProductDetail = () => {
                         fontFamily: "'Montserrat', sans-serif",
                         fontWeight: 300,
                         fontSize: '0.82rem',
-                        color: 'rgba(41,36,31,0.5)',
+                        color: '#29241f',
                         lineHeight: 1.8,
                       }}
                     >
@@ -300,7 +300,7 @@ const ProductDetail = () => {
                       <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '0.95rem', color: '#29241f' }}>
                         {r.title}
                       </h4>
-                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: 'rgba(41,36,31,0.4)' }}>
+                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: '#29241f' }}>
                         {r.body}
                       </p>
                     </div>

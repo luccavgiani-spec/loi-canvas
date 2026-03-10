@@ -98,7 +98,7 @@ const ProductCard = ({ product, addItem }: { product: typeof PRODUCTS[0]; addIte
               fontFamily: "'Montserrat', sans-serif",
               fontWeight: 300,
               fontSize: '0.7rem',
-              color: 'rgba(41,36,31,0.3)',
+              color: '#29241f',
               textDecoration: 'line-through',
             }}
           >
@@ -178,7 +178,7 @@ const ProductFocusBanner = ({
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: '1.05rem',
-              color: 'rgba(41,36,31,0.5)',
+              color: '#29241f',
               lineHeight: 1.8,
               marginBottom: '1.5rem',
             }}
@@ -281,7 +281,7 @@ const CollabCard = ({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             fontFamily: "'Montserrat', sans-serif",
             fontWeight: 300,
             fontSize: '0.72rem',
-            color: 'rgba(41,36,31,0.45)',
+            color: '#29241f',
             marginBottom: 8,
           }}
         >
@@ -456,7 +456,7 @@ const HomeSections = () => {
                     fontFamily: "'Montserrat', sans-serif",
                     fontWeight: 300,
                     fontSize: '0.82rem',
-                    color: 'rgba(41,36,31,0.45)',
+                    color: '#29241f',
                     lineHeight: 1.8,
                     maxWidth: 520,
                   }}
@@ -491,7 +491,7 @@ const HomeSections = () => {
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: '1.05rem',
-              color: 'rgba(41,36,31,0.5)',
+              color: '#29241f',
               lineHeight: 1.7,
             }}
           >

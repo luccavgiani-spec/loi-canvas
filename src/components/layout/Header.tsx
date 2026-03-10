@@ -67,15 +67,16 @@ const Header = () => {
     setTrackingOpen(false);
   };
 
+  // Both scrolled (home) and non-home pages use dark navbar
   const linkClass = scrolled ? 'loi-nav-link' : 'hero-nav-link';
-  const iconColor = scrolled ? '#29241f' : 'rgba(244,237,210,0.5)';
-  const iconHoverColor = scrolled ? '#29241f' : '#f4edd2';
-  const activeLinkColor = scrolled ? '#29241f' : '#f4edd2';
+  const iconColor = scrolled ? '#fcf5e0' : 'rgba(244,237,210,0.5)';
+  const iconHoverColor = '#f4edd2';
+  const activeLinkColor = '#f4edd2';
 
-  const dropdownBg = scrolled ? 'rgba(252,245,224,0.97)' : 'rgba(41,36,31,0.95)';
-  const dropdownBorder = scrolled ? 'rgba(86,86,0,0.1)' : 'rgba(244,237,210,0.1)';
-  const dropdownText = scrolled ? '#29241f' : '#f4edd2';
-  const dropdownMuted = scrolled ? 'rgba(41,36,31,0.45)' : 'rgba(244,237,210,0.3)';
+  const dropdownBg = 'rgba(41,36,31,0.95)';
+  const dropdownBorder = 'rgba(244,237,210,0.1)';
+  const dropdownText = '#f4edd2';
+  const dropdownMuted = 'rgba(244,237,210,0.3)';
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,9 +117,9 @@ const Header = () => {
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
       style={{
-        background: scrolled ? 'rgba(252,245,224,0.92)' : 'transparent',
+        background: scrolled ? 'rgba(41,36,31,0.95)' : 'transparent',
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(86,86,0,0.1)' : '1px solid transparent',
+        borderBottom: scrolled ? '1px solid rgba(244,237,210,0.08)' : '1px solid transparent',
       }}
     >
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-6 md:px-10" style={{ height: '5rem' }}>
@@ -179,7 +180,7 @@ const Header = () => {
                     to="/shop"
                     onClick={() => setCollectionsOpen(false)}
                     className="block mb-3 pb-3"
-                    style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.68rem', color: scrolled ? '#29241f' : '#f4edd2', textDecoration: 'none', borderBottom: `1px solid ${dropdownBorder}` }}
+                    style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.68rem', color: '#f4edd2', textDecoration: 'none', borderBottom: `1px solid ${dropdownBorder}` }}
                   >
                     ver todas
                   </Link>
@@ -192,7 +193,7 @@ const Header = () => {
                       style={{ textDecoration: 'none' }}
                     >
                       <span
-                        style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.68rem', color: scrolled ? '#29241f' : 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'block' }}
+                        style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.68rem', color: 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'block' }}
                         className="group-hover/item:!text-[#565600]"
                       >
                         {col.label}
@@ -216,7 +217,7 @@ const Header = () => {
         </div>
 
         {/* Logo center */}
-        <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ background: scrolled ? '#fcf5e0' : 'transparent', borderRadius: 4 }}>
+        <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ borderRadius: 4 }}>
           <img
             src="/hero/LOGO_BRANCA_t.png"
             alt="Loiê"
@@ -226,7 +227,6 @@ const Header = () => {
             style={{
               width: 'clamp(70px, 8vw, 110px)',
               height: 'auto',
-              mixBlendMode: scrolled ? 'multiply' : 'normal',
               transition: 'opacity 0.5s ease',
             }}
           />
@@ -251,7 +251,7 @@ const Header = () => {
                 className="absolute top-full right-0 mt-3"
                 style={{ background: dropdownBg, backdropFilter: 'blur(16px)', border: `1px solid ${dropdownBorder}`, padding: '16px 20px', minWidth: 280 }}
               >
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.62rem', color: scrolled ? 'rgba(41,36,31,0.4)' : 'rgba(244,237,210,0.35)', display: 'block', marginBottom: 10 }}>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.62rem', color: 'rgba(244,237,210,0.35)', display: 'block', marginBottom: 10 }}>
                   rastrear pedido
                 </span>
                 <form onSubmit={handleTracking} className="flex items-center gap-2">
@@ -261,7 +261,7 @@ const Header = () => {
                     onChange={(e) => setTrackingCode(e.target.value)}
                     placeholder="Código de rastreio"
                     autoFocus
-                    style={{ background: scrolled ? 'rgba(41,36,31,0.05)' : 'rgba(244,237,210,0.05)', border: `1px solid ${scrolled ? 'rgba(86,86,0,0.15)' : 'rgba(244,237,210,0.1)'}`, outline: 'none', fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.08em', color: dropdownText, padding: '8px 12px', width: '100%' }}
+                    style={{ background: 'rgba(244,237,210,0.05)', border: '1px solid rgba(244,237,210,0.1)', outline: 'none', fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.08em', color: dropdownText, padding: '8px 12px', width: '100%' }}
                   />
                   <button
                     type="submit"
@@ -287,7 +287,7 @@ const Header = () => {
             {count > 0 && (
               <span
                 className="absolute -top-1 -right-2 flex items-center justify-center w-4 h-4 rounded-full text-[9px]"
-                style={{ background: '#29241f', color: '#f4edd2', fontFamily: "var(--font-body)", fontWeight: 400 }}
+                style={{ background: '#fcf5e0', color: '#29241f', fontFamily: "var(--font-body)", fontWeight: 400 }}
               >
                 {count}
               </span>
@@ -300,17 +300,17 @@ const Header = () => {
       {searchOpen && (
         <div
           className="md:hidden px-6 py-3"
-          style={{ background: 'rgba(252,245,224,0.97)', borderTop: '1px solid rgba(86,86,0,0.08)', backdropFilter: 'blur(12px)' }}
+          style={{ background: 'rgba(41,36,31,0.97)', borderTop: '1px solid rgba(244,237,210,0.08)', backdropFilter: 'blur(12px)' }}
         >
           <form onSubmit={handleSearch} className="flex items-center gap-2">
-            <Search size={14} style={{ color: '#29241f', flexShrink: 0 }} />
+            <Search size={14} style={{ color: '#fcf5e0', flexShrink: 0 }} />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar produtos..."
               autoFocus
-              style={{ background: 'transparent', border: 'none', outline: 'none', fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.1em', color: '#29241f', width: '100%' }}
+              style={{ background: 'transparent', border: 'none', outline: 'none', fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.1em', color: '#fcf5e0', width: '100%' }}
             />
           </form>
         </div>
@@ -321,8 +321,8 @@ const Header = () => {
         <nav
           className="md:hidden px-6 py-5"
           style={{
-            background: 'rgba(252,245,224,0.97)',
-            borderTop: '1px solid rgba(86,86,0,0.1)',
+            background: 'rgba(41,36,31,0.97)',
+            borderTop: '1px solid rgba(244,237,210,0.08)',
             backdropFilter: 'blur(12px)',
           }}
         >
@@ -333,7 +333,7 @@ const Header = () => {
                 to="/shop"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#29241f', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
               >
                 Coleções
               </Link>
@@ -346,7 +346,7 @@ const Header = () => {
                   to={`/shop?collection=${col.slug}`}
                   onClick={() => setMobileOpen(false)}
                   className="block py-2 pl-4"
-                  style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.1em', fontSize: '0.7rem', color: 'rgba(41,36,31,0.7)', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.04)' }}
+                  style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.1em', fontSize: '0.7rem', color: 'rgba(244,237,210,0.6)', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.04)' }}
                 >
                   {col.label}
                 </Link>
@@ -358,7 +358,7 @@ const Header = () => {
                 to="/about"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#29241f', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
               >
                 Sobre
               </Link>
@@ -369,7 +369,7 @@ const Header = () => {
                 to="/collabs"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#29241f', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
               >
                 Collabs
               </Link>
@@ -380,7 +380,7 @@ const Header = () => {
                 to="/contact"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#29241f', textDecoration: 'none' }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none' }}
               >
                 Contato
               </Link>
@@ -388,19 +388,19 @@ const Header = () => {
           </ul>
 
           {/* Tracking inline form */}
-          <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(86,86,0,0.08)' }}>
+          <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}>
             <form onSubmit={handleTracking} className="flex items-center gap-2">
-              <Truck size={14} style={{ color: '#29241f', flexShrink: 0 }} />
+              <Truck size={14} style={{ color: '#fcf5e0', flexShrink: 0 }} />
               <input
                 type="text"
                 value={trackingCode}
                 onChange={(e) => setTrackingCode(e.target.value)}
                 placeholder="Código de rastreio"
-                style={{ background: 'rgba(41,36,31,0.03)', border: '1px solid rgba(86,86,0,0.1)', outline: 'none', fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.08em', color: '#29241f', padding: '6px 10px', width: '100%' }}
+                style={{ background: 'rgba(244,237,210,0.05)', border: '1px solid rgba(244,237,210,0.1)', outline: 'none', fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.08em', color: '#fcf5e0', padding: '6px 10px', width: '100%' }}
               />
               <button
                 type="submit"
-                style={{ background: '#29241f', color: '#f4edd2', border: 'none', padding: '6px 12px', fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.6rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                style={{ background: '#fcf5e0', color: '#29241f', border: 'none', padding: '6px 12px', fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.6rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
               >
                 rastrear
               </button>

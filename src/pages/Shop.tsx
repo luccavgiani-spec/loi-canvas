@@ -73,7 +73,7 @@ const Shop = () => {
                       border: '1px solid',
                       borderColor: collection === c ? '#565600' : 'rgba(86,86,0,0.2)',
                       background: collection === c ? 'rgba(86,86,0,0.12)' : 'transparent',
-                      color: collection === c ? '#29241f' : 'rgba(41,36,31,0.45)',
+                      color: '#29241f',
                       transition: 'all 0.3s ease',
                       cursor: 'pointer',
                     }}
@@ -88,7 +88,7 @@ const Shop = () => {
                 style={{
                   background: 'rgba(41,36,31,0.04)',
                   border: '1px solid rgba(86,86,0,0.2)',
-                  color: 'rgba(41,36,31,0.55)',
+                  color: '#29241f',
                   fontFamily: "'Montserrat', sans-serif",
                   fontWeight: 300,
                   fontSize: '0.75rem',
@@ -115,7 +115,7 @@ const Shop = () => {
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-20">
-                <p style={{ color: 'rgba(41,36,31,0.4)', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}>
+                <p style={{ color: '#29241f', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic' }}>
                   Nenhum produto encontrado.
                 </p>
               </div>
@@ -179,7 +179,7 @@ const Shop = () => {
                           fontWeight: 300,
                           fontStyle: 'italic',
                           fontSize: '0.82rem',
-                          color: 'rgba(41,36,31,0.4)',
+                          color: '#29241f',
                           lineHeight: 1.5,
                           marginBottom: 8,
                           display: '-webkit-box',
@@ -195,7 +195,7 @@ const Shop = () => {
                           R$ {product.price.toFixed(2)}
                         </span>
                         {product.compare_at_price && (
-                          <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(41,36,31,0.3)', textDecoration: 'line-through' }}>
+                          <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: '#29241f', textDecoration: 'line-through' }}>
                             R$ {product.compare_at_price.toFixed(2)}
                           </span>
                         )}
