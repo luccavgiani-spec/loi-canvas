@@ -385,7 +385,7 @@ const HomeSections = () => {
       <section className="py-16 px-6 md:py-[5px]" style={{ background: '#f4edd2' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4">parcerias</span>
+            
             <h2
               className="reveal heading-display"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#29241f' }}>
