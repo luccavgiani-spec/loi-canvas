@@ -277,7 +277,7 @@ const HeroSection = () => {
             Feitas à mão, com essência e intenção.
           </p>
 
-          <div className="flex items-center gap-8 mt-10">
+          <div className="flex items-center gap-4 sm:gap-8 mt-10 px-6 sm:px-0">
             <a
               href="/shop"
               className="hero-fadeUp hero-btn-primary"
@@ -357,7 +357,7 @@ const HeroSection = () => {
         {/* brand symbol */}
         <div
           className="hero-fadeIn group"
-          style={{ width: 80, height: 80, animationDelay: '2.2s', position: 'relative' }}
+          style={{ width: 120, height: 120, animationDelay: '2.2s', position: 'relative' }}
         >
           <div
             className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
