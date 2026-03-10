@@ -112,3 +112,26 @@ export interface Coupon {
   uses: number;
   created_at: string;
 }
+
+export interface Collection {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string;
+  cover_image?: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface Collab {
+  id: string;
+  slug: string;
+  name: string;
+  caption?: string;
+  description?: string;
+  images: string[];
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+}

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Instagram, Facebook } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -104,8 +105,27 @@ const Footer = () => {
               <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 Bragança Paulista, SP 12900-161
               </li>
-              <li className="pt-2">
-                <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.7rem', color: 'rgba(244,237,210,0.5)' }}>@loie.velas</span>
+              <li className="pt-3 flex items-center gap-4">
+                <a
+                  href="https://www.instagram.com/loie_____/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  style={{ color: 'rgba(244,237,210,0.4)', transition: 'color 0.3s ease' }}
+                  className="hover:!text-[#f4edd2]"
+                >
+                  <Instagram size={18} strokeWidth={1.5} />
+                </a>
+                <a
+                  href="https://www.facebook.com/loievelas"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  style={{ color: 'rgba(244,237,210,0.4)', transition: 'color 0.3s ease' }}
+                  className="hover:!text-[#f4edd2]"
+                >
+                  <Facebook size={18} strokeWidth={1.5} />
+                </a>
               </li>
             </ul>
           </div>
