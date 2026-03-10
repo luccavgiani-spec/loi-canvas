@@ -184,7 +184,7 @@ const Header = () => {
                       style={{ textDecoration: 'none' }}
                     >
                       <span
-                        style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.68rem', color: scrolled ? '#29241f' : 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'block', opacity: scrolled ? 0.75 : 1 }}
+                        style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.68rem', color: scrolled ? '#29241f' : 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'block' }}
                         className="group-hover/item:!text-[#565600]"
                       >
                         {col.label}
@@ -208,7 +208,7 @@ const Header = () => {
         </div>
 
         {/* Logo center */}
-        <Link to="/" className="absolute left-1/2 -translate-x-1/2">
+        <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ background: scrolled ? '#fcf5e0' : 'transparent', borderRadius: 4 }}>
           <img
             src={scrolled ? '/hero/Logo_Marrom.jpg' : '/hero/LOGO_BRANCA_t.png'}
             alt="Loiê"
@@ -292,7 +292,7 @@ const Header = () => {
           style={{ background: 'rgba(252,245,224,0.97)', borderTop: '1px solid rgba(86,86,0,0.08)', backdropFilter: 'blur(12px)' }}
         >
           <form onSubmit={handleSearch} className="flex items-center gap-2">
-            <Search size={14} style={{ color: 'rgba(41,36,31,0.3)', flexShrink: 0 }} />
+            <Search size={14} style={{ color: '#29241f', flexShrink: 0 }} />
             <input
               type="text"
               value={searchQuery}
@@ -322,7 +322,7 @@ const Header = () => {
                 to="/shop"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: location.pathname === '/shop' ? '#29241f' : 'rgba(41,36,31,0.55)', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#29241f', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
               >
                 Coleções
               </Link>
@@ -335,7 +335,7 @@ const Header = () => {
                   to={`/shop?collection=${col.slug}`}
                   onClick={() => setMobileOpen(false)}
                   className="block py-2 pl-4"
-                  style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.1em', fontSize: '0.7rem', color: 'rgba(41,36,31,0.4)', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.04)' }}
+                  style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.1em', fontSize: '0.7rem', color: 'rgba(41,36,31,0.7)', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.04)' }}
                 >
                   {col.label}
                 </Link>
@@ -347,7 +347,7 @@ const Header = () => {
                 to="/about"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: location.pathname === '/about' ? '#29241f' : 'rgba(41,36,31,0.55)', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#29241f', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
               >
                 Sobre
               </Link>
@@ -358,7 +358,7 @@ const Header = () => {
                 to="/collabs"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: location.pathname === '/collabs' ? '#29241f' : 'rgba(41,36,31,0.55)', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#29241f', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.06)' }}
               >
                 Collabs
               </Link>
@@ -369,7 +369,7 @@ const Header = () => {
                 to="/contact"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: location.pathname === '/contact' ? '#29241f' : 'rgba(41,36,31,0.55)', textDecoration: 'none' }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#29241f', textDecoration: 'none' }}
               >
                 Contato
               </Link>
@@ -379,7 +379,7 @@ const Header = () => {
           {/* Tracking inline form */}
           <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(86,86,0,0.08)' }}>
             <form onSubmit={handleTracking} className="flex items-center gap-2">
-              <Truck size={14} style={{ color: 'rgba(41,36,31,0.3)', flexShrink: 0 }} />
+              <Truck size={14} style={{ color: '#29241f', flexShrink: 0 }} />
               <input
                 type="text"
                 value={trackingCode}
@@ -389,7 +389,7 @@ const Header = () => {
               />
               <button
                 type="submit"
-                style={{ background: '#565600', color: '#f4edd2', border: 'none', padding: '6px 12px', fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.6rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                style={{ background: '#29241f', color: '#f4edd2', border: 'none', padding: '6px 12px', fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.6rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
               >
                 rastrear
               </button>
