@@ -7,6 +7,7 @@ import type { Product } from '@/types';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { storageUrl } from '@/lib/storage';
 
 const collectionMeta: Record<string, {numeral: string;detail: string;priceLabel: string;}> = {
   'Cotidianas': { numeral: 'I', detail: 'Latinha 160g · dois pavios', priceLabel: 'a partir de R$ 72' },
@@ -221,14 +222,31 @@ const Shop = () => {
         <section
           className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-6 overflow-hidden"
           style={{ background: '#29241f' }}>
-          
-          <div
-            className="absolute inset-0 opacity-[0.03]"
+
+          {/* Background video */}
+          <video
+            autoPlay
+            muted
+            playsInline
+            loop
+            preload="auto"
+            src={storageUrl('Cartao_Postal_Loie.mp4')}
+            className="absolute inset-0 w-full h-full object-cover"
             style={{
-              backgroundImage: 'radial-gradient(circle at 1px 1px, #f4edd2 1px, transparent 0)',
-              backgroundSize: '40px 40px'
-            }} />
-          
+              filter: 'saturate(0.5) brightness(0.35) contrast(1.05)',
+            }}
+          />
+
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.55) 100%),
+                linear-gradient(to bottom, rgba(41,36,31,0.65) 0%, rgba(41,36,31,0.00) 30%, rgba(41,36,31,0.00) 70%, rgba(41,36,31,0.70) 100%)
+              `,
+            }}
+          />
+
           <div className="max-w-[1400px] mx-auto relative z-10 text-center">
             <span
               className="reveal-fade inline-block mb-6"
