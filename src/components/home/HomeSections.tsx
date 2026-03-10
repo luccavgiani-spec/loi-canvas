@@ -382,7 +382,7 @@ const HomeSections = () => {
       </section>
 
       {/* ── 4. Collabs — Grid animado ── */}
-      <section className="py-16 md:py-20 px-6" style={{ background: '#f4edd2' }}>
+      <section className="py-16 px-6 md:py-[5px]" style={{ background: '#f4edd2' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
             <span className="reveal loi-label block mb-4">parcerias</span>
