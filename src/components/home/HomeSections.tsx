@@ -358,7 +358,7 @@ const HomeSections = () => {
       <section className="py-16 md:py-20 px-6">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4">destaques</span>
+            
             <h2
               className="reveal heading-display"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#29241f' }}>
