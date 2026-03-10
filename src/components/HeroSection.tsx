@@ -277,7 +277,7 @@ const HeroSection = () => {
             Feitas à mão, com essência e intenção.
           </p>
 
-          <div className="flex items-center gap-8 mt-10">
+          <div className="flex items-center gap-4 sm:gap-8 mt-10 px-6 sm:px-0">
             <a
               href="/shop"
               className="hero-fadeUp hero-btn-primary"

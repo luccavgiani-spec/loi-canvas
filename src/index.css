@@ -437,6 +437,19 @@
 }
 .hero-btn-ghost:hover .hero-btn-ghost-dash { width: 36px; }
 
+/* ── Hero buttons mobile ── */
+@media (max-width: 639px) {
+  .hero-btn-primary {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+  }
+  .hero-btn-ghost {
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+  }
+}
+
 /* ── Scroll indicator bounce ── */
 @keyframes scrollBounce {
   0%, 100% { transform: translateY(0); }
