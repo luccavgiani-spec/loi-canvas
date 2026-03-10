@@ -12,12 +12,23 @@ const BROWN = PRODUCTS.filter((p) => p.collection === 'Brown').slice(0, 4);
 const ProductCard = ({ product, addItem }: { product: typeof PRODUCTS[0]; addItem: (p: typeof PRODUCTS[0]) => void }) => (
   <div className="reveal group">
     <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
-      <img
-        src={product.images[0]}
-        alt={product.name}
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        loading="lazy"
-      />
+      {product.images[0]?.match(/\.mp4$/i) ? (
+        <video
+          src={product.images[0]}
+          muted
+          playsInline
+          autoPlay
+          loop
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      ) : (
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          loading="lazy"
+        />
+      )}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{ background: 'linear-gradient(to top, rgba(41,36,31,0.5) 0%, transparent 50%)' }}
