@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
 import { mockProducts } from '@/lib/mocks';
+import { storageUrl } from '@/lib/storage';
 import { useState, useEffect, useRef } from 'react';
 
 const PRODUCTS = mockProducts;
@@ -209,25 +210,25 @@ const COLLAB_ITEMS = [
   {
     name: 'Ateliê Cerâmica',
     slug: 'atelie-ceramica',
-    images: ['/hero/Cartao_Postal_Loie_1.mp4', '/hero/Cartao_Postal_Loie_5.mp4'],
+    images: [storageUrl('loie_vela_bosque_compress (1).mp4'), storageUrl('loie_vela_pomar.mp4')],
     caption: 'Vasos artesanais × Loiê',
   },
   {
     name: 'Estúdio Botânico',
     slug: 'estudio-botanico',
-    images: ['/hero/Cartao_Postal_Loie.mp4', '/hero/Cartao_Postal_Loie_8.mp4'],
+    images: [storageUrl('Cartao_Postal_Loie.mp4'), storageUrl('loie_vela_estela (1).mp4')],
     caption: 'Arranjos vivos × fragrâncias',
   },
   {
     name: 'Casa de Chá',
     slug: 'casa-de-cha',
-    images: ['/hero/escritorio_cadeira__1_.mp4', '/hero/Cartao_Postal_Loie_1.mp4'],
+    images: [storageUrl('escritorio_cadeira__1_.mp4'), storageUrl('loie_vela_bosque_compress (1).mp4')],
     caption: 'Rituais de chá × velas',
   },
   {
     name: 'Galeria Têxtil',
     slug: 'galeria-textil',
-    images: ['/hero/Cartao_Postal_Loie_5.mp4', '/hero/Cartao_Postal_Loie.mp4'],
+    images: [storageUrl('loie_vela_estela (1).mp4'), storageUrl('Cartao_Postal_Loie.mp4')],
     caption: 'Tecidos naturais × aromas',
   },
 ];
@@ -347,10 +348,10 @@ const HomeSections = () => {
 
       {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) ── */}
       <section className="relative">
-        <ProductFocusBanner product={focusBosque} videoSrc="/hero/loie_vela_bosque_compress (1).mp4" />
+        <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} />
       </section>
       <section className="relative">
-        <ProductFocusBanner product={focusPomar} reverse videoSrc="/hero/loie_vela_pomar.mp4" />
+        <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} />
       </section>
 
       {/* ── 3. Coleção Brown — Descubra Novos Aromas ── */}

@@ -1,5 +1,8 @@
 import Layout from '@/components/layout/Layout';
-import { bannerAtelier as banner02, bannerCollection as banner01 } from '@/assets';
+import { storageUrl } from '@/lib/storage';
+
+const banner01 = storageUrl('loie_vela_campos_imagem.JPG');
+const banner02 = storageUrl('loie_vela_estela_imagem.JPG');
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 

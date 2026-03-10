@@ -4,6 +4,7 @@ import HomeSections from '@/components/home/HomeSections';
 import HomeFooter from '@/components/home/HomeFooter';
 import CartDrawer from '@/components/layout/CartDrawer';
 import Header from '@/components/layout/Header';
+import { storageUrl } from '@/lib/storage';
 
 const Index = () => {
   const [assetsReady, setAssetsReady] = useState(false);
@@ -30,7 +31,7 @@ const Index = () => {
     const timeout = setTimeout(onReady, 2000);
     video.addEventListener('loadeddata', () => clearTimeout(timeout), { once: true });
 
-    video.src = '/hero/escritorio_cadeira__1_.mp4';
+    video.src = storageUrl('escritorio_cadeira__1_.mp4');
     video.load();
 
     return () => {

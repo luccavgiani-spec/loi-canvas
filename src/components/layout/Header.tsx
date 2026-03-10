@@ -218,7 +218,7 @@ const Header = () => {
         {/* Logo center */}
         <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ background: scrolled ? '#fcf5e0' : 'transparent', borderRadius: 4 }}>
           <img
-            src={scrolled ? '/hero/Logo_Marrom.jpg' : '/hero/LOGO_BRANCA_t.png'}
+            src="/hero/LOGO_BRANCA_t.png"
             alt="Loiê"
             width={110}
             height={40}
