@@ -71,12 +71,12 @@ const About = () => {
             }}
           />
 
-          {/* bottom fade into cream — seamless transition */}
+          {/* bottom fade into brown — seamless transition */}
           <div
             className="absolute bottom-0 left-0 right-0 pointer-events-none"
             style={{
               height: '40%',
-              background: 'linear-gradient(to bottom, transparent 0%, rgba(244,237,210,0.15) 40%, rgba(244,237,210,0.5) 70%, #f4edd2 100%)',
+              background: 'linear-gradient(to bottom, transparent 0%, rgba(41,36,31,0.20) 40%, rgba(41,36,31,0.55) 70%, #29241f 100%)',
             }}
           />
 
@@ -212,8 +212,35 @@ const About = () => {
                 </div>
               </div>
 
-              {/* Right: scroll-triggered video */}
-              <div className="relative">
+              {/* Right: scroll-triggered video with depth frame */}
+              <div
+                className="relative"
+                style={{
+                  /* soft ambient shadow for depth */
+                  boxShadow: '0 8px 40px rgba(41,36,31,0.25), 0 2px 12px rgba(41,36,31,0.15)',
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                  transform: 'perspective(800px) rotateY(-2deg)',
+                }}
+              >
+                {/* subtle inner border glow */}
+                <div
+                  className="absolute inset-0 z-10 pointer-events-none"
+                  style={{
+                    borderRadius: '4px',
+                    boxShadow: 'inset 0 0 30px rgba(41,36,31,0.3), inset 0 0 4px rgba(41,36,31,0.15)',
+                  }}
+                />
+                {/* fade edges so video blends into the page */}
+                <div
+                  className="absolute inset-0 z-10 pointer-events-none"
+                  style={{
+                    background: `
+                      linear-gradient(to right, rgba(244,237,210,0.35) 0%, transparent 8%, transparent 92%, rgba(244,237,210,0.35) 100%),
+                      linear-gradient(to bottom, rgba(244,237,210,0.25) 0%, transparent 6%, transparent 94%, rgba(244,237,210,0.25) 100%)
+                    `,
+                  }}
+                />
                 <video
                   ref={videoRef}
                   src={manifestoVideo}
@@ -221,10 +248,11 @@ const About = () => {
                   loop
                   playsInline
                   preload="metadata"
-                  className="w-full aspect-[9/16] object-cover transition-opacity duration-700"
+                  className="w-full aspect-[9/16] object-cover transition-all duration-700"
                   style={{
                     opacity: isVisible ? 1 : 0.3,
                     filter: 'saturate(0.7) brightness(0.85)',
+                    transform: isVisible ? 'scale(1)' : 'scale(0.97)',
                   }}
                 />
               </div>
