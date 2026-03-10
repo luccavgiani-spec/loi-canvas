@@ -32,10 +32,11 @@ const HeroSection = () => {
       <video
         ref={videoRef}
         src={VIDEO_SRC}
+        autoPlay
         muted
         playsInline
         loop
-        preload="metadata"
+        preload="auto"
         poster="/hero/hero-poster.jpg"
         width={1920}
         height={1080}
