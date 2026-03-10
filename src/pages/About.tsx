@@ -26,7 +26,7 @@ const About = () => {
             playsInline
             preload="auto"
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: 'saturate(0.65) brightness(0.60) contrast(1.05)' }}
+            style={{ filter: 'saturate(0.70) brightness(0.72) contrast(1.05)' }}
           />
 
           {/* overlay (radial vignette + top/bottom gradient — matches home hero) */}
@@ -34,8 +34,8 @@ const About = () => {
             className="absolute inset-0 pointer-events-none"
             style={{
               background: `
-                radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.60) 100%),
-                linear-gradient(to bottom, rgba(41,36,31,0.62) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 72%, rgba(41,36,31,0.72) 100%)
+                radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.02) 0%, rgba(41,36,31,0.35) 100%),
+                linear-gradient(to bottom, rgba(41,36,31,0.40) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 72%, rgba(41,36,31,0.45) 100%)
               `,
             }}
           />
@@ -47,7 +47,7 @@ const About = () => {
           />
 
           {/* content */}
-          <div className="relative z-[1] flex items-end justify-center h-full px-6 pb-12 md:pb-16">
+          <div className="relative z-[1] flex items-center justify-center h-full px-6">
             <div className="text-center">
               <span className="loi-label block mb-4">sobre a loiê</span>
               <h1
@@ -60,8 +60,11 @@ const About = () => {
           </div>
         </section>
 
+        {/* Gradient transition from hero to content */}
+        <div className="w-full h-24 md:h-32" style={{ background: 'linear-gradient(to bottom, #29241f 0%, #f4edd2 100%)' }} />
+
         {/* Story */}
-        <section className="py-28 md:py-36 px-6">
+        <section className="py-12 md:py-16 px-6">
           <div className="max-w-4xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
               <div className="reveal-left">
