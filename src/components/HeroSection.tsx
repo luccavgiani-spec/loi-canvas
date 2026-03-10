@@ -131,10 +131,10 @@ const HeroSection = () => {
 
       {/* ── bottom bar: scroll + symbol ── */}
       <div
-        className="absolute z-[3] bottom-0 left-0 right-0 flex items-end justify-between px-[5rem] pb-[2.5rem]"
+        className="absolute z-[3] bottom-0 left-0 right-0 flex flex-col items-center gap-6 pb-[2rem] md:flex-row md:items-end md:justify-between md:px-[5rem] md:pb-[2.5rem]"
       >
-        {/* spacer for left alignment */}
-        <div />
+        {/* spacer for left alignment (desktop only) */}
+        <div className="hidden md:block" />
 
         {/* scroll indicator */}
         <div
@@ -149,50 +149,60 @@ const HeroSection = () => {
 
         {/* brand symbol */}
         <div
-          className="hero-fadeIn group"
-          style={{ width: 120, height: 120, animationDelay: '2.2s', position: 'relative' }}
+          className="hero-fadeIn hero-symbol-wrapper group"
+          style={{ width: 80, height: 80, animationDelay: '2.2s', position: 'relative', margin: '0 auto' }}
         >
+          {/* Glow - desktop: hover, mobile: constant pulse */}
           <div
-            className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
+            className="absolute inset-0 rounded-full pointer-events-none hidden md:block opacity-0 group-hover:opacity-100"
             style={{
-              background: 'radial-gradient(circle, rgba(244,237,210,0.15) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(86,86,0,0.25) 0%, transparent 70%)',
               transition: '550ms cubic-bezier(0.4,0,0.2,1)',
             }}
           />
+          <div
+            className="absolute inset-0 rounded-full pointer-events-none md:hidden hero-symbol-glow"
+            style={{
+              background: 'radial-gradient(circle, rgba(86,86,0,0.3) 0%, transparent 70%)',
+            }}
+          />
+
+          {/* Default symbol (outline) */}
           <img
             src="/hero/SIMBOLO_t.png"
             alt=""
-            width={120}
-            height={120}
-            className="absolute inset-0 w-full h-full object-contain"
+            width={80}
+            height={80}
+            className="absolute inset-0 w-full h-full object-contain md:opacity-100 opacity-0"
             style={{
-              opacity: 1,
               transition: '550ms cubic-bezier(0.4,0,0.2,1)',
             }}
           />
+          {/* Green symbol - desktop: shown on hover, mobile: always visible with pulse */}
           <img
             src="/hero/SIMBOLO_2_t.png"
             alt=""
-            width={120}
-            height={120}
+            width={80}
+            height={80}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none md:opacity-0 hero-symbol-green"
             style={{
-              opacity: 0,
               transition: '550ms cubic-bezier(0.4,0,0.2,1)',
+              filter: 'drop-shadow(0 0 6px rgba(86,86,0,0.4))',
             }}
           />
+          {/* Desktop hover trigger */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 hidden md:block"
             onMouseEnter={() => {
-              const container = document.querySelector('.hero-fadeIn.group') as HTMLElement;
+              const container = document.querySelector('.hero-symbol-wrapper') as HTMLElement;
               if (!container) return;
               const imgs = container.querySelectorAll('img');
               if (imgs[0]) { imgs[0].style.opacity = '0'; imgs[0].style.transform = 'scale(1.1) rotate(4deg)'; }
-              if (imgs[1]) { imgs[1].style.opacity = '1'; imgs[1].style.transform = 'scale(1) rotate(0deg)'; imgs[1].style.filter = 'drop-shadow(0 0 8px rgba(244,237,210,0.4))'; }
+              if (imgs[1]) { imgs[1].style.opacity = '1'; imgs[1].style.transform = 'scale(1) rotate(0deg)'; imgs[1].style.filter = 'drop-shadow(0 0 8px rgba(86,86,0,0.5))'; }
             }}
             onMouseLeave={() => {
-              const container = document.querySelector('.hero-fadeIn.group') as HTMLElement;
+              const container = document.querySelector('.hero-symbol-wrapper') as HTMLElement;
               if (!container) return;
               const imgs = container.querySelectorAll('img');
               if (imgs[0]) { imgs[0].style.opacity = '1'; imgs[0].style.transform = 'scale(1) rotate(0deg)'; }

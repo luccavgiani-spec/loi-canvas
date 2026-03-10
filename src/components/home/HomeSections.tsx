@@ -14,9 +14,11 @@ const REFUGIO = PRODUCTS.filter((p) => p.collection === 'Refúgio').slice(0, 4);
 const ProductCarousel = ({
   products,
   addItem,
+  dark = false,
 }: {
   products: typeof PRODUCTS;
   addItem: (p: typeof PRODUCTS[0]) => void;
+  dark?: boolean;
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -140,15 +142,15 @@ const ProductCarousel = ({
               </button>
             </Link>
             <Link to={`/product/${product.slug}`} className="block">
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: dark ? '#f4edd2' : '#000', marginBottom: 4 }}>
                 {product.name}
               </h3>
               <div className="flex items-center gap-3">
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
+                <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: dark ? '#f4edd2' : '#000' }}>
                   R$ {product.price.toFixed(2)}
                 </span>
                 {product.compare_at_price && (
-                  <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(0,0,0,0.4)', textDecoration: 'line-through' }}>
+                  <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.7rem', color: dark ? 'rgba(244,237,210,0.4)' : 'rgba(0,0,0,0.4)', textDecoration: 'line-through' }}>
                     R$ {product.compare_at_price.toFixed(2)}
                   </span>
                 )}
@@ -161,7 +163,7 @@ const ProductCarousel = ({
       {products.length > 4 && (
         <div className="flex justify-center gap-1.5 mt-6 md:hidden">
           {Array.from({ length: Math.ceil(products.length / 2) }).map((_, i) => (
-            <div key={i} className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(0,0,0,0.15)' }} />
+            <div key={i} className="w-1.5 h-1.5 rounded-full" style={{ background: dark ? 'rgba(244,237,210,0.2)' : 'rgba(0,0,0,0.15)' }} />
           ))}
         </div>
       )}
@@ -318,28 +320,28 @@ const HomeSections = () => {
 
   return (
     <div ref={ref} style={{ background: '#fcf5e0' }}>
-      {/* ── Degradê de transição hero → conteúdo ── */}
+      {/* ── Degradê de transição hero → bestsellers (dark → dark) ── */}
       <div
         style={{
-          height: 'clamp(120px, 18vw, 240px)',
-          background: 'linear-gradient(to bottom, #29241f 0%, #3a3228 15%, #5c5040 30%, #8a7d6a 45%, #b8ad97 58%, #ddd5c0 72%, #efe9d3 85%, #fcf5e0 100%)',
+          height: 'clamp(60px, 8vw, 100px)',
+          background: '#29241f',
         }}
       />
 
-      {/* ── 1. Bestsellers — Carousel ── */}
-      <section className="py-16 px-6 md:py-0">
+      {/* ── 1. Bestsellers — Carousel (dark theme) ── */}
+      <section className="py-16 px-6 md:py-0" style={{ background: '#29241f' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4">mais amados</span>
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
+            <span className="reveal loi-label block mb-4" style={{ color: 'rgba(244,237,210,0.4)' }}>mais amados</span>
+            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#f4edd2' }}>
               Bestsellers
             </h2>
           </div>
-          <div className="reveal">
-            <ProductCarousel products={SALA_OU_ESTAR} addItem={addItem} />
+          <div className="reveal bestsellers-dark">
+            <ProductCarousel products={SALA_OU_ESTAR} addItem={addItem} dark />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/shop/sala-ou-estar" className="loi-ghost group">
+            <Link to="/shop/sala-ou-estar" className="loi-ghost group" style={{ color: 'rgba(244,237,210,0.5)' }}>
               <span>ver toda a coleção</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -347,6 +349,14 @@ const HomeSections = () => {
           </div>
         </div>
       </section>
+
+      {/* ── Degradê de transição bestsellers (dark) → conteúdo (cream) ── */}
+      <div
+        style={{
+          height: 'clamp(120px, 18vw, 240px)',
+          background: 'linear-gradient(to bottom, #29241f 0%, #3a3228 15%, #5c5040 30%, #8a7d6a 45%, #b8ad97 58%, #ddd5c0 72%, #efe9d3 85%, #fcf5e0 100%)',
+        }}
+      />
 
       {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) ── */}
       <section className="relative">
