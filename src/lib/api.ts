@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@/config';
+import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
 import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
 import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections, mockCollabs } from '@/lib/mocks';
 
@@ -14,6 +14,23 @@ async function fetchApi<T>(path: string, options?: RequestInit, fallback?: T): P
     if (fallback !== undefined) return fallback;
     throw new Error(`Failed to fetch ${path}`);
   }
+}
+
+async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>): Promise<T> {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/${fnName}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `Edge function error: ${res.status}` }));
+    throw new Error(err.error || `Edge function ${fnName} failed`);
+  }
+  return res.json();
 }
 
 // Products
@@ -48,13 +65,13 @@ export const createReview = (data: { product_id: string; author: string; rating:
 export const quoteShipping = (data: { items: { product_id: string; quantity: number }[] }) =>
   fetchApi<ShippingQuote>('/cart/quote-shipping', { method: 'POST', body: JSON.stringify(data) }, { shipping_cost: 19.9, free_shipping_threshold: 299, is_free: false });
 
-// Orders
+// Orders (via Supabase Edge Function)
 export const createOrder = (data: { items: { product_id: string; quantity: number; price: number }[]; customer: { name: string; email: string; phone: string } }) =>
-  fetchApi<{ order_id: string }>('/orders/create', { method: 'POST', body: JSON.stringify(data) });
+  callEdgeFunction<{ order_id: string; total: number }>('create-order', data);
 
-// Mercado Pago
-export const createPaymentIntent = (data: { order_id: string; amount: number }) =>
-  fetchApi<{ preference_id: string; init_point: string }>('/mp/create-intent', { method: 'POST', body: JSON.stringify(data) });
+// Mercado Pago (via Supabase Edge Function)
+export const createPaymentPreference = (data: { order_id: string }) =>
+  callEdgeFunction<{ preference_id: string; init_point: string; sandbox_init_point: string }>('mp-create-preference', data);
 
 // Newsletter
 export const subscribeNewsletter = (email: string) =>

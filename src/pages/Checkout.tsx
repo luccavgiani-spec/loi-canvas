@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
-import { createOrder, createPaymentIntent } from '@/lib/api';
-import { FREE_SHIPPING_THRESHOLD } from '@/config';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { createOrder, createPaymentPreference } from '@/lib/api';
+import { MP_PUBLIC_KEY, FREE_SHIPPING_THRESHOLD } from '@/config';
+import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
+import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
+
+initMercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
 
 const customerSchema = z.object({
   name: z.string().trim().min(2, 'Nome obrigatório').max(100),
@@ -12,7 +15,7 @@ const customerSchema = z.object({
   phone: z.string().trim().min(10, 'Telefone inválido').max(20),
 });
 
-type CheckoutState = 'form' | 'processing' | 'success' | 'error';
+type CheckoutStep = 'form' | 'payment' | 'processing' | 'success' | 'error';
 
 const inputStyle = {
   width: '100%',
@@ -28,13 +31,17 @@ const inputStyle = {
 
 const Checkout = () => {
   const { items, subtotal, clear } = useCart();
-  const [state, setState] = useState<CheckoutState>('form');
+  const [step, setStep] = useState<CheckoutStep>('form');
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 19.9;
   const total = subtotal + shipping;
 
-  const handlePay = async () => {
+  const handleContinueToPayment = async () => {
     const result = customerSchema.safeParse(form);
     if (!result.success) {
       const errs: Record<string, string> = {};
@@ -43,27 +50,52 @@ const Checkout = () => {
       return;
     }
     setErrors({});
-    setState('processing');
+    setStep('processing');
 
     try {
-      const orderItems = items.map(i => ({ product_id: i.product.id, quantity: i.quantity, price: i.product.price }));
-      let orderId = 'mock-order-' + Date.now();
-      try {
-        const res = await createOrder({ items: orderItems, customer: result.data as { name: string; email: string; phone: string } });
-        orderId = res.order_id;
-      } catch { /* use mock */ }
-      try {
-        await createPaymentIntent({ order_id: orderId, amount: total });
-      } catch { /* mock success */ }
-      await new Promise(r => setTimeout(r, 1500));
-      clear();
-      setState('success');
-    } catch {
-      setState('error');
+      const orderItems = items.map(i => ({
+        product_id: i.product.id,
+        quantity: i.quantity,
+        price: i.product.price,
+      }));
+
+      const orderRes = await createOrder({
+        items: orderItems,
+        customer: result.data as { name: string; email: string; phone: string },
+      });
+
+      setOrderId(orderRes.order_id);
+
+      const prefRes = await createPaymentPreference({ order_id: orderRes.order_id });
+      setPreferenceId(prefRes.preference_id);
+      setStep('payment');
+    } catch (err) {
+      console.error('Checkout error:', err);
+      setErrorMessage(err instanceof Error ? err.message : 'Erro ao processar pedido');
+      setStep('error');
     }
   };
 
-  if (items.length === 0 && state !== 'success') {
+  const handlePaymentSubmit = useCallback(async () => {
+    setStep('processing');
+  }, []);
+
+  const handlePaymentReady = useCallback(() => {
+    // Payment Brick is ready
+  }, []);
+
+  const handlePaymentError = useCallback((error: unknown) => {
+    console.error('Payment Brick error:', error);
+    setErrorMessage('Erro no processamento do pagamento. Tente novamente.');
+    setStep('error');
+  }, []);
+
+  const handleOnApprove = useCallback(() => {
+    clear();
+    setStep('success');
+  }, [clear]);
+
+  if (items.length === 0 && step !== 'success') {
     return (
       <Layout>
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
@@ -85,7 +117,7 @@ const Checkout = () => {
           </h1>
         </div>
 
-        {state === 'success' ? (
+        {step === 'success' ? (
           <div className="text-center py-16">
             <CheckCircle size={48} className="mx-auto mb-4" style={{ color: '#000' }} />
             <h2 className="heading-display mb-3" style={{ fontSize: '2rem', color: '#000' }}>
@@ -97,8 +129,9 @@ const Checkout = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-5 gap-10">
-            {/* Form */}
+            {/* Form + Payment */}
             <div className="md:col-span-3 space-y-6">
+              {/* Customer Form */}
               <div>
                 <h2 className="heading-display mb-6" style={{ fontSize: '1.4rem', color: '#000' }}>
                   Seus dados
@@ -116,6 +149,7 @@ const Checkout = () => {
                         value={form[field.id as keyof typeof form]}
                         onChange={(e) => setForm((f) => ({ ...f, [field.id]: e.target.value }))}
                         style={inputStyle}
+                        disabled={step === 'payment' || step === 'processing'}
                       />
                       {errors[field.id] && (
                         <p style={{ color: '#c44', fontSize: '0.7rem', marginTop: 4, fontFamily: "'Montserrat', sans-serif" }}>
@@ -127,35 +161,87 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Payment placeholder */}
+              {/* Payment Section */}
               <div className="p-6" style={{ border: '1px solid rgba(86,86,0,0.12)', background: 'rgba(41,36,31,0.02)' }}>
                 <span className="loi-label block mb-2">pagamento</span>
-                <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.9rem', color: 'rgba(41,36,31,0.4)' }}>
-                  O Checkout Transparente do Mercado Pago será renderizado aqui após a configuração do backend.
-                </p>
+
+                {step === 'form' && (
+                  <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.9rem', color: 'rgba(41,36,31,0.4)' }}>
+                    Preencha seus dados acima e clique em continuar para escolher a forma de pagamento.
+                  </p>
+                )}
+
+                {step === 'payment' && preferenceId && (
+                  <Payment
+                    initialization={{
+                      amount: total,
+                      preferenceId: preferenceId,
+                    }}
+                    customization={{
+                      paymentMethods: {
+                        creditCard: 'all',
+                        debitCard: 'all',
+                        ticket: 'all',
+                        bankTransfer: 'all',
+                        mercadoPago: 'all',
+                      },
+                      visual: {
+                        style: {
+                          theme: 'flat',
+                        },
+                      },
+                    }}
+                    onSubmit={handlePaymentSubmit}
+                    onReady={handlePaymentReady}
+                    onError={handlePaymentError}
+                  />
+                )}
+
+                {step === 'processing' && (
+                  <div className="flex items-center justify-center py-8 gap-3">
+                    <Loader2 size={20} className="animate-spin" style={{ color: '#000' }} />
+                    <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.85rem', color: 'rgba(41,36,31,0.6)' }}>
+                      Processando...
+                    </span>
+                  </div>
+                )}
               </div>
 
-              <button
-                onClick={handlePay}
-                disabled={state === 'processing'}
-                className="loi-btn w-full justify-center"
-              >
-                {state === 'processing' ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 size={16} className="animate-spin" /> processando...
-                  </span>
-                ) : (
-                  `pagar r$ ${total.toFixed(2)}`
-                )}
-              </button>
-              {state === 'error' && (
-                <p style={{ color: '#c44', fontSize: '0.7rem', fontFamily: "'Montserrat', sans-serif" }}>
-                  Erro ao processar pagamento. Tente novamente.
+              {/* Action Button */}
+              {step === 'form' && (
+                <button
+                  onClick={handleContinueToPayment}
+                  className="loi-btn w-full justify-center"
+                >
+                  continuar para pagamento
+                </button>
+              )}
+
+              {step === 'payment' && (
+                <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.75rem', color: 'rgba(41,36,31,0.4)', textAlign: 'center' }}>
+                  Escolha a forma de pagamento acima e finalize sua compra.
                 </p>
+              )}
+
+              {step === 'error' && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle size={16} style={{ color: '#c44' }} />
+                    <p style={{ color: '#c44', fontSize: '0.8rem', fontFamily: "'Montserrat', sans-serif" }}>
+                      {errorMessage || 'Erro ao processar pagamento. Tente novamente.'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { setStep('form'); setErrorMessage(''); }}
+                    className="loi-btn w-full justify-center"
+                  >
+                    tentar novamente
+                  </button>
+                </div>
               )}
             </div>
 
-            {/* Order summary */}
+            {/* Order Summary */}
             <div className="md:col-span-2">
               <div className="p-6 sticky top-24" style={{ border: '1px solid rgba(86,86,0,0.12)', background: 'rgba(41,36,31,0.02)' }}>
                 <h3 className="heading-display mb-6" style={{ fontSize: '1.2rem', color: '#000' }}>Resumo</h3>
