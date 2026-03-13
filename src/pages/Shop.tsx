@@ -101,6 +101,8 @@ const ProductCarousel = ({
               playsInline
               autoPlay
               loop
+              preload="none"
+              poster={product.images.find(s => !s.match(/\.mp4$/i))}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" /> :
 
 
@@ -223,7 +225,8 @@ const Shop = () => {
             muted
             playsInline
             loop
-            preload="auto"
+            preload="metadata"
+            poster={storageUrl('loie_vela_campos_principal.JPG')}
             src={storageUrl('Cartao_Postal_Loie.mp4')}
             className="absolute inset-0 w-full h-full object-cover"
             style={{

@@ -113,7 +113,7 @@ function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs
         {images.map((src, i) => (
           <div key={i} className="relative w-20 h-20 border border-border rounded overflow-hidden group">
             {src.endsWith('.mp4') ? (
-              <video src={src} className="w-full h-full object-cover" muted />
+              <video src={src} className="w-full h-full object-cover" muted preload="none" />
             ) : (
               <img src={src} alt="" className="w-full h-full object-cover" />
             )}
@@ -768,7 +768,7 @@ function CollabsTab() {
                   {c.images.slice(0, 2).map((src, i) => (
                     <div key={i} className="w-16 h-20 overflow-hidden rounded border border-border">
                       {src.endsWith('.mp4') ? (
-                        <video src={src} className="w-full h-full object-cover" muted />
+                        <video src={src} className="w-full h-full object-cover" muted preload="none" />
                       ) : (
                         <img src={src} alt="" className="w-full h-full object-cover" />
                       )}

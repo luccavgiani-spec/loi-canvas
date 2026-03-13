@@ -68,6 +68,8 @@ const ProductDetail = () => {
                   playsInline
                   autoPlay
                   loop
+                  preload="metadata"
+                  poster={product.images.find(s => !s.match(/\.mp4$/i))}
                   className="w-full h-full object-cover"
                   style={{ filter: 'saturate(0.85) brightness(0.9)' }}
                 />
@@ -97,6 +99,8 @@ const ProductDetail = () => {
                         src={img}
                         muted
                         playsInline
+                        preload="none"
+                        poster={product.images.find(s => !s.match(/\.mp4$/i))}
                         className="w-full h-full object-cover"
                         style={{ filter: 'saturate(0.7) brightness(0.8)' }}
                       />
@@ -331,6 +335,8 @@ const ProductDetail = () => {
                         playsInline
                         autoPlay
                         loop
+                        preload="none"
+                        poster={p.images.find(s => !s.match(/\.mp4$/i))}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         style={{ filter: 'saturate(0.85) brightness(0.9)' }}
                       />

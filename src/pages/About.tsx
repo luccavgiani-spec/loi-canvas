@@ -55,7 +55,8 @@ const About = () => {
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
+            poster={banner01}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ filter: 'saturate(0.70) brightness(0.72) contrast(1.05)' }}
           />
@@ -247,7 +248,8 @@ const About = () => {
                   muted
                   loop
                   playsInline
-                  preload="metadata"
+                  preload="none"
+                  poster={banner01}
                   className="w-full aspect-[9/16] object-cover transition-all duration-700"
                   style={{
                     opacity: isVisible ? 1 : 0.3,
