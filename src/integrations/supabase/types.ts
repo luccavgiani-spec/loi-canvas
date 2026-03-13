@@ -34,46 +34,37 @@ export type Database = {
       }
       collections: {
         Row: {
-          id: string
-          slug: string
-          name: string
+          created_at: string | null
           description: string | null
-          cover_image: string | null
-          numeral: string | null
           detail: string | null
-          story: string | null
+          id: string
+          name: string
+          numeral: string | null
           price_label: string | null
-          is_active: boolean
-          sort_order: number
-          created_at: string
+          slug: string
+          story: string | null
         }
         Insert: {
-          id?: string
-          slug: string
-          name: string
+          created_at?: string | null
           description?: string | null
-          cover_image?: string | null
-          numeral?: string | null
           detail?: string | null
-          story?: string | null
+          id?: string
+          name: string
+          numeral?: string | null
           price_label?: string | null
-          is_active?: boolean
-          sort_order?: number
-          created_at?: string
+          slug: string
+          story?: string | null
         }
         Update: {
-          id?: string
-          slug?: string
-          name?: string
+          created_at?: string | null
           description?: string | null
-          cover_image?: string | null
-          numeral?: string | null
           detail?: string | null
-          story?: string | null
+          id?: string
+          name?: string
+          numeral?: string | null
           price_label?: string | null
-          is_active?: boolean
-          sort_order?: number
-          created_at?: string
+          slug?: string
+          story?: string | null
         }
         Relationships: []
       }
@@ -186,13 +177,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "order_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "order_items_variant_id_fkey"
             columns: ["variant_id"]
             isOneToOne: false
@@ -271,23 +255,14 @@ export type Database = {
           stock?: number | null
           variant_name?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "product_variants_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       products: {
         Row: {
           accord: string | null
           asset_folder: string | null
-          burn_hours: number | null
+          burn_hours: number
           collection_id: string | null
-          compare_at_price: number | null
           composition: string | null
           created_at: string | null
           description: string | null
@@ -295,17 +270,16 @@ export type Database = {
           is_bestseller: boolean | null
           name: string
           price: number
-          sku: string | null
+          sku: string
           slug: string
           suggested_use: string | null
-          weight_g: number | null
+          weight_g: number
         }
         Insert: {
           accord?: string | null
           asset_folder?: string | null
-          burn_hours?: number | null
+          burn_hours: number
           collection_id?: string | null
-          compare_at_price?: number | null
           composition?: string | null
           created_at?: string | null
           description?: string | null
@@ -313,17 +287,16 @@ export type Database = {
           is_bestseller?: boolean | null
           name: string
           price: number
-          sku?: string | null
+          sku: string
           slug: string
           suggested_use?: string | null
-          weight_g?: number | null
+          weight_g: number
         }
         Update: {
           accord?: string | null
           asset_folder?: string | null
-          burn_hours?: number | null
+          burn_hours?: number
           collection_id?: string | null
-          compare_at_price?: number | null
           composition?: string | null
           created_at?: string | null
           description?: string | null
@@ -331,10 +304,10 @@ export type Database = {
           is_bestseller?: boolean | null
           name?: string
           price?: number
-          sku?: string | null
+          sku?: string
           slug?: string
           suggested_use?: string | null
-          weight_g?: number | null
+          weight_g?: number
         }
         Relationships: [
           {
@@ -377,15 +350,7 @@ export type Database = {
           rating?: number
           title?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       shipping_rules: {
         Row: {
