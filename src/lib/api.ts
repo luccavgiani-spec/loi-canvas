@@ -1,6 +1,7 @@
 import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
 import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
 import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections, mockCollabs } from '@/lib/mocks';
+import { supabase } from '@/integrations/supabase/client';
 
 async function fetchApi<T>(path: string, options?: RequestInit, fallback?: T): Promise<T> {
   try {
@@ -33,26 +34,78 @@ async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>
   return res.json();
 }
 
-// Products
-export const getProducts = (params?: { collection?: string; tag?: string; minPrice?: number; maxPrice?: number; sort?: string }) => {
-  const query = new URLSearchParams();
-  if (params?.collection) query.set('collection', params.collection);
-  if (params?.tag) query.set('tag', params.tag);
-  if (params?.minPrice) query.set('minPrice', String(params.minPrice));
-  if (params?.maxPrice) query.set('maxPrice', String(params.maxPrice));
-  if (params?.sort) query.set('sort', params.sort);
-  const qs = query.toString();
-  let fallback = mockProducts;
-  if (params?.collection) fallback = fallback.filter(p => p.collection === params.collection);
-  if (params?.tag) fallback = fallback.filter(p => p.tags.includes(params.tag!));
-  return fetchApi<Product[]>(`/products${qs ? `?${qs}` : ''}`, undefined, fallback);
+// Products (query Supabase directly, mock fallback)
+export const getProducts = async (params?: { collection?: string; tag?: string; minPrice?: number; maxPrice?: number; sort?: string }): Promise<Product[]> => {
+  try {
+    let query = supabase.from('products').select('*').eq('is_active', true);
+    if (params?.collection) query = query.eq('collection', params.collection);
+    if (params?.minPrice) query = query.gte('price', params.minPrice);
+    if (params?.maxPrice) query = query.lte('price', params.maxPrice);
+
+    const sortCol = params?.sort === 'price_asc' || params?.sort === 'price_desc' ? 'price' : 'created_at';
+    const ascending = params?.sort === 'price_asc';
+    query = query.order(sortCol, { ascending });
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    let products = (data || []).map(mapDbProduct);
+    if (params?.tag) products = products.filter(p => p.tags.includes(params.tag!));
+    return products;
+  } catch {
+    let fallback = mockProducts;
+    if (params?.collection) fallback = fallback.filter(p => p.collection === params.collection);
+    if (params?.tag) fallback = fallback.filter(p => p.tags.includes(params.tag!));
+    return fallback;
+  }
 };
 
-export const getProductBySlug = (slug: string) =>
-  fetchApi<Product>(`/products/${slug}`, undefined, mockProducts.find(p => p.slug === slug) || mockProducts[0]);
+export const getProductBySlug = async (slug: string): Promise<Product> => {
+  try {
+    const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single();
+    if (error) throw error;
+    return mapDbProduct(data);
+  } catch {
+    return mockProducts.find(p => p.slug === slug) || mockProducts[0];
+  }
+};
 
-export const getRelatedProducts = (id: string) =>
-  fetchApi<Product[]>(`/products/${id}/related`, undefined, mockProducts.filter(p => p.id !== id).slice(0, 4));
+export const getRelatedProducts = async (id: string): Promise<Product[]> => {
+  try {
+    const { data: current } = await supabase.from('products').select('collection').eq('id', id).single();
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('is_active', true)
+      .eq('collection', current?.collection || '')
+      .neq('id', id)
+      .limit(4);
+    if (error) throw error;
+    return (data || []).map(mapDbProduct);
+  } catch {
+    return mockProducts.filter(p => p.id !== id).slice(0, 4);
+  }
+};
+
+/** Map Supabase row to Product type */
+function mapDbProduct(row: any): Product {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    description: row.description || '',
+    details: row.short_description || undefined,
+    price: Number(row.price),
+    compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : undefined,
+    images: Array.isArray(row.images) ? row.images as string[] : [],
+    collection: row.collection || '',
+    tags: Array.isArray(row.tags) ? row.tags : [],
+    rating_avg: 0,
+    rating_count: 0,
+    is_bestseller: false,
+    created_at: row.created_at || '',
+  };
+}
 
 // Reviews
 export const getReviews = (productId: string) =>
