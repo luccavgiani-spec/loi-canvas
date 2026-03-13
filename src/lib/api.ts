@@ -37,7 +37,7 @@ async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>
 // Products (query Supabase directly, mock fallback)
 export const getProducts = async (params?: { collection?: string; tag?: string; minPrice?: number; maxPrice?: number; sort?: string }): Promise<Product[]> => {
   try {
-    let query = supabase.from('products').select('*').eq('is_active', true);
+    let query = supabase.from('products').select('*').neq('is_active', false);
     if (params?.collection) query = query.eq('collection', params.collection);
     if (params?.minPrice) query = query.gte('price', params.minPrice);
     if (params?.maxPrice) query = query.lte('price', params.maxPrice);
@@ -48,11 +48,13 @@ export const getProducts = async (params?: { collection?: string; tag?: string; 
 
     const { data, error } = await query;
     if (error) throw error;
+    if (!data || data.length === 0) throw new Error('No products returned from Supabase');
 
-    let products = (data || []).map(mapDbProduct);
+    let products = data.map(mapDbProduct);
     if (params?.tag) products = products.filter(p => p.tags.includes(params.tag!));
     return products;
-  } catch {
+  } catch (err) {
+    console.warn('[getProducts] Supabase query failed, using mock fallback:', err);
     let fallback = mockProducts;
     if (params?.collection) fallback = fallback.filter(p => p.collection === params.collection);
     if (params?.tag) fallback = fallback.filter(p => p.tags.includes(params.tag!));
@@ -65,7 +67,8 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single();
     if (error) throw error;
     return mapDbProduct(data);
-  } catch {
+  } catch (err) {
+    console.warn(`[getProductBySlug] Supabase query failed for "${slug}", using mock fallback:`, err);
     return mockProducts.find(p => p.slug === slug) || mockProducts[0];
   }
 };
