@@ -60,7 +60,7 @@ function mapDbProduct(row: any): Product {
     tags: [],
     rating_avg: 0,
     rating_count: 0,
-    is_bestseller: false,
+    is_bestseller: row.is_bestseller ?? false,
     created_at: row.created_at || '',
   };
 }
