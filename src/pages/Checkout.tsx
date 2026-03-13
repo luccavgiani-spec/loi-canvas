@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
-import { createOrder, createPaymentPreference, processPayment } from '@/lib/api';
+import { createOrder, processPayment } from '@/lib/api';
 import { MP_PUBLIC_KEY, FREE_SHIPPING_THRESHOLD } from '@/config';
 import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
@@ -34,7 +34,6 @@ const Checkout = () => {
   const [step, setStep] = useState<CheckoutStep>('form');
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -66,8 +65,6 @@ const Checkout = () => {
 
       setOrderId(orderRes.order_id);
 
-      const prefRes = await createPaymentPreference({ order_id: orderRes.order_id });
-      setPreferenceId(prefRes.preference_id);
       setStep('payment');
     } catch (err) {
       console.error('Checkout error:', err);
@@ -207,11 +204,10 @@ const Checkout = () => {
                   </p>
                 )}
 
-                {step === 'payment' && preferenceId && (
+                {step === 'payment' && (
                   <Payment
                     initialization={{
                       amount: total,
-                      preferenceId: preferenceId,
                     }}
                     customization={{
                       paymentMethods: {
