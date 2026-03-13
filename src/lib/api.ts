@@ -2,6 +2,7 @@ import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
 import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
 import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections, mockCollabs } from '@/lib/mocks';
 import { supabase } from '@/integrations/supabase/client';
+import { getProductImages } from '@/lib/storage';
 
 async function fetchApi<T>(path: string, options?: RequestInit, fallback?: T): Promise<T> {
   try {
@@ -37,8 +38,7 @@ async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>
 // Products (query Supabase directly, mock fallback)
 export const getProducts = async (params?: { collection?: string; tag?: string; minPrice?: number; maxPrice?: number; sort?: string }): Promise<Product[]> => {
   try {
-    let query = supabase.from('products').select('*').neq('is_active', false);
-    if (params?.collection) query = query.eq('collection', params.collection);
+    let query = supabase.from('products').select('*, collections(name, slug)');
     if (params?.minPrice) query = query.gte('price', params.minPrice);
     if (params?.maxPrice) query = query.lte('price', params.maxPrice);
 
@@ -50,21 +50,20 @@ export const getProducts = async (params?: { collection?: string; tag?: string; 
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('No products returned from Supabase');
 
-    let products = data.map(mapDbProduct);
-    if (params?.tag) products = products.filter(p => p.tags.includes(params.tag!));
+    let products = await Promise.all(data.map(mapDbProduct));
+    if (params?.collection) products = products.filter(p => p.collection === params.collection);
     return products;
   } catch (err) {
     console.warn('[getProducts] Supabase query failed, using mock fallback:', err);
     let fallback = mockProducts;
     if (params?.collection) fallback = fallback.filter(p => p.collection === params.collection);
-    if (params?.tag) fallback = fallback.filter(p => p.tags.includes(params.tag!));
     return fallback;
   }
 };
 
 export const getProductBySlug = async (slug: string): Promise<Product> => {
   try {
-    const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single();
+    const { data, error } = await supabase.from('products').select('*, collections(name, slug)').eq('slug', slug).single();
     if (error) throw error;
     return mapDbProduct(data);
   } catch (err) {
@@ -75,37 +74,70 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
 
 export const getRelatedProducts = async (id: string): Promise<Product[]> => {
   try {
-    const { data: current } = await supabase.from('products').select('collection').eq('id', id).single();
+    const { data: current } = await supabase.from('products').select('collection_id').eq('id', id).single();
     const { data, error } = await supabase
       .from('products')
-      .select('*')
-      .eq('is_active', true)
-      .eq('collection', current?.collection || '')
+      .select('*, collections(name, slug)')
+      .eq('collection_id', current?.collection_id || '')
       .neq('id', id)
       .limit(4);
     if (error) throw error;
-    return (data || []).map(mapDbProduct);
+    return Promise.all((data || []).map(mapDbProduct));
   } catch {
     return mockProducts.filter(p => p.id !== id).slice(0, 4);
   }
 };
 
-/** Map Supabase row to Product type */
-function mapDbProduct(row: any): Product {
+/** Map Supabase row (with joined collections) to Product type */
+async function mapDbProduct(row: any): Promise<Product> {
+  const images = await getProductImages(row.asset_folder);
   return {
     id: row.id,
     slug: row.slug,
     name: row.name,
     description: row.description || '',
-    details: row.short_description || undefined,
+    details: row.suggested_use || undefined,
     price: Number(row.price),
     compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : undefined,
-    images: Array.isArray(row.images) ? row.images as string[] : [],
-    collection: row.collection || '',
-    tags: Array.isArray(row.tags) ? row.tags : [],
+    images,
+    collection: row.collections?.name || '',
+    tags: [],
     rating_avg: 0,
     rating_count: 0,
     is_bestseller: false,
+    created_at: row.created_at || '',
+  };
+}
+
+// Collections (query Supabase directly, mock fallback)
+export const getCollections = async (): Promise<Collection[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('collections')
+      .select('*')
+      .order('sort_order', { ascending: true });
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error('No collections returned from Supabase');
+    return data.map(mapDbCollection);
+  } catch (err) {
+    console.warn('[getCollections] Supabase query failed, using mock fallback:', err);
+    return mockCollections;
+  }
+};
+
+function mapDbCollection(row: any): Collection {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    description: row.description || undefined,
+    cover_image: row.cover_image || undefined,
+    numeral: row.numeral || undefined,
+    detail: row.detail || undefined,
+    story: row.story || undefined,
+    price_label: row.price_label || undefined,
+    is_active: row.is_active ?? true,
+    sort_order: row.sort_order ?? 0,
     created_at: row.created_at || '',
   };
 }

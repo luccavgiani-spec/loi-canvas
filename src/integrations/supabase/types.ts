@@ -236,53 +236,148 @@ export type Database = {
           },
         ]
       }
-      products: {
+      collections: {
         Row: {
-          collection: string | null
-          compare_at_price: number | null
-          created_at: string | null
-          description: string | null
           id: string
-          images: Json | null
-          is_active: boolean | null
-          name: string
-          price: number
-          short_description: string | null
           slug: string
-          stock: number | null
-          tags: string[] | null
+          name: string
+          description: string | null
+          cover_image: string | null
+          numeral: string | null
+          detail: string | null
+          story: string | null
+          price_label: string | null
+          is_active: boolean | null
+          sort_order: number | null
+          created_at: string | null
         }
         Insert: {
-          collection?: string | null
-          compare_at_price?: number | null
-          created_at?: string | null
-          description?: string | null
           id?: string
-          images?: Json | null
-          is_active?: boolean | null
-          name: string
-          price: number
-          short_description?: string | null
           slug: string
-          stock?: number | null
-          tags?: string[] | null
+          name: string
+          description?: string | null
+          cover_image?: string | null
+          numeral?: string | null
+          detail?: string | null
+          story?: string | null
+          price_label?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
         }
         Update: {
-          collection?: string | null
-          compare_at_price?: number | null
-          created_at?: string | null
-          description?: string | null
           id?: string
-          images?: Json | null
-          is_active?: boolean | null
-          name?: string
-          price?: number
-          short_description?: string | null
           slug?: string
-          stock?: number | null
-          tags?: string[] | null
+          name?: string
+          description?: string | null
+          cover_image?: string | null
+          numeral?: string | null
+          detail?: string | null
+          story?: string | null
+          price_label?: string | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
         }
         Relationships: []
+      }
+      collabs: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          caption: string | null
+          description: string | null
+          images: Json | null
+          is_active: boolean | null
+          sort_order: number | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          caption?: string | null
+          description?: string | null
+          images?: Json | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          caption?: string | null
+          description?: string | null
+          images?: Json | null
+          is_active?: boolean | null
+          sort_order?: number | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          description: string | null
+          price: number
+          compare_at_price: number | null
+          collection_id: string | null
+          sku: string | null
+          weight_g: number | null
+          burn_hours: number | null
+          accord: string | null
+          suggested_use: string | null
+          composition: string | null
+          asset_folder: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          description?: string | null
+          price: number
+          compare_at_price?: number | null
+          collection_id?: string | null
+          sku?: string | null
+          weight_g?: number | null
+          burn_hours?: number | null
+          accord?: string | null
+          suggested_use?: string | null
+          composition?: string | null
+          asset_folder?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          description?: string | null
+          price?: number
+          compare_at_price?: number | null
+          collection_id?: string | null
+          sku?: string | null
+          weight_g?: number | null
+          burn_hours?: number | null
+          accord?: string | null
+          suggested_use?: string | null
+          composition?: string | null
+          asset_folder?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {

@@ -1,21 +1,18 @@
 -- =============================================
 -- 1. Produto de teste para validar checkout (R$ 1,00)
 -- =============================================
-INSERT INTO public.products (id, slug, name, description, short_description, price, images, collection, tags, is_active, stock)
+INSERT INTO public.products (id, slug, name, description, price, sku, weight_g, asset_folder)
 VALUES (
   '00000000-0000-0000-0000-000000000001',
   'vela-teste',
   'Vela Teste',
   'Produto de teste para validação do checkout. Não é um produto real.',
-  'Produto de teste — R$ 1,00',
   1.00,
-  '["https://xigituxddrtsqhmrmsvy.supabase.co/storage/v1/object/public/produtos/loie_vela_campos_principal.JPG"]'::jsonb,
-  'Cotidianas',
-  ARRAY['teste'],
-  true,
-  999
+  'TESTE-001',
+  160,
+  'loie_vela_campos'
 )
-ON CONFLICT (id) DO UPDATE SET price = 1.00, is_active = true;
+ON CONFLICT (id) DO UPDATE SET price = 1.00, asset_folder = 'loie_vela_campos';
 
 -- =============================================
 -- 2. RLS policies para tabelas sensíveis

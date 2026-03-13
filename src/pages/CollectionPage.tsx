@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getProducts } from '@/lib/api';
-import { mockCollections } from '@/lib/mocks';
-import type { Product } from '@/types';
+import { getProducts, getCollections } from '@/lib/api';
+import type { Product, Collection } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { useReveal } from '@/hooks/useReveal';
 import { ArrowLeft } from 'lucide-react';
@@ -19,12 +18,17 @@ const sortOptions = [
 const CollectionPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [products, setProducts] = useState<Product[]>([]);
+  const [allCollections, setAllCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState('default');
   const { addItem } = useCart();
   const ref = useReveal(0.15, [loading]);
 
-  const collection = mockCollections.find(c => c.slug === slug);
+  useEffect(() => {
+    getCollections().then(setAllCollections);
+  }, []);
+
+  const collection = allCollections.find(c => c.slug === slug);
 
   useEffect(() => {
     if (!collection) return;
@@ -42,9 +46,10 @@ const CollectionPage = () => {
     return result;
   }, [products, sort]);
 
-  if (!collection) return <Navigate to="/shop" replace />;
+  if (allCollections.length > 0 && !collection) return <Navigate to="/shop" replace />;
+  if (!collection) return <Layout><div className="py-40 text-center"><p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', color: 'rgba(0,0,0,0.4)' }}>Carregando...</p></div></Layout>;
 
-  const otherCollections = mockCollections.filter(c => c.slug !== slug && c.is_active);
+  const otherCollections = allCollections.filter(c => c.slug !== slug && c.is_active);
 
   return (
     <Layout>
