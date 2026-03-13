@@ -66,7 +66,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
   try {
     const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single();
     if (error) throw error;
-    return mapDbProduct(data);
+    return Product(data);
   } catch (err) {
     console.warn(`[getProductBySlug] Supabase query failed for "${slug}", using mock fallback:`, err);
     return mockProducts.find(p => p.slug === slug) || mockProducts[0];
@@ -83,7 +83,7 @@ export const getRelatedProducts = async (id: string): Promise<Product[]> => {
       .neq('id', id)
       .limit(4);
     if (error) throw error;
-    return (data || []).map(mapDbProduct);
+    return (data || []).map(Product);
   } catch {
     return mockProducts.filter(p => p.id !== id).slice(0, 4);
   }
@@ -91,17 +91,21 @@ export const getRelatedProducts = async (id: string): Promise<Product[]> => {
 
 /** Map Supabase row to Product type */
 function mapDbProduct(row: any): Product {
+  const assetFolder = row.asset_folder || row.slug || '';
+  const storageBase = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/produtos`;
+  const imageUrl = assetFolder ? `${storageBase}/${assetFolder}` : '';
+
   return {
     id: row.id,
     slug: row.slug,
     name: row.name,
     description: row.description || '',
-    details: row.short_description || undefined,
+    details: row.suggested_use || undefined,
     price: Number(row.price),
     compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : undefined,
-    images: Array.isArray(row.images) ? row.images as string[] : [],
-    collection: row.collection || '',
-    tags: Array.isArray(row.tags) ? row.tags : [],
+    images: imageUrl ? [`${imageUrl}/principal.JPG`, `${imageUrl}/imagem_2.JPG`] : [],
+    collection: row.collections?.name || row.collection_id || '',
+    tags: [],
     rating_avg: 0,
     rating_count: 0,
     is_bestseller: false,
