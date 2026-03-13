@@ -37,7 +37,7 @@ async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>
 // Products (query Supabase directly, mock fallback)
 export const getProducts = async (params?: { collection?: string; tag?: string; minPrice?: number; maxPrice?: number; sort?: string }): Promise<Product[]> => {
   try {
-    let query = supabase.from('products').select('*').neq('is_active', false);
+    let query = supabase.from('products').select('*');
     if (params?.collection) query = query.eq('collection', params.collection);
     if (params?.minPrice) query = query.gte('price', params.minPrice);
     if (params?.maxPrice) query = query.lte('price', params.maxPrice);
@@ -79,7 +79,6 @@ export const getRelatedProducts = async (id: string): Promise<Product[]> => {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('is_active', true)
       .eq('collection', current?.collection || '')
       .neq('id', id)
       .limit(4);
@@ -109,6 +108,36 @@ function mapDbProduct(row: any): Product {
     created_at: row.created_at || '',
   };
 }
+
+// Collections (query Supabase directly, mock fallback)
+export const getCollections = async (): Promise<Collection[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('collections')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error('No collections returned from Supabase');
+    return data.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      name: row.name,
+      description: row.description || undefined,
+      cover_image: row.cover_image || undefined,
+      numeral: row.numeral || undefined,
+      detail: row.detail || undefined,
+      story: row.story || undefined,
+      price_label: row.price_label || undefined,
+      is_active: row.is_active,
+      sort_order: row.sort_order,
+      created_at: row.created_at,
+    }));
+  } catch (err) {
+    console.warn('[getCollections] Supabase query failed, using mock fallback:', err);
+    return mockCollections;
+  }
+};
 
 // Reviews
 export const getReviews = (productId: string) =>

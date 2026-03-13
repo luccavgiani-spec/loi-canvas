@@ -236,6 +236,51 @@ export type Database = {
           },
         ]
       }
+      collections: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          description: string | null
+          cover_image: string | null
+          numeral: string | null
+          detail: string | null
+          story: string | null
+          price_label: string | null
+          is_active: boolean
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          description?: string | null
+          cover_image?: string | null
+          numeral?: string | null
+          detail?: string | null
+          story?: string | null
+          price_label?: string | null
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          description?: string | null
+          cover_image?: string | null
+          numeral?: string | null
+          detail?: string | null
+          story?: string | null
+          price_label?: string | null
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           collection: string | null
@@ -244,7 +289,6 @@ export type Database = {
           description: string | null
           id: string
           images: Json | null
-          is_active: boolean | null
           name: string
           price: number
           short_description: string | null
@@ -259,7 +303,6 @@ export type Database = {
           description?: string | null
           id?: string
           images?: Json | null
-          is_active?: boolean | null
           name: string
           price: number
           short_description?: string | null
@@ -274,7 +317,6 @@ export type Database = {
           description?: string | null
           id?: string
           images?: Json | null
-          is_active?: boolean | null
           name?: string
           price?: number
           short_description?: string | null
