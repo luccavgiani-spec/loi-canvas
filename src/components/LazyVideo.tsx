@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, memo } from 'react';
 
 interface LazyVideoProps {
   src: string;
+  poster?: string;
   className?: string;
   style?: React.CSSProperties;
   muted?: boolean;
@@ -20,6 +21,7 @@ interface LazyVideoProps {
  */
 const LazyVideo = memo(({
   src,
+  poster,
   className,
   style,
   muted = true,
@@ -62,20 +64,23 @@ const LazyVideo = memo(({
 
   return (
     <div ref={containerRef} className={className} style={style}>
-      {isVisible && (
+      {isVisible ? (
         <video
           ref={videoRef}
           src={src}
+          poster={poster}
           muted={muted}
           loop={loop}
           playsInline={playsInline}
           autoPlay={autoPlay}
-          preload="metadata"
+          preload="none"
           width={width}
           height={height}
           className="absolute inset-0 w-full h-full object-cover"
         />
-      )}
+      ) : poster ? (
+        <img src={poster} alt="" className="absolute inset-0 w-full h-full object-cover" />
+      ) : null}
     </div>
   );
 });

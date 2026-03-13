@@ -19,6 +19,8 @@ const ProductCard = ({ product }: Props) => {
             playsInline
             autoPlay
             loop
+            preload="none"
+            poster={product.images.find(s => !s.match(/\.mp4$/i))}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (

@@ -36,7 +36,7 @@ const HeroSection = () => {
         muted
         playsInline
         loop
-        preload="auto"
+        preload="metadata"
         poster="/hero/hero-poster.jpg"
         width={1920}
         height={1080}

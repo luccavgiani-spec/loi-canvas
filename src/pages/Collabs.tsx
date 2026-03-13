@@ -1,26 +1,43 @@
 import { useSearchParams } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
 import { getAdminCollabs } from '@/lib/api';
+import { storageUrl } from '@/lib/storage';
 import type { Collab } from '@/types';
+
+const COLLAB_POSTER = storageUrl('loie_vela_campos_principal.JPG');
 
 const CollabDetailCard = ({ collab }: { collab: Collab }) => {
   const [currentImage, setCurrentImage] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: '200px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % collab.images.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [collab.images.length]);
+  }, [collab.images.length, isVisible]);
 
   return (
     <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-      <div className="relative overflow-hidden aspect-[4/5]">
-        {collab.images.map((src, i) => (
+      <div ref={containerRef} className="relative overflow-hidden aspect-[4/5]">
+        {isVisible ? collab.images.map((src, i) => (
           <video
             key={src}
             src={src}
@@ -28,10 +45,14 @@ const CollabDetailCard = ({ collab }: { collab: Collab }) => {
             playsInline
             autoPlay
             loop
+            preload="none"
+            poster={COLLAB_POSTER}
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
             style={{ opacity: currentImage === i ? 1 : 0 }}
           />
-        ))}
+        )) : (
+          <img src={COLLAB_POSTER} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        )}
       </div>
       <div className="flex flex-col justify-center">
         <span className="loi-label block mb-4">collab</span>

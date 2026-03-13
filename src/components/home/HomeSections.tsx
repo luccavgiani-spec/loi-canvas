@@ -300,7 +300,8 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
               playsInline
               autoPlay
               loop
-              preload="metadata"
+              preload="none"
+              poster={storageUrl('loie_vela_campos_principal.JPG')}
               className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
               style={{ opacity: currentImage === i ? 1 : 0 }}
             />
