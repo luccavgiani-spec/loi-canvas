@@ -55,8 +55,8 @@ function mapDbProduct(row: any): Product {
     details: row.suggested_use || undefined,
     price: Number(row.price),
     compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : undefined,
-    images: buildImageUrls(row.asset_folder),
-    collection: row.collections?.name || row.collection_id || '',
+    images: buildImageUrls(row.asset_folder || row.slug),
+    collection: row.collections?.name || row.collection || row.collection_id || '',
     tags: [],
     rating_avg: 0,
     rating_count: 0,
@@ -83,12 +83,9 @@ export const getProducts = async (params?: { collection?: string; tag?: string; 
 
     let products = data.map(mapDbProduct);
 
-    // Filter by collection slug after fetch (via join)
+    // Filter by collection name after fetch
     if (params?.collection) {
-      products = products.filter(p => {
-        const row = data.find((r: any) => r.id === p.id);
-        return row?.collections?.slug === params.collection;
-      });
+      products = products.filter(p => p.collection === params.collection);
     }
 
     return products;
@@ -144,6 +141,7 @@ export const getCollections = async (): Promise<Collection[]> => {
     const { data, error } = await supabase
       .from('collections')
       .select('*')
+      .eq('is_active', true)
       .order('sort_order', { ascending: true });
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('No collections returned from Supabase');
