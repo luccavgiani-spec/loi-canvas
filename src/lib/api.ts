@@ -34,11 +34,41 @@ async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>
   return res.json();
 }
 
+/** Build image URLs from asset_folder in Supabase Storage */
+function buildImageUrls(assetFolder: string | null | undefined): string[] {
+  if (!assetFolder) return [];
+  const storageBase = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/produtos`;
+  return [
+    `${storageBase}/${assetFolder}/principal.JPG`,
+    `${storageBase}/${assetFolder}/imagem_2.JPG`,
+  ];
+}
+
+/** Map Supabase row to Product type */
+function mapDbProduct(row: any): Product {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    description: row.description || '',
+    details: row.suggested_use || undefined,
+    price: Number(row.price),
+    compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : undefined,
+    images: buildImageUrls(row.asset_folder),
+    collection: row.collections?.name || row.collection_id || '',
+    tags: [],
+    rating_avg: 0,
+    rating_count: 0,
+    is_bestseller: false,
+    created_at: row.created_at || '',
+  };
+}
+
 // Products (query Supabase directly, mock fallback)
 export const getProducts = async (params?: { collection?: string; tag?: string; minPrice?: number; maxPrice?: number; sort?: string }): Promise<Product[]> => {
   try {
-    let query = supabase.from('products').select('*');
-    if (params?.collection) query = query.eq('collection', params.collection);
+    let query = supabase.from('products').select('*, collections(name, slug)');
+
     if (params?.minPrice) query = query.gte('price', params.minPrice);
     if (params?.maxPrice) query = query.lte('price', params.maxPrice);
 
@@ -51,7 +81,15 @@ export const getProducts = async (params?: { collection?: string; tag?: string; 
     if (!data || data.length === 0) throw new Error('No products returned from Supabase');
 
     let products = data.map(mapDbProduct);
-    if (params?.tag) products = products.filter(p => p.tags.includes(params.tag!));
+
+    // Filter by collection slug after fetch (via join)
+    if (params?.collection) {
+      products = products.filter(p => {
+        const row = data.find((r: any) => r.id === p.id);
+        return row?.collections?.slug === params.collection;
+      });
+    }
+
     return products;
   } catch (err) {
     console.warn('[getProducts] Supabase query failed, using mock fallback:', err);
@@ -64,9 +102,13 @@ export const getProducts = async (params?: { collection?: string; tag?: string; 
 
 export const getProductBySlug = async (slug: string): Promise<Product> => {
   try {
-    const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single();
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, collections(name, slug)')
+      .eq('slug', slug)
+      .single();
     if (error) throw error;
-    return Product(data);
+    return mapDbProduct(data);
   } catch (err) {
     console.warn(`[getProductBySlug] Supabase query failed for "${slug}", using mock fallback:`, err);
     return mockProducts.find(p => p.slug === slug) || mockProducts[0];
@@ -75,43 +117,25 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
 
 export const getRelatedProducts = async (id: string): Promise<Product[]> => {
   try {
-    const { data: current } = await supabase.from('products').select('collection').eq('id', id).single();
+    const { data: current } = await supabase
+      .from('products')
+      .select('collection_id')
+      .eq('id', id)
+      .single();
+
     const { data, error } = await supabase
       .from('products')
-      .select('*')
-      .eq('collection', current?.collection || '')
+      .select('*, collections(name, slug)')
+      .eq('collection_id', current?.collection_id || '')
       .neq('id', id)
       .limit(4);
+
     if (error) throw error;
-    return (data || []).map(Product);
+    return (data || []).map(mapDbProduct);
   } catch {
     return mockProducts.filter(p => p.id !== id).slice(0, 4);
   }
 };
-
-/** Map Supabase row to Product type */
-function mapDbProduct(row: any): Product {
-  const assetFolder = row.asset_folder || row.slug || '';
-  const storageBase = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/produtos`;
-  const imageUrl = assetFolder ? `${storageBase}/${assetFolder}` : '';
-
-  return {
-    id: row.id,
-    slug: row.slug,
-    name: row.name,
-    description: row.description || '',
-    details: row.suggested_use || undefined,
-    price: Number(row.price),
-    compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : undefined,
-    images: imageUrl ? [`${imageUrl}/principal.JPG`, `${imageUrl}/imagem_2.JPG`] : [],
-    collection: row.collections?.name || row.collection_id || '',
-    tags: [],
-    rating_avg: 0,
-    rating_count: 0,
-    is_bestseller: false,
-    created_at: row.created_at || '',
-  };
-}
 
 // Collections (query Supabase directly, mock fallback)
 export const getCollections = async (): Promise<Collection[]> => {
@@ -119,7 +143,6 @@ export const getCollections = async (): Promise<Collection[]> => {
     const { data, error } = await supabase
       .from('collections')
       .select('*')
-      .eq('is_active', true)
       .order('sort_order', { ascending: true });
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('No collections returned from Supabase');
@@ -175,7 +198,7 @@ export const processPayment = (data: {
     status: string;
     mp_status: string;
     mp_status_detail: string;
-    mp_order_id: string;
+    mp_payment_id: string;
   }>('mp-process-payment', data);
 
 // Newsletter
@@ -228,7 +251,7 @@ export const updateAdminCoupon = (id: string, data: Partial<Coupon>) =>
 export const deleteAdminCoupon = (id: string) =>
   fetchApi<void>(`/admin/coupons/${id}`, { method: 'DELETE' });
 
-// Collections
+// Collections Admin
 export const getAdminCollections = () =>
   fetchApi<Collection[]>('/admin/collections', undefined, mockCollections);
 
