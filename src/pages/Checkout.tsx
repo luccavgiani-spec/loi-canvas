@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+// checkout v3 - cardform nativo
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
 import { createOrder, processPayment } from '@/lib/api';
