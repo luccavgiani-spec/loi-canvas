@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getProducts } from '@/lib/api';
-import { mockCollections } from '@/lib/mocks';
-import type { Product } from '@/types';
+import { getProducts, getCollections } from '@/lib/api';
+import type { Product, Collection } from '@/types';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -198,15 +197,19 @@ const ProductCarousel = ({
 
 const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
   const ref = useReveal(0.15, [loading]);
 
   useEffect(() => {
-    getProducts().then(setProducts).finally(() => setLoading(false));
+    Promise.all([getProducts(), getCollections()])
+      .then(([prods, cols]) => {
+        setProducts(prods);
+        setCollections(cols);
+      })
+      .finally(() => setLoading(false));
   }, []);
-
-  const collections = mockCollections.filter((c) => c.is_active).sort((a, b) => a.sort_order - b.sort_order);
 
   const getCollectionProducts = (name: string) =>
   products.filter((p) => p.collection === name);
