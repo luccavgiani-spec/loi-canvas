@@ -76,9 +76,9 @@ serve(async (req) => {
       external_reference: order_id,
       ...(WEBHOOK_URL ? { notification_url: WEBHOOK_URL } : {}),
       back_urls: {
-        success: `${Deno.env.get('SITE_URL') || 'https://loie.com.br'}/checkout?status=approved`,
-        failure: `${Deno.env.get('SITE_URL') || 'https://loie.com.br'}/checkout?status=failure`,
-        pending: `${Deno.env.get('SITE_URL') || 'https://loie.com.br'}/checkout?status=pending`,
+        success: `${Deno.env.get('SITE_URL') || 'https://loie-commerce-spark.lovable.app'}/checkout?status=approved`,
+        failure: `${Deno.env.get('SITE_URL') || 'https://loie-commerce-spark.lovable.app'}/checkout?status=failure`,
+        pending: `${Deno.env.get('SITE_URL') || 'https://loie-commerce-spark.lovable.app'}/checkout?status=pending`,
       },
       auto_return: 'approved',
       statement_descriptor: 'LOIE',
