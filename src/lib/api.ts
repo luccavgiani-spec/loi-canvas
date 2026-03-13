@@ -1,3 +1,4 @@
+// v2 - schema corrigido
 import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
 import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
 import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections, mockCollabs } from '@/lib/mocks';
