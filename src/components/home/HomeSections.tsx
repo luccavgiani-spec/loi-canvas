@@ -1,15 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
-import { mockProducts } from '@/lib/mocks';
+import { getProducts } from '@/lib/api';
 import { storageUrl } from '@/lib/storage';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/LazyVideo';
-
-const PRODUCTS = mockProducts;
-const SALA_OU_ESTAR = PRODUCTS.filter((p) => p.collection === 'Sala ou Estar').slice(0, 6);
-const REFUGIO = PRODUCTS.filter((p) => p.collection === 'Refúgio').slice(0, 4);
+import type { Product } from '@/types';
 
 /* ── Horizontal carousel with snap scrolling ── */
 const ProductCarousel = memo(({
@@ -17,8 +14,8 @@ const ProductCarousel = memo(({
   addItem,
   dark = false,
 }: {
-  products: typeof PRODUCTS;
-  addItem: (p: typeof PRODUCTS[0]) => void;
+  products: Product[];
+  addItem: (p: Product) => void;
   dark?: boolean;
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -181,7 +178,7 @@ const ProductFocusBanner = memo(({
   videoSrc,
   dark = false,
 }: {
-  product: typeof PRODUCTS[0];
+  product: Product;
   reverse?: boolean;
   videoSrc?: string;
   dark?: boolean;
@@ -333,9 +330,16 @@ CollabCard.displayName = 'CollabCard';
 const HomeSections = () => {
   const ref = useReveal();
   const { addItem } = useCart();
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
 
-  const focusBosque = PRODUCTS.find((p) => p.slug === 'bosque')!;
-  const focusPomar = PRODUCTS.find((p) => p.slug === 'pomar')!;
+  useEffect(() => {
+    getProducts().then(setAllProducts);
+  }, []);
+
+  const salaOuEstar = allProducts.filter((p) => p.collection === 'Sala ou Estar').slice(0, 6);
+  const refugio = allProducts.filter((p) => p.collection === 'Refúgio').slice(0, 4);
+  const focusBosque = allProducts.find((p) => p.slug === 'bosque');
+  const focusPomar = allProducts.find((p) => p.slug === 'pomar');
 
   return (
     <div ref={ref} style={{ background: '#fcf5e0' }}>
@@ -357,7 +361,7 @@ const HomeSections = () => {
             </h2>
           </div>
           <div className="reveal">
-            <ProductCarousel products={SALA_OU_ESTAR} addItem={addItem} />
+            <ProductCarousel products={salaOuEstar} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
             <Link to="/shop/sala-ou-estar" className="loi-ghost group">
@@ -379,12 +383,16 @@ const HomeSections = () => {
 
       {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) — DARK THEME ── */}
       <section style={{ background: '#29241f' }} className="loi-section-lazy">
-        <div className="relative">
-          <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
-        </div>
-        <div className="relative">
-          <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} dark />
-        </div>
+        {focusBosque && (
+          <div className="relative">
+            <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
+          </div>
+        )}
+        {focusPomar && (
+          <div className="relative">
+            <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} dark />
+          </div>
+        )}
       </section>
 
       {/* ── Degradê dark → cream (transição para Descubra Novos Aromas) ── */}
@@ -404,7 +412,7 @@ const HomeSections = () => {
             </h2>
           </div>
           <div className="reveal">
-            <ProductCarousel products={REFUGIO} addItem={addItem} />
+            <ProductCarousel products={refugio} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
             <Link to="/shop/refugio" className="loi-ghost group">

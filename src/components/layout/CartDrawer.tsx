@@ -3,7 +3,9 @@ import { useCart } from '@/contexts/CartContext';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FREE_SHIPPING_THRESHOLD } from '@/config';
-import { mockProducts } from '@/lib/mocks';
+import { getProducts } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import type { Product } from '@/types';
 
 const CartDrawer = () => {
   const { items, isOpen, setIsOpen, removeItem, updateQty, subtotal } = useCart();
@@ -11,7 +13,12 @@ const CartDrawer = () => {
   const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const progress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
-  const upsellProducts = mockProducts.filter(p => !items.find(i => i.product.id === p.id)).slice(0, 2);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  useEffect(() => {
+    if (isOpen) getProducts().then(setAllProducts);
+  }, [isOpen]);
+
+  const upsellProducts = allProducts.filter(p => !items.find(i => i.product.id === p.id)).slice(0, 2);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
