@@ -168,8 +168,8 @@ const CardForm = ({
     loadMP();
 
     return () => {
-      formRef.current?.unmount?.();
-    };
+  // cleanup intencional vazio - cardForm do MP não precisa de unmount manual
+};
   }, [total, email]);
 
   const handleSubmit = () => {
