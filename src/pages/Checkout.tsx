@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
-import { createOrder, createPaymentPreference } from '@/lib/api';
+import { createOrder, createPaymentPreference, processPayment } from '@/lib/api';
 import { MP_PUBLIC_KEY, FREE_SHIPPING_THRESHOLD } from '@/config';
 import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
@@ -76,9 +76,50 @@ const Checkout = () => {
     }
   };
 
-  const handlePaymentSubmit = useCallback(async () => {
+  const handlePaymentSubmit = useCallback(async (paymentData: any) => {
     setStep('processing');
-  }, []);
+    try {
+      const formData = paymentData?.formData || paymentData;
+      console.log('Payment Brick formData:', formData);
+
+      const result = await processPayment({
+        order_id: orderId!,
+        token: formData.token,
+        payment_method_id: formData.payment_method_id,
+        issuer_id: formData.issuer_id,
+        installments: formData.installments || 1,
+        transaction_amount: formData.transaction_amount || total,
+        payer: formData.payer || { email: form.email },
+      });
+
+      console.log('Payment result:', result);
+
+      if (result.status === 'paid') {
+        clear();
+        setStep('success');
+      } else if (result.status === 'pending') {
+        setErrorMessage('Pagamento em análise. Você será notificado por e-mail quando for aprovado.');
+        setStep('error');
+      } else {
+        const detail = result.mp_status_detail || 'rejected';
+        const messages: Record<string, string> = {
+          cc_rejected_other_reason: 'Pagamento recusado. Tente outro cartão.',
+          cc_rejected_call_for_authorize: 'Pagamento recusado. Ligue para a operadora do cartão.',
+          cc_rejected_insufficient_amount: 'Saldo insuficiente.',
+          cc_rejected_bad_filled_security_code: 'Código de segurança inválido.',
+          cc_rejected_bad_filled_date: 'Data de vencimento inválida.',
+          cc_rejected_bad_filled_other: 'Dados do cartão inválidos.',
+          accredited: 'Pagamento aprovado!',
+        };
+        setErrorMessage(messages[detail] || `Pagamento recusado (${detail}). Tente novamente.`);
+        setStep('error');
+      }
+    } catch (err) {
+      console.error('Process payment error:', err);
+      setErrorMessage(err instanceof Error ? err.message : 'Erro ao processar pagamento.');
+      setStep('error');
+    }
+  }, [orderId, total, form.email, clear]);
 
   const handlePaymentReady = useCallback(() => {
     // Payment Brick is ready
@@ -89,11 +130,6 @@ const Checkout = () => {
     setErrorMessage('Erro no processamento do pagamento. Tente novamente.');
     setStep('error');
   }, []);
-
-  const handleOnApprove = useCallback(() => {
-    clear();
-    setStep('success');
-  }, [clear]);
 
   if (items.length === 0 && step !== 'success') {
     return (

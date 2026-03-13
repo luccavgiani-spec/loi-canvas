@@ -129,6 +129,22 @@ export const createOrder = (data: { items: { product_id: string; quantity: numbe
 export const createPaymentPreference = (data: { order_id: string }) =>
   callEdgeFunction<{ preference_id: string; init_point: string; sandbox_init_point: string }>('mp-create-preference', data);
 
+export const processPayment = (data: {
+  order_id: string;
+  token: string;
+  payment_method_id: string;
+  issuer_id?: string;
+  installments: number;
+  transaction_amount: number;
+  payer: { email: string; identification?: { type: string; number: string } };
+}) =>
+  callEdgeFunction<{
+    status: string;
+    mp_status: string;
+    mp_status_detail: string;
+    mp_order_id: string;
+  }>('mp-process-payment', data);
+
 // Newsletter
 export const subscribeNewsletter = (email: string) =>
   fetchApi<{ coupon_code: string }>('/newsletter/subscribe', { method: 'POST', body: JSON.stringify({ email }) }, { coupon_code: `LOIE15-${Math.random().toString(36).substring(2, 6).toUpperCase()}` });
