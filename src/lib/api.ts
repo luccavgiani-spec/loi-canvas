@@ -138,14 +138,14 @@ export const getRelatedProducts = async (id: string): Promise<Product[]> => {
 // Collections (query Supabase directly, mock fallback)
 export const getCollections = async (): Promise<Collection[]> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('collections')
-      .select('*')
+      .select('*') as any)
       .eq('is_active', true)
       .order('sort_order', { ascending: true });
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('No collections returned from Supabase');
-    return data.map((row) => ({
+    return (data as any[]).map((row: any) => ({
       id: row.id,
       slug: row.slug,
       name: row.name,

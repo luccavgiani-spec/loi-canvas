@@ -34,36 +34,45 @@ export type Database = {
       }
       collections: {
         Row: {
+          cover_image: string | null
           created_at: string | null
           description: string | null
           detail: string | null
           id: string
+          is_active: boolean
           name: string
           numeral: string | null
           price_label: string | null
           slug: string
+          sort_order: number
           story: string | null
         }
         Insert: {
+          cover_image?: string | null
           created_at?: string | null
           description?: string | null
           detail?: string | null
           id?: string
+          is_active?: boolean
           name: string
           numeral?: string | null
           price_label?: string | null
           slug: string
+          sort_order?: number
           story?: string | null
         }
         Update: {
+          cover_image?: string | null
           created_at?: string | null
           description?: string | null
           detail?: string | null
           id?: string
+          is_active?: boolean
           name?: string
           numeral?: string | null
           price_label?: string | null
           slug?: string
+          sort_order?: number
           story?: string | null
         }
         Relationships: []
