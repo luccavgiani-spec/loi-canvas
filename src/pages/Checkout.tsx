@@ -154,6 +154,9 @@ const PixQRCode = ({ qrCode, qrCodeBase64, amount }: { qrCode: string; qrCodeBas
 
 // ─── Card form ────────────────────────────────────────────────────────────────
 const SCRIPT_ID = 'mp-sdk-v2';
+// Instância singleton do MP — evita "Cardform already instantiated" no StrictMode
+let mpInstance: any = null;
+let cardFormInstance: any = null;
 
 const CardForm = ({
   total, email, onSuccess, onError,
@@ -199,7 +202,10 @@ const CardForm = ({
         return;
       }
 
-      const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+      if (!mpInstance) {
+        mpInstance = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+      }
+      const mp = mpInstance;
       const cardForm = mp.cardForm({
         amount: String(total),
         iframe: true,
@@ -248,6 +254,7 @@ const CardForm = ({
         },
       });
       formRef.current = cardForm;
+      cardFormInstance = cardForm;
     };
 
     // Polling: aguarda window.MercadoPago estar disponível (máx 10s)
@@ -280,6 +287,12 @@ const CardForm = ({
     return () => {
       mounted = false;
       if (intervalRef) clearInterval(intervalRef);
+      // Limpa instâncias ao desmontar para permitir remontagem correta
+      if (cardFormInstance) {
+        try { cardFormInstance.unmount?.(); } catch (_) {}
+        cardFormInstance = null;
+      }
+      mpInstance = null;
     };
   }, [total, email]);
 
@@ -288,8 +301,8 @@ const CardForm = ({
       {/* Container do MP SDK — id obrigatório para o cardForm localizar os campos */}
       <div id="loie-card-form" style={{ display: 'none' }}>
         <input type="hidden" id="mp__cardholderEmail" value={email} readOnly />
-        <input type="hidden" id="mp__installments" />
-        <input type="hidden" id="mp__identificationType" />
+        <select id="mp__installments" style={{ display: 'none' }} />
+        <select id="mp__identificationType" style={{ display: 'none' }} />
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -339,7 +352,7 @@ const CardForm = ({
           </div>
         </div>
 
-        <input type="hidden" id="mp__issuer" style={{ display: 'none' }} />
+        <select id="mp__issuer" style={{ display: 'none' }} />
 
         {installments.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
