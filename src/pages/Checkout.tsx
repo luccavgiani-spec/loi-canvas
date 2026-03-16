@@ -249,14 +249,22 @@ const CardForm = ({
             if (data?.payer_costs) setInstallments(data.payer_costs);
           },
           onSubmit: async (event: any) => {
-            event.preventDefault();
-            setIsSubmitting(true);
+            event?.preventDefault?.();
+          },
+          onCardTokenReceived: (errors: any, token: any) => {
+            if (!mounted) return;
+            if (errors && errors.length > 0) {
+              console.error('Token errors:', errors);
+              setIsSubmitting(false);
+              onError(errors.map((e: any) => e.message || e.cause).join(', ') || 'Dados do cartão inválidos.');
+              return;
+            }
             const d = cardForm.getCardFormData();
             onSuccess({
-              token: d.token,
+              token: token?.id || d.token,
               payment_method_id: d.paymentMethodId,
               issuer_id: d.issuerId,
-              installments: Number(d.installments) || 1,
+              installments: Number(d.installments) || selectedInstallment || 1,
               transaction_amount: Number(d.amount),
               payer: {
                 email: d.cardholderEmail || email,
@@ -393,20 +401,27 @@ const CardForm = ({
 
         <button
           type="button"
-          onClick={() => formRef.current?.createCardToken?.()}
+          onClick={() => {
+            if (!formRef.current || isSubmitting) return;
+            setIsSubmitting(true);
+            formRef.current.createCardToken?.();
+          }}
           disabled={!mpReady || isSubmitting}
           style={{
-            marginTop: 8, padding: '14px 24px',
-            background: mpReady && !isSubmitting ? CHAR : `${CHAR}44`,
-            color: CREME, border: 'none',
+            marginTop: 8, padding: '16px 24px',
+            background: mpReady && !isSubmitting ? '#2d7a3a' : '#2d7a3a99',
+            color: '#ffffff', border: 'none',
             fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
             fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase',
             cursor: mpReady && !isSubmitting ? 'pointer' : 'not-allowed',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            transition: 'opacity 0.2s',
           }}
+          onMouseEnter={e => { if (mpReady && !isSubmitting) e.currentTarget.style.opacity = '0.88'; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
         >
           {isSubmitting && <Loader2 size={14} className="animate-spin" />}
-          {!mpReady ? 'carregando...' : isSubmitting ? 'processando...' : `pagar R$ ${total.toFixed(2)}`}
+          {!mpReady ? 'carregando...' : isSubmitting ? 'processando...' : 'finalizar compra'}
         </button>
 
         <p style={{ textAlign: 'center', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.78rem', color: `${CHAR}44` }}>
