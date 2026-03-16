@@ -142,6 +142,52 @@ export const getRelatedProducts = async (id: string): Promise<Product[]> => {
   }
 };
 
+// Products by collection slug (single query, no race condition)
+export const getProductsByCollectionSlug = async (collectionSlug: string): Promise<{ products: Product[]; collection: Collection | null }> => {
+  try {
+    // Get collection by slug
+    const { data: colRow, error: colError } = await supabase
+      .from('collections')
+      .select('*')
+      .eq('slug', collectionSlug)
+      .single();
+    if (colError || !colRow) {
+      console.log('[LOIÊ] collection query:', collectionSlug, 0, colError);
+      return { products: [], collection: null };
+    }
+
+    // Get products for that collection
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, collections(name, slug)')
+      .eq('collection_id', colRow.id)
+      .order('created_at', { ascending: false });
+
+    console.log('[LOIÊ] collection query:', collectionSlug, data?.length, error);
+    if (error) throw error;
+
+    const collection: Collection = {
+      id: colRow.id,
+      slug: colRow.slug,
+      name: colRow.name,
+      description: colRow.description || undefined,
+      cover_image: colRow.cover_image || undefined,
+      numeral: colRow.numeral || undefined,
+      detail: colRow.detail || undefined,
+      story: colRow.story || undefined,
+      price_label: colRow.price_label || undefined,
+      is_active: colRow.is_active,
+      sort_order: colRow.sort_order,
+      created_at: colRow.created_at,
+    };
+
+    return { products: (data || []).map(mapDbProduct), collection };
+  } catch (err) {
+    console.warn('[getProductsByCollectionSlug] failed:', err);
+    return { products: [], collection: null };
+  }
+};
+
 // Collections (query Supabase directly, mock fallback)
 export const getCollections = async (): Promise<Collection[]> => {
   try {
