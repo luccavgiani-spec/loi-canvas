@@ -12,7 +12,9 @@ const ProductCard = ({ product }: Props) => {
   return (
     <div className="group">
       <Link to={`/product/${product.slug}`} className="block relative overflow-hidden rounded bg-secondary aspect-square mb-3">
-        {product.images[0]?.match(/\.mp4$/i) ? (
+        {product.images.length === 0 ? (
+          <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
+        ) : product.images[0]?.match(/\.mp4$/i) ? (
           <video
             src={product.images[0]}
             muted

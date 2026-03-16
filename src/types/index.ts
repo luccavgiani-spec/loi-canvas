@@ -1,13 +1,21 @@
 export interface Product {
   id: string;
+  collection_id?: string;
+  collection_slug?: string;
   slug: string;
   name: string;
+  sku?: string;
   description: string;
   details?: string;
   how_to_use?: string;
   care_instructions?: string;
+  suggested_use?: string;
+  composition?: string;
   price: number;
   compare_at_price?: number;
+  weight_g?: number | null;
+  burn_hours?: number | null;
+  accord?: string;
   images: string[];
   collection: string;
   tags: string[];

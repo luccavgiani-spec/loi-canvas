@@ -37,7 +37,7 @@ async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>
 
 /** Build image URLs from asset_folder in Supabase Storage */
 function buildImageUrls(assetFolder: string | null | undefined): string[] {
-  if (!assetFolder) return [];
+  if (!assetFolder || typeof assetFolder !== 'string') return [];
   const storageBase = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/produtos`;
   return [
     `${storageBase}/${assetFolder}/principal.JPG`,
@@ -49,18 +49,24 @@ function buildImageUrls(assetFolder: string | null | undefined): string[] {
 function mapDbProduct(row: any): Product {
   return {
     id: row.id,
+    collection_id: row.collection_id,
+    collection: row.collections?.name ?? '',
+    collection_slug: row.collections?.slug ?? '',
     slug: row.slug,
     name: row.name,
-    description: row.description || '',
-    details: row.suggested_use || undefined,
+    sku: row.sku ?? '',
     price: Number(row.price),
-    compare_at_price: row.compare_at_price ? Number(row.compare_at_price) : undefined,
-    images: buildImageUrls(row.asset_folder || row.slug),
-    collection: row.collections?.name || row.collection || row.collection_id || '',
+    weight_g: row.weight_g ?? null,
+    burn_hours: row.burn_hours ?? null,
+    accord: row.accord ?? '',
+    description: row.description ?? '',
+    suggested_use: row.suggested_use ?? '',
+    composition: row.composition ?? '',
+    is_bestseller: row.is_bestseller ?? false,
+    images: buildImageUrls(row.asset_folder),
     tags: [],
     rating_avg: 0,
     rating_count: 0,
-    is_bestseller: row.is_bestseller ?? false,
     created_at: row.created_at || '',
   };
 }
@@ -78,6 +84,7 @@ export const getProducts = async (params?: { collection?: string; tag?: string; 
     query = query.order(sortCol, { ascending });
 
     const { data, error } = await query;
+    console.log('[LOIÊ] products fetched:', data?.length, data?.[0]);
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('No products returned from Supabase');
 

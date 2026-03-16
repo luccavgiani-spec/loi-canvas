@@ -14,6 +14,11 @@ const HeroSection = () => {
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
+    // Lazy-load: set src only now, not in JSX
+    if (!v.src) {
+      v.src = VIDEO_SRC;
+      v.load();
+    }
     // Start playback as soon as enough data is buffered
     const tryPlay = () => { v.play().catch(() => {}); };
     if (v.readyState >= 3) {
@@ -31,12 +36,10 @@ const HeroSection = () => {
       {/* ── video ── */}
       <video
         ref={videoRef}
-        src={VIDEO_SRC}
-        autoPlay
         muted
         playsInline
         loop
-        preload="metadata"
+        preload="none"
         poster="/hero/hero-poster.jpg"
         width={1920}
         height={1080}
