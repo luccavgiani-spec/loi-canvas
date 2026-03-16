@@ -1,5 +1,6 @@
 // checkout v5 - fix: cardForm race condition + PIX via Payments API
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
 import { createOrder, processPayment } from '@/lib/api';
@@ -435,6 +436,7 @@ const CardForm = ({
 // ─── Main Checkout ─────────────────────────────────────────────────────────────
 const Checkout = () => {
   const { items, subtotal, clear } = useCart();
+  const navigate = useNavigate();
   const [step, setStep] = useState<CheckoutStep>('form');
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -478,7 +480,10 @@ const Checkout = () => {
     setStep('processing');
     try {
       const result = await processPayment({ order_id: orderId!, ...paymentData });
-      if (result.status === 'paid') { clear(); setStep('success'); }
+      if (result.status === 'paid') {
+        clear();
+        navigate(`/pedido-confirmado?order_id=${orderId}`);
+      }
       else if (result.status === 'pending') {
         setErrorMessage('Pagamento em análise. Você será notificado por e-mail.');
         setStep('error');

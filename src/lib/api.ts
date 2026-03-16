@@ -264,6 +264,17 @@ export const processPayment = (data: {
     mp_payment_id: string;
   }>('mp-process-payment', data);
 
+// Order by ID (for confirmation page)
+export const getOrderById = async (orderId: string) => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, order_items(*, products(name, price, asset_folder, slug, collection_id, collections(name, slug)))')
+    .eq('id', orderId)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
 // Newsletter
 export const subscribeNewsletter = (email: string) =>
   fetchApi<{ coupon_code: string }>('/newsletter/subscribe', { method: 'POST', body: JSON.stringify({ email }) }, { coupon_code: `LOIE15-${Math.random().toString(36).substring(2, 6).toUpperCase()}` });

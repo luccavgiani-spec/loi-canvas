@@ -17,6 +17,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Collabs = lazy(() => import("./pages/Collabs"));
 const Policies = lazy(() => import("./pages/Policies"));
 const Admin = lazy(() => import("./pages/Admin"));
+const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -45,6 +46,7 @@ const App = () => (
                 <Route path="/shop/:slug" element={<CollectionPage />} />
                 <Route path="/product/:slug" element={<ProductDetail />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/pedido-confirmado" element={<OrderConfirmation />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/collabs" element={<Collabs />} />
