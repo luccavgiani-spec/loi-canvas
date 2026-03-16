@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getProducts, getCollections } from '@/lib/api';
+import { getProductsByCollectionSlug, getCollections } from '@/lib/api';
 import type { Product, Collection } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { useReveal } from '@/hooks/useReveal';
@@ -18,25 +18,39 @@ const sortOptions = [
 const CollectionPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [products, setProducts] = useState<Product[]>([]);
+  const [collection, setCollection] = useState<Collection | null>(null);
   const [allCollections, setAllCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [sort, setSort] = useState('default');
   const { addItem } = useCart();
   const ref = useReveal(0.15, [loading]);
 
   useEffect(() => {
-    getCollections().then(setAllCollections);
-  }, []);
-
-  const collection = allCollections.find(c => c.slug === slug);
-
-  useEffect(() => {
-    if (!collection) return;
+    if (!slug) return;
     setLoading(true);
-    getProducts({ collection: collection.name })
-      .then(setProducts)
+    setError(null);
+    setNotFound(false);
+
+    Promise.all([
+      getProductsByCollectionSlug(slug),
+      getCollections(),
+    ])
+      .then(([result, cols]) => {
+        setAllCollections(cols);
+        if (!result.collection) {
+          setNotFound(true);
+          return;
+        }
+        setCollection(result.collection);
+        setProducts(result.products);
+      })
+      .catch((err) => {
+        setError(err.message || 'Erro ao carregar coleção');
+      })
       .finally(() => setLoading(false));
-  }, [collection]);
+  }, [slug]);
 
   const sorted = useMemo(() => {
     const result = [...products];
@@ -46,7 +60,25 @@ const CollectionPage = () => {
     return result;
   }, [products, sort]);
 
-  if (allCollections.length > 0 && !collection) return <Navigate to="/shop" replace />;
+  if (notFound && !loading) return <Navigate to="/shop" replace />;
+
+  if (error) return (
+    <Layout>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500 text-sm">{error}</p>
+      </div>
+    </Layout>
+  );
+
+  if (loading || !collection) return (
+    <Layout>
+      <div className="min-h-screen flex items-center justify-center">
+        <p style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
+          Carregando...
+        </p>
+      </div>
+    </Layout>
+  );
 
   const otherCollections = allCollections.filter(c => c.slug !== slug && c.is_active);
 
@@ -178,20 +210,10 @@ const CollectionPage = () => {
             </div>
 
             {/* Grid */}
-            {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i}>
-                    <div className="aspect-[3/4] mb-4" style={{ background: 'rgba(0,0,0,0.05)' }} />
-                    <div className="h-4 w-3/4 mb-2" style={{ background: 'rgba(0,0,0,0.05)' }} />
-                    <div className="h-3 w-1/2" style={{ background: 'rgba(0,0,0,0.05)' }} />
-                  </div>
-                ))}
-              </div>
-            ) : sorted.length === 0 ? (
-              <div className="text-center py-20">
+            {sorted.length === 0 ? (
+              <div className="min-h-[40vh] flex items-center justify-center">
                 <p style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
-                  Nenhum produto encontrado nesta coleção.
+                  Nenhum produto nesta coleção ainda.
                 </p>
               </div>
             ) : (
@@ -199,24 +221,15 @@ const CollectionPage = () => {
                 {sorted.map((product) => (
                   <div key={product.id} className="reveal group">
                     <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
-                      {product.images[0]?.match(/\.mp4$/i) ? (
-                        <video
-                          src={product.images[0]}
-                          muted
-                          playsInline
-                          autoPlay
-                          loop
-                          preload="none"
-                          poster={product.images.find(s => !s.match(/\.mp4$/i))}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : (
+                      {product.images[0] ? (
                         <img
                           src={product.images[0]}
                           alt={product.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           loading="lazy"
                         />
+                      ) : (
+                        <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
                       )}
                       <div
                         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"

@@ -12,26 +12,15 @@ const ProductCard = ({ product }: Props) => {
   return (
     <div className="group">
       <Link to={`/product/${product.slug}`} className="block relative overflow-hidden rounded bg-secondary aspect-square mb-3">
-        {product.images.length === 0 ? (
-          <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
-        ) : product.images[0]?.match(/\.mp4$/i) ? (
-          <video
-            src={product.images[0]}
-            muted
-            playsInline
-            autoPlay
-            loop
-            preload="none"
-            poster={product.images.find(s => !s.match(/\.mp4$/i))}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
+        {product.images[0] ? (
           <img
             src={product.images[0]}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
+        ) : (
+          <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
         )}
         {product.badge && (
           <span className={`badge-product badge-${product.badge} absolute top-2 left-2 rounded-sm`}>

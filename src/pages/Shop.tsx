@@ -93,26 +93,13 @@ const ProductCarousel = ({
           className="group flex-shrink-0 snap-start">
           
             <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
-              {product.images.length === 0 ?
-            <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} /> :
-            product.images[0]?.match(/\.mp4$/i) ?
-            <video
-              src={product.images[0]}
-              muted
-              playsInline
-              autoPlay
-              loop
-              preload="none"
-              poster={product.images.find(s => !s.match(/\.mp4$/i))}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" /> :
-
-
+              {product.images[0] ?
             <img
               src={product.images[0]}
               alt={product.name}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              loading="lazy" />
-
+              loading="lazy" /> :
+            <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
             }
               <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
