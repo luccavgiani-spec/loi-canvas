@@ -57,7 +57,7 @@ const OrderConfirmation = () => {
 
         // Fetch related products
         const items = data.order_items || [];
-        const firstProduct = items[0]?.products;
+        const firstProduct = items[0]?.product;
         let recs: Product[] = [];
 
         if (firstProduct) {
@@ -96,7 +96,7 @@ const OrderConfirmation = () => {
   if (!order) return null;
 
   const items = order.order_items || [];
-  const orderTotal = Number(order.total) || items.reduce((s: number, i: any) => s + Number(i.price) * Number(i.quantity), 0);
+  const orderTotal = Number(order.total) || items.reduce((s: number, i: any) => s + Number(i.unit_price) * Number(i.qty), 0);
 
   return (
     <Layout>
@@ -168,10 +168,10 @@ const OrderConfirmation = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {items.map((item: any, idx: number) => {
-                const product = item.products;
+                const product = item.product;
                 const thumb = buildThumbUrl(product?.asset_folder);
-                const qty = Number(item.quantity);
-                const unitPrice = Number(item.price);
+                const qty = Number(item.qty);
+                const unitPrice = Number(item.unit_price);
                 return (
                   <div key={idx} style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                     {thumb ? (
