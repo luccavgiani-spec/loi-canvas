@@ -49,17 +49,30 @@ const INPUT: React.CSSProperties = {
 
 const IFRAME_CONTAINER: React.CSSProperties = {
   width: '100%',
-  height: 44,
-  minHeight: 44,
+  height: 46,
+  minHeight: 46,
   border: `1px solid ${CHAR}22`,
   borderRadius: 0,
   background: 'transparent',
   boxSizing: 'border-box' as const,
-  overflow: 'visible',
+  overflow: 'hidden',
   position: 'relative' as const,
   display: 'block',
-  // Garante que o iframe injetado pelo MP SDK ocupe todo o container e receba eventos
 };
+
+// Estilo injetado globalmente para ajustar iframes do MP SDK
+const MP_IFRAME_CSS = `
+  div[id^="mp__"] iframe {
+    width: 100% !important;
+    height: 46px !important;
+    border: none !important;
+    padding: 0 14px !important;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 1rem !important;
+    color: #29241f !important;
+    background: transparent !important;
+  }
+`;
 
 // ─── PIX form ─────────────────────────────────────────────────────────────────
 const PixForm = ({
@@ -298,6 +311,7 @@ const CardForm = ({
 
   return (
     <div ref={containerRef}>
+      <style dangerouslySetInnerHTML={{ __html: MP_IFRAME_CSS }} />
       {/* Container do MP SDK — id obrigatório para o cardForm localizar os campos */}
       <div id="loie-card-form" style={{ display: 'none' }}>
         <input type="hidden" id="mp__cardholderEmail" value={email} readOnly />
@@ -329,7 +343,7 @@ const CardForm = ({
             id="mp__cardholderName"
             type="text"
             placeholder="Nome como no cartão"
-            style={{ ...INPUT }}
+            style={{ ...INPUT, height: 46, padding: '11px 14px' }}
             autoComplete="cc-name"
           />
         </div>
@@ -348,7 +362,13 @@ const CardForm = ({
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={LABEL}>número</label>
-            <div id="mp__identificationNumber" style={IFRAME_CONTAINER} />
+            <input
+              id="mp__identificationNumber"
+              type="text"
+              placeholder="000.000.000-00"
+              style={{ ...INPUT, height: 46, padding: '11px 14px' }}
+              autoComplete="off"
+            />
           </div>
         </div>
 
