@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 const HomeFooter = () => {
   return (
-    <footer style={{ background: '#29241f' }}>
+    <footer style={{ background: '#29241f' }} className="py-[7px]">
       <div className="max-w-[1400px] mx-auto px-6 py-[16px]">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
