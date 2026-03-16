@@ -275,36 +275,48 @@ const CardForm = ({
       formRef.current = cardForm;
     };
 
+    // Aguarda window.MercadoPago estar disponível via polling (máx 10s)
+    const waitForSDK = (onReady: () => void) => {
+      if (window.MercadoPago) {
+        onReady();
+        return;
+      }
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (window.MercadoPago) {
+          clearInterval(interval);
+          onReady();
+        } else if (attempts >= 100) {
+          // 100 * 100ms = 10s timeout
+          clearInterval(interval);
+          if (mounted) onError("Não foi possível carregar o formulário de pagamento. Recarregue a página.");
+        }
+      }, 100);
+      return interval;
+    };
+
     const existing = document.getElementById(SCRIPT_ID);
+    let intervalRef: ReturnType<typeof setInterval> | undefined;
 
     if (existing) {
-      // Script já está no DOM
-      if (window.MercadoPago) {
-        // SDK já disponível — defer de 150ms para garantir que o SDK finalizou init interno
-        const t = setTimeout(init, 150);
-        return () => {
-          mounted = false;
-          clearTimeout(t);
-        };
-      } else {
-        // Script no DOM mas ainda carregando
-        existing.addEventListener("load", init);
-        return () => {
-          mounted = false;
-          existing.removeEventListener("load", init);
-        };
-      }
+      // Script já está no DOM — polling até SDK estar pronto
+      intervalRef = waitForSDK(init);
     } else {
-      // Primeira vez — injeta o script
+      // Primeira vez — injeta o script, depois polling
       const script = document.createElement("script");
       script.id = SCRIPT_ID;
       script.src = "https://sdk.mercadopago.com/js/v2";
-      script.onload = init;
-      document.head.appendChild(script);
-      return () => {
-        mounted = false;
+      script.onload = () => {
+        intervalRef = waitForSDK(init);
       };
+      document.head.appendChild(script);
     }
+
+    return () => {
+      mounted = false;
+      if (intervalRef) clearInterval(intervalRef);
+    };
   }, [total, email]);
 
   return (
