@@ -49,6 +49,7 @@ const INPUT: React.CSSProperties = {
 
 const IFRAME_CONTAINER: React.CSSProperties = {
   width: "100%",
+  height: 44,
   minHeight: 44,
   border: `1px solid ${CHAR}22`,
   borderRadius: 0,
@@ -56,7 +57,24 @@ const IFRAME_CONTAINER: React.CSSProperties = {
   boxSizing: "border-box" as const,
   overflow: "visible",
   position: "relative" as const,
+  display: "block",
+  // Garante que o iframe injetado pelo MP SDK ocupe todo o container e receba eventos
 };
+
+// ─── Inject MP iframe fix styles ─────────────────────────────────────────────
+const MP_IFRAME_STYLE = `
+  div[id^="mp__"] { position: relative !important; display: block !important; }
+  div[id^="mp__"] iframe {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 44px !important;
+    border: none !important;
+    display: block !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+`;
 
 // ─── PIX form ─────────────────────────────────────────────────────────────────
 const PixForm = ({
@@ -351,6 +369,7 @@ const CardForm = ({
 
   return (
     <div ref={containerRef}>
+      <style dangerouslySetInnerHTML={{ __html: MP_IFRAME_STYLE }} />
       <form id="loie-card-form" style={{ display: "none" }}>
         <input type="hidden" id="mp__cardholderEmail" value={email} readOnly />
         <input type="hidden" id="mp__installments" />
