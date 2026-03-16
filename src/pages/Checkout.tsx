@@ -213,6 +213,7 @@ const CardForm = ({
   onError: (msg: string) => void;
 }) => {
   const formRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [installments, setInstallments] = useState<any[]>([]);
   const [selectedInstallment, setSelectedInstallment] = useState(1);
   const [docType, setDocType] = useState("CPF");
@@ -220,10 +221,28 @@ const CardForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // Só inicializa quando o container DOM já estiver pintado
+    if (!containerRef.current) return;
+
     let mounted = true;
+    let intervalRef: ReturnType<typeof setInterval> | undefined;
 
     const init = () => {
       if (!mounted) return;
+
+      // Confirma que todos os elementos alvo existem antes de chamar cardForm
+      const requiredIds = [
+        "mp__cardNumber",
+        "mp__expirationDate",
+        "mp__securityCode",
+        "mp__cardholderName",
+        "mp__identificationNumber",
+      ];
+      const allPresent = requiredIds.every((id) => document.getElementById(id));
+      if (!allPresent) {
+        setTimeout(init, 50);
+        return;
+      }
 
       const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
       const cardForm = mp.cardForm({
@@ -245,6 +264,7 @@ const CardForm = ({
           onFormMounted: (error: any) => {
             if (!mounted) return;
             if (error) {
+              console.error("onFormMounted error:", error);
               onError("Erro ao carregar formulário de pagamento.");
               return;
             }
@@ -275,41 +295,33 @@ const CardForm = ({
       formRef.current = cardForm;
     };
 
-    // Aguarda window.MercadoPago estar disponível via polling (máx 10s)
-    const waitForSDK = (onReady: () => void) => {
+    // Polling: aguarda window.MercadoPago estar disponível (máx 10s)
+    const waitForSDK = () => {
       if (window.MercadoPago) {
-        onReady();
+        init();
         return;
       }
       let attempts = 0;
-      const interval = setInterval(() => {
+      intervalRef = setInterval(() => {
         attempts++;
         if (window.MercadoPago) {
-          clearInterval(interval);
-          onReady();
+          clearInterval(intervalRef);
+          init();
         } else if (attempts >= 100) {
-          // 100 * 100ms = 10s timeout
-          clearInterval(interval);
+          clearInterval(intervalRef);
           if (mounted) onError("Não foi possível carregar o formulário de pagamento. Recarregue a página.");
         }
       }, 100);
-      return interval;
     };
 
     const existing = document.getElementById(SCRIPT_ID);
-    let intervalRef: ReturnType<typeof setInterval> | undefined;
-
     if (existing) {
-      // Script já está no DOM — polling até SDK estar pronto
-      intervalRef = waitForSDK(init);
+      waitForSDK();
     } else {
-      // Primeira vez — injeta o script, depois polling
       const script = document.createElement("script");
       script.id = SCRIPT_ID;
       script.src = "https://sdk.mercadopago.com/js/v2";
-      script.onload = () => {
-        intervalRef = waitForSDK(init);
-      };
+      script.onload = waitForSDK;
       document.head.appendChild(script);
     }
 
@@ -320,7 +332,7 @@ const CardForm = ({
   }, [total, email]);
 
   return (
-    <div>
+    <div ref={containerRef}>
       <form id="loie-card-form" style={{ display: "none" }}>
         <input type="hidden" id="mp__cardholderEmail" value={email} readOnly />
         <input type="hidden" id="mp__installments" />
