@@ -176,9 +176,6 @@ const CardForm = ({
     let mounted = true;
     let intervalRef: ReturnType<typeof setInterval> | undefined;
 
-    let retryCount = 0;
-    const MAX_RETRIES = 3;
-
     const init = () => {
       if (!mounted) return;
 
@@ -202,12 +199,6 @@ const CardForm = ({
         return;
       }
 
-      // Destrói instância anterior se existir (retry)
-      if (formRef.current) {
-        try { formRef.current.unmount?.(); } catch (_) {}
-        formRef.current = null;
-      }
-
       const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
       const cardForm = mp.cardForm({
         amount: String(total),
@@ -228,17 +219,10 @@ const CardForm = ({
           onFormMounted: (error: any) => {
             if (!mounted) return;
             if (error) {
-              console.warn(`onFormMounted error (tentativa ${retryCount + 1}):`, error);
-              retryCount++;
-              if (retryCount < MAX_RETRIES) {
-                // Retry automático silencioso: aguarda 800ms e reinicia
-                setTimeout(init, 800);
-              } else {
-                onError('Erro ao carregar formulário de pagamento.');
-              }
+              console.error('onFormMounted error:', error);
+              onError('Erro ao carregar formulário de pagamento.');
               return;
             }
-            retryCount = 0;
             setMpReady(true);
           },
           onInstallmentsReceived: (_: any, data: any) => {
@@ -328,7 +312,13 @@ const CardForm = ({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <label style={LABEL}>nome no cartão</label>
-          <div id="mp__cardholderName" style={IFRAME_CONTAINER} />
+          <input
+            id="mp__cardholderName"
+            type="text"
+            placeholder="Nome como no cartão"
+            style={{ ...INPUT }}
+            autoComplete="cc-name"
+          />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: 16 }}>
