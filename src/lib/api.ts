@@ -266,13 +266,36 @@ export const processPayment = (data: {
 
 // Order by ID (for confirmation page)
 export const getOrderById = async (orderId: string) => {
-  const { data, error } = await supabase
+  // Fetch order + items (no FK from order_items.product_id → products)
+  const { data: order, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, products(name, price, asset_folder, slug, collection_id, collections(name, slug)))')
+    .select('*, order_items(*)')
     .eq('id', orderId)
     .single();
   if (error) throw error;
-  return data;
+
+  // Enrich items with product data
+  const items = order.order_items || [];
+  const productIds = [...new Set(items.map((i: any) => i.product_id).filter(Boolean))];
+
+  let productsMap: Record<string, any> = {};
+  if (productIds.length > 0) {
+    const { data: products } = await supabase
+      .from('products')
+      .select('id, name, price, asset_folder, slug, collection_id, collections(name, slug)')
+      .in('id', productIds);
+    if (products) {
+      productsMap = Object.fromEntries(products.map((p: any) => [p.id, p]));
+    }
+  }
+
+  return {
+    ...order,
+    order_items: items.map((item: any) => ({
+      ...item,
+      product: productsMap[item.product_id] || null,
+    })),
+  };
 };
 
 // Newsletter
