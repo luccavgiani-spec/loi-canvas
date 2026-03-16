@@ -1,4 +1,4 @@
-// checkout v6 - force rebuild
+// checkout v5 - fix: cardForm race condition + PIX via Payments API
 import { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
@@ -227,6 +227,9 @@ const CardForm = ({
     let mounted = true;
     let intervalRef: ReturnType<typeof setInterval> | undefined;
 
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+
     const init = () => {
       if (!mounted) return;
 
@@ -242,6 +245,14 @@ const CardForm = ({
       if (!allPresent) {
         setTimeout(init, 50);
         return;
+      }
+
+      // Destrói instância anterior se existir (retry)
+      if (formRef.current) {
+        try {
+          formRef.current.unmount?.();
+        } catch (_) {}
+        formRef.current = null;
       }
 
       const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
@@ -264,10 +275,17 @@ const CardForm = ({
           onFormMounted: (error: any) => {
             if (!mounted) return;
             if (error) {
-              console.error("onFormMounted error:", error);
-              onError("Erro ao carregar formulário de pagamento.");
+              console.warn(`onFormMounted error (tentativa ${retryCount + 1}):`, error);
+              retryCount++;
+              if (retryCount < MAX_RETRIES) {
+                // Retry automático silencioso: aguarda 800ms e reinicia
+                setTimeout(init, 800);
+              } else {
+                onError("Erro ao carregar formulário de pagamento.");
+              }
               return;
             }
+            retryCount = 0;
             setMpReady(true);
           },
           onInstallmentsReceived: (_: any, data: any) => {
