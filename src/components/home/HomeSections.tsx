@@ -328,7 +328,7 @@ CollabCard.displayName = 'CollabCard';
 
 /* ────────────────────────────────────────────────────────────── */
 const HomeSections = () => {
-  const ref = useReveal();
+  const ref = useReveal(0.15, [loading]);
   const { addItem } = useCart();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
