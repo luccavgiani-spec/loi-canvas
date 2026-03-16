@@ -1,4 +1,4 @@
-// checkout v5 - fix: cardForm race condition + PIX via Payments API
+// checkout v6 - force rebuild
 import { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
