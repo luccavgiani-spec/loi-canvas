@@ -18,6 +18,9 @@ const ProductCard = ({ product }: Props) => {
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
           />
         ) : (
           <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />

@@ -36,13 +36,24 @@ async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>
 }
 
 /** Build image URLs from asset_folder in Supabase Storage */
+const SUPABASE_STORAGE_URL =
+  'https://xigituxddrtsqhmrmsvy.supabase.co/storage/v1/object/public/produtos';
+
+const IMAGE_SUFFIXES = [
+  '_principal.JPG',
+  '_imagem.JPG',
+  '_imagem_2.JPG',
+  '_ultima.JPG',
+  '_principal.jpg',
+  '_imagem.jpg',
+  '_ultima.jpg',
+];
+
 function buildImageUrls(assetFolder: string | null | undefined): string[] {
   if (!assetFolder || typeof assetFolder !== 'string') return [];
-  const storageBase = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/produtos`;
-  return [
-    `${storageBase}/${assetFolder}/principal.JPG`,
-    `${storageBase}/${assetFolder}/imagem_2.JPG`,
-  ];
+  return IMAGE_SUFFIXES.map(
+    (suffix) => `${SUPABASE_STORAGE_URL}/${assetFolder}${suffix}`,
+  );
 }
 
 /** Map Supabase row to Product type */
