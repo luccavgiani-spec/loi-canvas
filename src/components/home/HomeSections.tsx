@@ -331,13 +331,26 @@ const HomeSections = () => {
   const ref = useReveal();
   const { addItem } = useCart();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProducts().then(setAllProducts);
+    getProducts()
+      .then(setAllProducts)
+      .finally(() => setLoading(false));
   }, []);
 
-  const salaOuEstar = allProducts.filter((p) => p.collection === 'Sala ou Estar').slice(0, 6);
-  const refugio = allProducts.filter((p) => p.collection === 'Refúgio').slice(0, 4);
+  const salaOuEstar = allProducts
+    .filter((p) =>
+      p.collection?.toLowerCase().includes('sala') ||
+      p.collection_slug === 'sala-ou-estar'
+    )
+    .slice(0, 6);
+  const refugio = allProducts
+    .filter((p) =>
+      p.collection?.toLowerCase().includes('ref') ||
+      p.collection_slug === 'refugio'
+    )
+    .slice(0, 4);
   const focusBosque = allProducts.find((p) => p.slug === 'bosque');
   const focusPomar = allProducts.find((p) => p.slug === 'pomar');
 
@@ -383,15 +396,35 @@ const HomeSections = () => {
 
       {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) — DARK THEME ── */}
       <section style={{ background: '#29241f' }} className="loi-section-lazy">
-        {focusBosque && (
-          <div className="relative">
-            <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
-          </div>
-        )}
-        {focusPomar && (
-          <div className="relative">
-            <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} dark />
-          </div>
+        {loading ? (
+          <div style={{ minHeight: '50vh', background: '#29241f' }} />
+        ) : (
+          <>
+            {focusBosque && (
+              <div className="relative">
+                <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
+              </div>
+            )}
+            {focusPomar && (
+              <div className="relative">
+                <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} dark />
+              </div>
+            )}
+            {!focusBosque && !focusPomar && (
+              <>
+                {allProducts[0] && (
+                  <div className="relative">
+                    <ProductFocusBanner product={allProducts[0]} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
+                  </div>
+                )}
+                {allProducts[1] && (
+                  <div className="relative">
+                    <ProductFocusBanner product={allProducts[1]} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} dark />
+                  </div>
+                )}
+              </>
+            )}
+          </>
         )}
       </section>
 
