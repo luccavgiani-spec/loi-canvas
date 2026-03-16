@@ -61,21 +61,6 @@ const IFRAME_CONTAINER: React.CSSProperties = {
   // Garante que o iframe injetado pelo MP SDK ocupe todo o container e receba eventos
 };
 
-// ─── Inject MP iframe fix styles ─────────────────────────────────────────────
-const MP_IFRAME_STYLE = `
-  div[id^="mp__"] { position: relative !important; display: block !important; }
-  div[id^="mp__"] iframe {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 44px !important;
-    border: none !important;
-    display: block !important;
-    pointer-events: auto !important;
-    position: relative !important;
-    z-index: 1 !important;
-  }
-`;
-
 // ─── PIX form ─────────────────────────────────────────────────────────────────
 const PixForm = ({
   total,
@@ -265,6 +250,15 @@ const CardForm = ({
         return;
       }
 
+      // Verifica que os elementos estão realmente attached e visíveis no documento
+      const firstEl = document.getElementById("mp__cardNumber");
+      const rect = firstEl?.getBoundingClientRect();
+      if (!rect || (rect.width === 0 && rect.height === 0)) {
+        // Elemento existe mas ainda não foi pintado — aguarda próximo frame
+        requestAnimationFrame(() => setTimeout(init, 100));
+        return;
+      }
+
       // Destrói instância anterior se existir (retry)
       if (formRef.current) {
         try {
@@ -369,7 +363,6 @@ const CardForm = ({
 
   return (
     <div ref={containerRef}>
-      <style dangerouslySetInnerHTML={{ __html: MP_IFRAME_STYLE }} />
       <form id="loie-card-form" style={{ display: "none" }}>
         <input type="hidden" id="mp__cardholderEmail" value={email} readOnly />
         <input type="hidden" id="mp__installments" />
