@@ -38,6 +38,7 @@ const HeroSection = () => {
         ref={videoRef}
         muted
         playsInline
+        autoPlay
         loop
         preload="none"
         poster="/hero/hero-poster.jpg"
