@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getProductBySlug, getRelatedProducts, getReviews } from '@/lib/api';
-import type { Product, Review } from '@/types';
+import { getProductBySlug, getRelatedProducts } from '@/lib/api';
+import type { Product } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { Star, Truck, RefreshCw, Leaf, Package } from 'lucide-react';
+import ReviewSection from '@/components/product/ReviewSection';
 import ShippingCalculator from '@/components/ShippingCalculator';
 
 const benefits = [
@@ -19,19 +20,14 @@ const ProductDetail = () => {
   const { addItem } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [related, setRelated] = useState<Product[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
-    Promise.all([
-      getProductBySlug(slug),
-      getReviews(slug),
-    ]).then(([prod, revs]) => {
+    getProductBySlug(slug).then((prod) => {
       setProduct(prod);
-      setReviews(revs);
       setSelectedImage(0);
       getRelatedProducts(prod.id).then(setRelated);
     }).finally(() => setLoading(false));
@@ -311,46 +307,10 @@ const ProductDetail = () => {
                 ))}
             </div>
 
-            {/* Reviews */}
-            {reviews.length > 0 && (
-              <div className="mt-8">
-                <h3
-                  className="heading-display mb-6"
-                  style={{ fontSize: '1.3rem', color: '#000' }}
-                >
-                  Avaliações ({reviews.length})
-                </h3>
-                <div className="space-y-4">
-                  {reviews.map((r) => (
-                    <div key={r.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: 16 }}>
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="flex">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
-                              key={s}
-                              size={12}
-                              className={s <= r.rating ? 'fill-current' : ''}
-                              style={{ color: s <= r.rating ? '#000' : 'rgba(0,0,0,0.15)' }}
-                            />
-                          ))}
-                        </div>
-                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(0,0,0,0.45)' }}>
-                          {r.author}
-                        </span>
-                      </div>
-                      <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '0.95rem', color: '#000' }}>
-                        {r.title}
-                      </h4>
-                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: '#000' }}>
-                        {r.body}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        <ReviewSection productId={product.id} />
 
         {/* Related */}
         {related.length > 0 && (

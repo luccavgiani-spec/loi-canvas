@@ -103,9 +103,9 @@ export const mockProducts: Product[] = [
 ];
 
 export const mockReviews: Review[] = [
-  { id: '1', product_id: 'sal-1', author: 'Maria S.', rating: 5, title: 'Perfume incrível!', body: 'A fragrância preenche todo o ambiente. Duração excelente.', created_at: '2025-02-15' },
-  { id: '2', product_id: 'sal-1', author: 'João P.', rating: 5, title: 'Presente perfeito', body: 'Comprei para presentear e a embalagem é linda. Super recomendo.', created_at: '2025-02-20' },
-  { id: '3', product_id: 'cot-1', author: 'Ana L.', rating: 4, title: 'Muito boa', body: 'Gostei bastante, perfeita para o dia a dia. Latinha linda!', created_at: '2025-03-01' },
+  { id: '1', product_id: 'sal-1', author_name: 'Maria S.', rating: 5, title: 'Perfume incrível!', body: 'A fragrância preenche todo o ambiente. Duração excelente.', created_at: '2025-02-15' },
+  { id: '2', product_id: 'sal-1', author_name: 'João P.', rating: 5, title: 'Presente perfeito', body: 'Comprei para presentear e a embalagem é linda. Super recomendo.', created_at: '2025-02-20' },
+  { id: '3', product_id: 'cot-1', author_name: 'Ana L.', rating: 4, title: 'Muito boa', body: 'Gostei bastante, perfeita para o dia a dia. Latinha linda!', created_at: '2025-03-01' },
 ];
 
 export const mockOrders: Order[] = [
