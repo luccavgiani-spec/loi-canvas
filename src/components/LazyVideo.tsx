@@ -53,12 +53,18 @@ const LazyVideo = memo(({
 
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v || !isVisible) {
+      videoRef.current?.pause();
+      return;
+    }
 
-    if (isVisible) {
-      v.play().catch(() => {});
+    const tryPlay = () => { v.play().catch(() => {}); };
+
+    if (v.readyState >= 3) {
+      tryPlay();
     } else {
-      v.pause();
+      v.addEventListener('canplay', tryPlay, { once: true });
+      return () => v.removeEventListener('canplay', tryPlay);
     }
   }, [isVisible]);
 
