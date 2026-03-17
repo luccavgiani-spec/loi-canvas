@@ -425,3 +425,21 @@ export const updateAdminCollab = (id: string, data: Partial<Collab>) =>
 
 export const deleteAdminCollab = (id: string) =>
   fetchApi<void>(`/admin/collabs/${id}`, { method: 'DELETE' });
+
+// Email — ship order and send tracking email
+export const shipOrder = (orderId: string, trackingCode: string): Promise<{ ok: boolean }> =>
+  callEdgeFunction('ship-order', { order_id: orderId, tracking_code: trackingCode });
+
+// Email — send campaign to a single recipient
+export const sendCampaignEmail = (subject: string, content: string, recipientEmail: string): Promise<{ ok: boolean }> =>
+  callEdgeFunction('send-email', {
+    type: 'campaign',
+    payload: { subject, html_content: content, recipient_email: recipientEmail },
+  });
+
+// Admin — get newsletter subscriber emails
+export const getAdminNewsletterEmails = async (): Promise<string[]> => {
+  const { data, error } = await supabase.from('newsletter').select('email');
+  if (error) throw error;
+  return (data ?? []).map((row: { email: string }) => row.email);
+};

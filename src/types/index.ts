@@ -57,6 +57,7 @@ export interface Order {
   subtotal: number;
   shipping_cost: number;
   total: number;
+  tracking_code?: string;
   created_at: string;
 }
 
