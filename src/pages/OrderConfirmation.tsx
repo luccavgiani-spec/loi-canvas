@@ -259,12 +259,13 @@ const OrderConfirmation = () => {
                 </p>
                 <p style={{
                   fontFamily: "'Cormorant Garamond', serif",
+                  fontStyle: 'italic',
                   fontSize: '0.9rem',
                   color: `${CHAR}77`,
                   margin: '0 0 12px',
-                  lineHeight: 1.5,
+                  lineHeight: 1.6,
                 }}>
-                  Você receberá o código de rastreamento por e-mail assim que o pedido for despachado.
+                  seu código de rastreio será enviado para o e-mail cadastrado assim que seu pedido for postado. fique de olho na sua caixa de entrada.
                 </p>
                 <a
                   href="https://rastreamento.correios.com.br"
