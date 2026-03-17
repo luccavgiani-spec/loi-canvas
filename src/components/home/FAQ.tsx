@@ -15,8 +15,8 @@ const FAQ = () => {
         <Accordion type="single" collapsible>
           {faqs.map((faq, i) => (
             <AccordionItem key={i} value={`faq-${i}`}>
-              <AccordionTrigger className="text-sm md:text-base text-left font-medium">{faq.q}</AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-sm leading-relaxed">{faq.a}</AccordionContent>
+              <AccordionTrigger className="text-base md:text-lg text-left font-medium">{faq.q}</AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-base leading-relaxed">{faq.a}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>

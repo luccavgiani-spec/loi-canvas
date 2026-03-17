@@ -5,7 +5,7 @@ const Manifesto = () => {
   return (
     <section className="py-20 md:py-28 bg-background">
       <div className="container max-w-3xl text-center">
-        <span className="text-xs uppercase tracking-[0.3em] text-accent mb-6 block">Nosso Ateliê</span>
+        <span className="text-sm uppercase tracking-[0.3em] text-accent mb-6 block">Nosso Ateliê</span>
         <h2 className="heading-display text-3xl md:text-4xl lg:text-5xl mb-6">
           Cada vela é uma história, cada aroma é uma memória
         </h2>
@@ -15,7 +15,7 @@ const Manifesto = () => {
           cuidadosamente selecionadas por perfumistas brasileiros. Do derretimento ao rótulo,
           cada detalhe é feito à mão no nosso ateliê em São Paulo.
         </p>
-        <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 text-sm uppercase tracking-wider">
+        <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 text-base uppercase tracking-wider">
           <Link to="/about">Conheça nossa história</Link>
         </Button>
       </div>

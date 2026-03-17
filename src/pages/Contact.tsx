@@ -69,7 +69,7 @@ const Contact = () => {
                   <label className="loi-label block mb-2">{field.label}</label>
                   <input
                     type={field.type}
-                    className="w-full px-4 py-3 bg-transparent text-sm"
+                    className="w-full px-4 py-3 bg-transparent text-base"
                     style={{
                       border: '1px solid rgba(86,86,0,0.2)',
                       color: '#000',
@@ -84,7 +84,7 @@ const Contact = () => {
                 <label className="loi-label block mb-2">Mensagem</label>
                 <textarea
                   rows={5}
-                  className="w-full px-4 py-3 bg-transparent text-sm resize-none"
+                  className="w-full px-4 py-3 bg-transparent text-base resize-none"
                   style={{
                     border: '1px solid rgba(86,86,0,0.2)',
                     color: '#000',

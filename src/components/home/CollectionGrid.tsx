@@ -16,7 +16,7 @@ const CollectionGrid = ({ title, subtitle, products, ctaLabel = 'Ver todos', cta
       <div className="container">
         <div className="text-center mb-10 md:mb-14">
           <h2 className="heading-display text-3xl md:text-4xl lg:text-5xl mb-3">{title}</h2>
-          {subtitle && <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">{subtitle}</p>}
+          {subtitle && <p className="text-muted-foreground text-base md:text-lg max-w-lg mx-auto">{subtitle}</p>}
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {products.map(product => (
@@ -24,7 +24,7 @@ const CollectionGrid = ({ title, subtitle, products, ctaLabel = 'Ver todos', cta
           ))}
         </div>
         <div className="text-center mt-10">
-          <Link to={ctaLink} className="text-sm uppercase tracking-wider text-accent hover:underline underline-offset-4">
+          <Link to={ctaLink} className="text-base uppercase tracking-wider text-accent hover:underline underline-offset-4">
             {ctaLabel} →
           </Link>
         </div>
