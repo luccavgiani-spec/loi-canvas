@@ -25,14 +25,14 @@ const Hero = () => {
         <h1 className="heading-display text-4xl md:text-6xl lg:text-7xl text-primary-foreground mb-4">
           Fragrâncias que<br />contam histórias
         </h1>
-        <p className="text-primary-foreground/70 text-sm md:text-base max-w-md mb-8 font-body">
+        <p className="text-primary-foreground/70 text-base md:text-lg max-w-md mb-8 font-body">
           Velas artesanais feitas à mão com cera de soja natural e óleos essenciais selecionados.
         </p>
         <div className="flex gap-3">
-          <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 py-3 text-sm uppercase tracking-wider">
+          <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 py-3 text-base uppercase tracking-wider">
             <Link to="/shop">Comprar agora</Link>
           </Button>
-          <Button asChild variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 px-8 py-3 text-sm uppercase tracking-wider">
+          <Button asChild variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 px-8 py-3 text-base uppercase tracking-wider">
             <Link to="/shop">Ver coleções</Link>
           </Button>
         </div>

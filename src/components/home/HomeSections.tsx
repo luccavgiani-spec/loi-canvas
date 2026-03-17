@@ -550,7 +550,7 @@ const HomeSections = () => {
             <input
               type="email"
               placeholder="seu@email.com"
-              className="flex-1 px-4 py-3 bg-transparent border text-sm"
+              className="flex-1 px-4 py-3 bg-transparent border text-base"
               style={{
                 borderColor: 'rgba(0,0,0,0.2)',
                 color: '#000',

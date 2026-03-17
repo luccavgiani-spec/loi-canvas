@@ -20,8 +20,8 @@ const Banner = ({ image, title, subtitle, ctaLabel, ctaLink, reverse }: Props) =
         <div className="md:w-1/2 flex items-center justify-center p-10 md:p-16 lg:p-24">
           <div className="max-w-md">
             <h2 className="heading-display text-3xl md:text-4xl lg:text-5xl mb-4">{title}</h2>
-            <p className="text-muted-foreground text-sm md:text-base mb-8 leading-relaxed">{subtitle}</p>
-            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 text-sm uppercase tracking-wider">
+            <p className="text-muted-foreground text-base md:text-lg mb-8 leading-relaxed">{subtitle}</p>
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 text-base uppercase tracking-wider">
               <Link to={ctaLink}>{ctaLabel}</Link>
             </Button>
           </div>

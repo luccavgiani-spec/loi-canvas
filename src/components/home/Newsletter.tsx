@@ -35,15 +35,15 @@ const Newsletter = () => {
     <section className="py-16 md:py-24 bg-secondary">
       <div className="container max-w-lg text-center">
         <h2 className="heading-display text-3xl md:text-4xl mb-3">Ganhe 15% de desconto</h2>
-        <p className="text-muted-foreground text-sm mb-8">
+        <p className="text-muted-foreground text-base mb-8">
           Cadastre-se e receba um cupom exclusivo de 15% na sua primeira compra.
         </p>
 
         {coupon ? (
           <div className="bg-background border border-border rounded-lg p-6">
-            <p className="text-sm text-muted-foreground mb-2">Seu cupom de 15%:</p>
+            <p className="text-base text-muted-foreground mb-2">Seu cupom de 15%:</p>
             <p className="font-heading text-2xl tracking-widest text-accent font-semibold">{coupon}</p>
-            <p className="text-xs text-muted-foreground mt-3">Use no checkout. Válido para primeira compra.</p>
+            <p className="text-sm text-muted-foreground mt-3">Use no checkout. Válido para primeira compra.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex gap-2">
@@ -54,12 +54,12 @@ const Newsletter = () => {
               onChange={e => setEmail(e.target.value)}
               className="flex-1 bg-background"
             />
-            <Button type="submit" disabled={loading} className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 text-sm uppercase tracking-wider">
+            <Button type="submit" disabled={loading} className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 text-base uppercase tracking-wider">
               {loading ? '...' : 'Cadastrar'}
             </Button>
           </form>
         )}
-        {error && <p className="text-destructive text-xs mt-2">{error}</p>}
+        {error && <p className="text-destructive text-sm mt-2">{error}</p>}
       </div>
     </section>
   );

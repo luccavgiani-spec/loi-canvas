@@ -33,17 +33,17 @@ const ProductCard = ({ product }: Props) => {
         {/* Quick add on hover */}
         <button
           onClick={(e) => { e.preventDefault(); addItem(product); }}
-          className="absolute bottom-0 left-0 right-0 bg-primary/90 text-primary-foreground text-xs uppercase tracking-wider py-2.5 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+          className="absolute bottom-0 left-0 right-0 bg-primary/90 text-primary-foreground text-sm uppercase tracking-wider py-2.5 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
         >
           Adicionar ao carrinho
         </button>
       </Link>
       <Link to={`/product/${product.slug}`}>
-        <h3 className="text-sm font-medium mb-1">{product.name}</h3>
+        <h3 className="text-base font-medium mb-1">{product.name}</h3>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-accent font-medium">R$ {product.price.toFixed(2)}</span>
+          <span className="text-base text-accent font-medium">R$ {product.price.toFixed(2)}</span>
           {product.compare_at_price && (
-            <span className="text-xs text-muted-foreground line-through">R$ {product.compare_at_price.toFixed(2)}</span>
+            <span className="text-sm text-muted-foreground line-through">R$ {product.compare_at_price.toFixed(2)}</span>
           )}
         </div>
       </Link>

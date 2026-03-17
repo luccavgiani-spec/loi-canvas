@@ -137,7 +137,7 @@
     font-weight: 300;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    font-size: 0.65rem;
+    font-size: 0.875rem;
     color: #000;
   }
 
@@ -154,7 +154,7 @@
     font-weight: 300;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    font-size: 0.72rem;
+    font-size: 0.875rem;
     text-decoration: none;
     transition: color 0.4s ease;
     z-index: 0;
@@ -187,7 +187,7 @@
     font-weight: 300;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    font-size: 0.72rem;
+    font-size: 0.875rem;
     text-decoration: none;
     transition: all 0.4s ease;
   }
@@ -206,7 +206,7 @@
     font-weight: 300;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    font-size: 0.72rem;
+    font-size: 0.875rem;
     text-decoration: none;
     transition: color 0.3s ease;
   }
@@ -250,7 +250,7 @@
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: #fcf5e0;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     text-decoration: none;
     transition: opacity 0.3s ease;
   }
@@ -260,7 +260,7 @@
 
   /* ─── Product badge ─── */
   .badge-product {
-    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium uppercase tracking-wider;
+    @apply inline-flex items-center px-2.5 py-0.5 text-sm font-medium uppercase tracking-wider;
   }
   .badge-sale {
     background-color: hsl(var(--badge-sale));
@@ -401,7 +401,7 @@
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: rgba(244, 237, 210, 0.5);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -422,7 +422,7 @@
   font-weight: 300;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  font-size: 0.72rem;
+  font-size: 0.875rem;
   text-decoration: none;
   transition: color 0.4s ease;
   z-index: 0;
@@ -449,7 +449,7 @@
   font-weight: 300;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  font-size: 0.72rem;
+  font-size: 0.875rem;
   text-decoration: none;
   background: none;
   border: none;

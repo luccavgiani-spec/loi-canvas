@@ -65,7 +65,7 @@ const CollectionPage = () => {
   if (error) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500 text-sm">{error}</p>
+        <p className="text-red-500 text-base">{error}</p>
       </div>
     </Layout>
   );

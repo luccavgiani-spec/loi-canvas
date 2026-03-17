@@ -27,8 +27,8 @@ import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, U
 
 /* ─────────── Shared styles ─────────── */
 const cardCls = 'bg-card border border-border rounded-lg p-4';
-const tableCls = 'w-full text-sm';
-const thCls = 'py-3 pr-4 text-left text-xs text-muted-foreground uppercase tracking-wider';
+const tableCls = 'w-full text-base';
+const thCls = 'py-3 pr-4 text-left text-sm text-muted-foreground uppercase tracking-wider';
 const tdCls = 'py-3 pr-4';
 
 /* ─────────── Confirm Delete Dialog ─────────── */
@@ -58,7 +58,7 @@ function EmptyState({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <Package size={40} className="text-muted-foreground/40 mb-4" />
-      <p className="text-sm text-muted-foreground">Nenhum(a) {label} encontrado(a).</p>
+      <p className="text-base text-muted-foreground">Nenhum(a) {label} encontrado(a).</p>
     </div>
   );
 }
@@ -74,7 +74,7 @@ function Modal({ open, onClose, title, children }: { open: boolean; onClose: () 
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-heading font-semibold">{title}</h2>
+          <h2 className="text-xl font-heading font-semibold">{title}</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
         </div>
         {children}
