@@ -59,6 +59,8 @@ export interface Order {
   total: number;
   tracking_code?: string;
   created_at: string;
+  tracking_code?: string;
+  tracking_email_sent_at?: string;
 }
 
 export interface OrderItem {

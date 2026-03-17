@@ -8,7 +8,7 @@ import {
   createAdminCollection, updateAdminCollection, deleteAdminCollection,
   createAdminCollab, updateAdminCollab, deleteAdminCollab,
   createAdminCoupon, updateAdminCoupon, deleteAdminCoupon,
-  shipOrder, sendCampaignEmail, getAdminNewsletterEmails,
+  sendTrackingEmail, sendCampaign, shipOrder, sendCampaignEmail, getAdminNewsletterEmails,
 } from '@/lib/api';
 import { mockProducts } from '@/lib/mocks';
 import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Product, Collection, Collab } from '@/types';
@@ -22,6 +22,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send } from 'lucide-react';
 
 /* ─────────── Shared styles ─────────── */
@@ -178,7 +179,7 @@ const Admin = () => {
             <TabsTrigger value="collabs">Collabs</TabsTrigger>
             <TabsTrigger value="coupons">Cupons</TabsTrigger>
             <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
-            <TabsTrigger value="campaign">E-mails</TabsTrigger>
+            <TabsTrigger value="campanhas">Campanhas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview"><OverviewTab /></TabsContent>
@@ -189,7 +190,7 @@ const Admin = () => {
           <TabsContent value="collabs"><CollabsTab /></TabsContent>
           <TabsContent value="coupons"><CouponsTab /></TabsContent>
           <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
-          <TabsContent value="campaign"><CampaignTab /></TabsContent>
+          <TabsContent value="campanhas"><CampaignsTab /></TabsContent>
         </Tabs>
       </div>
     </Layout>
@@ -282,13 +283,44 @@ function OrdersTab() {
   const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [status, setStatus] = useState('');
+  const [trackingInputs, setTrackingInputs] = useState<Record<string, string>>({});
+  const [emailSentAt, setEmailSentAt] = useState<Record<string, string>>({});
+  const [sending, setSending] = useState<Record<string, boolean>>({});
   const [shipTarget, setShipTarget] = useState<string | null>(null);
   const [trackingInput, setTrackingInput] = useState('');
   const [shipping, setShipping] = useState(false);
 
   useEffect(() => {
-    getAdminOrders({ status: status || undefined }).then(setOrders);
+    getAdminOrders({ status: status || undefined }).then(list => {
+      setOrders(list);
+      const inputs: Record<string, string> = {};
+      const sentAt: Record<string, string> = {};
+      list.forEach(o => {
+        inputs[o.id] = o.tracking_code || '';
+        if (o.tracking_email_sent_at) sentAt[o.id] = o.tracking_email_sent_at;
+      });
+      setTrackingInputs(inputs);
+      setEmailSentAt(sentAt);
+    });
   }, [status]);
+
+  const handleSendTracking = async (orderId: string) => {
+    const code = trackingInputs[orderId]?.trim();
+    if (!code) {
+      toast({ title: 'Informe o código de rastreio antes de enviar.', variant: 'destructive' });
+      return;
+    }
+    setSending(prev => ({ ...prev, [orderId]: true }));
+    try {
+      const { sent_at } = await sendTrackingEmail(orderId, code);
+      setEmailSentAt(prev => ({ ...prev, [orderId]: sent_at }));
+      toast({ title: 'E-mail de rastreio enviado com sucesso.' });
+    } catch (err: any) {
+      toast({ title: err?.message || 'Erro ao enviar e-mail.', variant: 'destructive' });
+    } finally {
+      setSending(prev => ({ ...prev, [orderId]: false }));
+    }
+  };
 
   const statuses = ['', 'pending', 'paid', 'shipped', 'delivered', 'cancelled'];
 
@@ -321,29 +353,61 @@ function OrdersTab() {
       </div>
       <div className="overflow-x-auto">
         <table className={tableCls}>
-          <thead><tr className="border-b border-border"><th className={thCls}>Pedido</th><th className={thCls}>Cliente</th><th className={thCls}>Status</th><th className={thCls}>Total</th><th className={thCls}>Data</th><th className={thCls}></th></tr></thead>
+          <thead>
+            <tr className="border-b border-border">
+              <th className={thCls}>Pedido</th>
+              <th className={thCls}>Cliente</th>
+              <th className={thCls}>Status</th>
+              <th className={thCls}>Total</th>
+              <th className={thCls}>Data</th>
+              <th className={thCls}>Código de Rastreio</th>
+              <th className={thCls}>Ação</th>
+            </tr>
+          </thead>
           <tbody>
             {orders.map(o => (
               <tr key={o.id} className="border-b border-border">
-                <td className={`${tdCls} font-medium`}>{o.id.slice(0, 8).toUpperCase()}</td>
-                <td className={tdCls}>{o.customer.name}</td>
+                <td className={`${tdCls} font-medium text-xs`}>{o.id.slice(0, 8).toUpperCase()}…</td>
+                <td className={tdCls}>
+                  <div>{o.customer.name}</div>
+                  <div className="text-xs text-muted-foreground">{o.customer.email}</div>
+                </td>
                 <td className={tdCls}><span className="badge-product badge-new rounded-sm">{o.status}</span></td>
                 <td className={tdCls}>R$ {o.total.toFixed(2)}</td>
-                <td className={`${tdCls} text-muted-foreground`}>{o.created_at}</td>
+                <td className={`${tdCls} text-muted-foreground text-xs`}>{new Date(o.created_at).toLocaleDateString('pt-BR')}</td>
                 <td className={tdCls}>
-                  {o.status === 'paid' && (
-                    <Button size="sm" variant="outline" className="text-xs gap-1 h-7 px-2" onClick={() => openShip(o.id)}>
-                      <Truck size={12} /> Enviar
+                  <Input
+                    value={trackingInputs[o.id] || ''}
+                    onChange={e => setTrackingInputs(prev => ({ ...prev, [o.id]: e.target.value }))}
+                    placeholder="Ex: BR123456789BR"
+                    className="h-8 text-xs w-44"
+                  />
+                </td>
+                <td className={tdCls}>
+                  <div className="flex flex-col gap-1 min-w-[140px]">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-8 gap-1"
+                      disabled={sending[o.id]}
+                      onClick={() => handleSendTracking(o.id)}
+                    >
+                      <Mail size={12} />
+                      {sending[o.id] ? 'Enviando…' : 'Enviar e-mail de rastreio'}
                     </Button>
-                  )}
-                  {o.status === 'shipped' && o.tracking_code && (
-                    <span className="text-xs text-muted-foreground font-mono">{o.tracking_code}</span>
-                  )}
+                    {emailSentAt[o.id] && (
+                      <span className="text-[11px] text-green-600 flex items-center gap-1">
+                        <Send size={10} />
+                        e-mail enviado em {new Date(emailSentAt[o.id]).toLocaleString('pt-BR')}
+                      </span>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {orders.length === 0 && <EmptyState label="pedido" />}
       </div>
 
       <Modal open={!!shipTarget} onClose={closeShip} title="Confirmar envio">
@@ -1071,6 +1135,88 @@ function CouponForm({ coupon, onSave, onCancel }: { coupon: Coupon | null; onSav
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
       </div>
     </form>
+  );
+}
+
+/* ═══════════ CAMPAIGNS ═══════════ */
+function CampaignsTab() {
+  const { toast } = useToast();
+  const [subject, setSubject] = useState('');
+  const [content, setContent] = useState('');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const previewHtml = `
+    <div style="font-family:Georgia,serif;background:#f5f0eb;padding:32px;border-radius:4px;">
+      <div style="background:#fffdf9;border:1px solid #e8dfd4;border-radius:4px;max-width:560px;margin:0 auto;overflow:hidden;">
+        <div style="text-align:center;padding:28px 32px 20px;border-bottom:1px solid #e8dfd4;">
+          <p style="margin:0;font-size:22px;letter-spacing:0.15em;color:#3a2e26;font-weight:400;text-transform:uppercase;">L O I Ê</p>
+          <p style="margin:5px 0 0;font-size:10px;letter-spacing:0.2em;color:#9c8677;text-transform:uppercase;">Velas artesanais</p>
+        </div>
+        <div style="padding:24px 32px 8px;">
+          <h2 style="margin:0 0 14px;font-size:20px;font-weight:400;color:#3a2e26;">${subject || '(sem assunto)'}</h2>
+          <div style="font-size:14px;color:#5a4a3f;line-height:1.8;white-space:pre-wrap;">${content || '(sem conteúdo)'}</div>
+        </div>
+        <div style="text-align:center;padding:16px 32px;border-top:1px solid #e8dfd4;margin-top:24px;">
+          <p style="margin:0;font-size:10px;color:#b0a090;">© ${new Date().getFullYear()} Loiê · Velas artesanais feitas com intenção</p>
+          <p style="margin:4px 0 0;font-size:10px;color:#b0a090;">Descadastrar</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const handleSend = async () => {
+    if (!subject.trim() || !content.trim()) {
+      toast({ title: 'Preencha o assunto e o conteúdo antes de enviar.', variant: 'destructive' });
+      return;
+    }
+    setSending(true);
+    try {
+      const { count } = await sendCampaign(subject, content);
+      toast({ title: `Campanha enviada para ${count} destinatário(s).` });
+    } catch (err: any) {
+      toast({ title: err?.message || 'Erro ao enviar campanha.', variant: 'destructive' });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="max-w-2xl space-y-4">
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Assunto</label>
+        <Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Ex: Novidades Loiê — coleção primavera" />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Conteúdo</label>
+        <Textarea
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          placeholder="Escreva o texto do e-mail aqui..."
+          className="min-h-[200px] resize-y"
+        />
+      </div>
+      <div className="flex gap-2 pt-1">
+        <Button variant="outline" onClick={() => setPreviewOpen(true)} className="gap-1 text-sm">
+          <Mail size={14} /> Pré-visualizar e-mail
+        </Button>
+        <Button
+          onClick={handleSend}
+          disabled={sending}
+          className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1 text-sm"
+        >
+          <Send size={14} />
+          {sending ? 'Enviando…' : 'Enviar para todos os clientes'}
+        </Button>
+      </div>
+
+      <Modal open={previewOpen} onClose={() => setPreviewOpen(false)} title="Pré-visualização do e-mail">
+        <div
+          className="rounded border border-border overflow-hidden"
+          dangerouslySetInnerHTML={{ __html: previewHtml }}
+        />
+      </Modal>
+    </div>
   );
 }
 
