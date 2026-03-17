@@ -11,6 +11,8 @@ export interface Product {
   care_instructions?: string;
   suggested_use?: string;
   composition?: string;
+  notes?: string;
+  ritual?: string;
   price: number;
   compare_at_price?: number;
   weight_g?: number | null;

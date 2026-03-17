@@ -192,6 +192,37 @@ const ProductDetail = () => {
               )}
             </div>
 
+            {/* Accord & Notes */}
+            {product.notes && (
+              <p
+                className="mb-2"
+                style={{
+                  fontFamily: "'Sackers Gothic', 'Montserrat', sans-serif",
+                  fontWeight: 300,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  fontSize: '0.65rem',
+                  color: 'rgba(0,0,0,0.45)',
+                }}
+              >
+                {product.notes}
+              </p>
+            )}
+            {product.accord && (
+              <p
+                className="mb-5"
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontWeight: 400,
+                  fontSize: '0.9rem',
+                  color: 'rgba(0,0,0,0.55)',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {product.accord}
+              </p>
+            )}
+
             <p
               className="mb-8"
               style={{
@@ -238,10 +269,10 @@ const ProductDetail = () => {
             {/* Details */}
             <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
               {[
-                { title: 'Descrição', content: product.description },
-                product.details ? { title: 'Detalhes', content: product.details } : null,
-                product.how_to_use ? { title: 'Como usar', content: product.how_to_use } : null,
-                product.care_instructions ? { title: 'Cuidados', content: product.care_instructions } : null,
+                product.suggested_use ? { title: 'uso sugerido', content: product.suggested_use } : null,
+                product.composition ? { title: 'composição', content: product.composition } : null,
+                product.ritual ? { title: 'ritual de uso', content: product.ritual } : null,
+                product.details ? { title: 'detalhes', content: product.details } : null,
               ]
                 .filter(Boolean)
                 .map((item) => (
