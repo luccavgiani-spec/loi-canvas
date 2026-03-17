@@ -314,16 +314,61 @@ export const getAdminSalesTimeseries = (range?: string) =>
 export const getAdminTopProducts = (range?: string) =>
   fetchApi<TopProduct[]>(`/admin/top-products${range ? `?range=${range}` : ''}`, undefined, mockTopProducts);
 
-export const getAdminOrders = (params?: { status?: string; range?: string }) => {
-  const query = new URLSearchParams();
-  if (params?.status) query.set('status', params.status);
-  if (params?.range) query.set('range', params.range);
-  const qs = query.toString();
-  return fetchApi<Order[]>(`/admin/orders${qs ? `?${qs}` : ''}`, undefined, mockOrders);
+export const getAdminOrders = async (params?: { status?: string }): Promise<Order[]> => {
+  try {
+    let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+    if (params?.status) query = query.eq('status', params.status);
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      status: row.status,
+      customer: { name: row.customer_name, email: row.customer_email, phone: row.customer_phone || '' },
+      items: [],
+      subtotal: Number(row.subtotal),
+      shipping_cost: Number(row.shipping_cost ?? 0),
+      total: Number(row.total),
+      created_at: row.created_at,
+      tracking_code: row.tracking_code ?? undefined,
+      tracking_email_sent_at: row.tracking_email_sent_at ?? undefined,
+    }));
+  } catch (err) {
+    console.warn('[getAdminOrders] Supabase query failed, using mock fallback:', err);
+    return mockOrders;
+  }
 };
 
-export const getAdminCustomers = (range?: string) =>
-  fetchApi<Customer[]>(`/admin/customers${range ? `?range=${range}` : ''}`, undefined, mockCustomers);
+export const getAdminCustomers = async (): Promise<Customer[]> => {
+  try {
+    const { data: customers, error } = await supabase
+      .from('customers')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    const { data: orderStats } = await supabase
+      .from('orders')
+      .select('customer_email, total')
+      .neq('status', 'cancelled');
+    const statsMap: Record<string, { count: number; total: number }> = {};
+    for (const o of orderStats || []) {
+      if (!statsMap[o.customer_email]) statsMap[o.customer_email] = { count: 0, total: 0 };
+      statsMap[o.customer_email].count += 1;
+      statsMap[o.customer_email].total += Number(o.total);
+    }
+    return (customers || []).map((c: any) => ({
+      id: c.id,
+      name: c.name,
+      email: c.email,
+      phone: c.phone || '',
+      orders_count: statsMap[c.email]?.count ?? 0,
+      total_spent: statsMap[c.email]?.total ?? 0,
+      created_at: c.created_at,
+    }));
+  } catch (err) {
+    console.warn('[getAdminCustomers] Supabase query failed, using mock fallback:', err);
+    return mockCustomers;
+  }
+};
 
 export const createAdminProduct = (data: Partial<Product>) =>
   fetchApi<Product>('/admin/products', { method: 'POST', body: JSON.stringify(data) });
@@ -334,11 +379,55 @@ export const updateAdminProduct = (id: string, data: Partial<Product>) =>
 export const deleteAdminProduct = (id: string) =>
   fetchApi<void>(`/admin/products/${id}`, { method: 'DELETE' });
 
-export const getAdminNewsletter = () =>
-  fetchApi<NewsletterSubscriber[]>('/admin/newsletter', undefined, mockNewsletterSubs);
+export const getAdminNewsletter = async (): Promise<NewsletterSubscriber[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('newsletter')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      email: row.email,
+      coupon_code: row.coupon_code || '',
+      subscribed_at: row.created_at,
+    }));
+  } catch (err) {
+    console.warn('[getAdminNewsletter] Supabase query failed, using mock fallback:', err);
+    return mockNewsletterSubs;
+  }
+};
 
-export const getAdminCoupons = () =>
-  fetchApi<Coupon[]>('/admin/coupons', undefined, mockCoupons);
+export const getAdminCoupons = async (): Promise<Coupon[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('coupons')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      code: row.code,
+      discount_percent: row.type === 'percent' ? Number(row.value) : 0,
+      is_active: row.is_active ?? true,
+      uses: 0,
+      max_uses: undefined,
+      created_at: row.created_at,
+    }));
+  } catch (err) {
+    console.warn('[getAdminCoupons] Supabase query failed, using mock fallback:', err);
+    return mockCoupons;
+  }
+};
+
+export const updateOrderTracking = (order_id: string, tracking_code: string) =>
+  supabase.from('orders').update({ tracking_code }).eq('id', order_id);
+
+export const sendTrackingEmail = (order_id: string, tracking_code: string) =>
+  callEdgeFunction<{ sent_at: string }>('send-tracking-email', { order_id, tracking_code });
+
+export const sendCampaign = (subject: string, html_content: string) =>
+  callEdgeFunction<{ count: number }>('send-campaign', { subject, html_content });
 
 // Coupons
 export const createAdminCoupon = (data: Partial<Coupon>) =>
