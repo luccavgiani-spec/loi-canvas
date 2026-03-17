@@ -278,7 +278,9 @@ export type Database = {
           id: string
           is_bestseller: boolean | null
           name: string
+          notes: string | null
           price: number
+          ritual: string | null
           sku: string
           slug: string
           suggested_use: string | null
@@ -295,7 +297,9 @@ export type Database = {
           id?: string
           is_bestseller?: boolean | null
           name: string
+          notes?: string | null
           price: number
+          ritual?: string | null
           sku: string
           slug: string
           suggested_use?: string | null
@@ -312,7 +316,9 @@ export type Database = {
           id?: string
           is_bestseller?: boolean | null
           name?: string
+          notes?: string | null
           price?: number
+          ritual?: string | null
           sku?: string
           slug?: string
           suggested_use?: string | null

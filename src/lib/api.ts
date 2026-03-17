@@ -73,6 +73,8 @@ function mapDbProduct(row: any): Product {
     description: row.description ?? '',
     suggested_use: row.suggested_use ?? '',
     composition: row.composition ?? '',
+    notes: row.notes ?? '',
+    ritual: row.ritual ?? '',
     is_bestseller: row.is_bestseller ?? false,
     images: buildImageUrls(row.asset_folder),
     tags: [],
