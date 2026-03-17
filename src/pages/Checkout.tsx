@@ -130,7 +130,7 @@ const PixForm = ({
         style={{
           padding: '14px 24px',
           background: loading ? `${OLIVA}55` : OLIVA,
-          color: CREME, border: 'none',
+          color: '#ffffff', border: 'none',
           fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
           fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase',
           cursor: loading ? 'not-allowed' : 'pointer',
@@ -163,7 +163,7 @@ const PixQRCode = ({ qrCode, qrCodeBase64, amount }: { qrCode: string; qrCodeBas
           padding: '10px 20px', background: 'transparent', border: `1px solid ${CHAR}33`, color: CHAR,
           fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
           fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase', cursor: 'pointer',
-          color: '#000000',
+          color: '#ffffff',
         }}
       >
         copiar código
@@ -764,7 +764,7 @@ const Checkout = () => {
                       style={{
                         width: '100%', padding: '14px 24px',
                         background: isFormComplete ? CHAR : `${CHAR}44`,
-                        color: '#000000', border: 'none',
+                        color: '#ffffff', border: 'none',
                         fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
                         fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase',
                         cursor: isFormComplete ? 'pointer' : 'not-allowed',
@@ -792,7 +792,7 @@ const Checkout = () => {
                               style={{
                                 flex: 1, padding: '12px 16px',
                                 background: paymentMethod === method ? CHAR : 'transparent',
-                                color: '#000000',
+                                color: '#ffffff',
                                 border: 'none', cursor: 'pointer',
                                 fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
                                 fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase',
@@ -835,7 +835,7 @@ const Checkout = () => {
                     <button
                       onClick={() => { setStep('form'); setErrorMessage(''); setPixData(null); }}
                       style={{
-                        padding: '12px 24px', background: 'transparent', border: `1px solid ${CHAR}33`, color: '#000000',
+                        padding: '12px 24px', background: 'transparent', border: `1px solid ${CHAR}33`, color: '#ffffff',
                         fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
                         fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase', cursor: 'pointer',
                       }}
