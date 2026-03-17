@@ -121,7 +121,7 @@ const PixForm = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.425rem', color: '#000000', lineHeight: 1.6 }}>
+      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.05rem', color: '#000000', lineHeight: 1.6 }}>
         Clique no botão abaixo para gerar o QR Code PIX. O pagamento é confirmado instantaneamente.
       </p>
       <button
@@ -168,7 +168,7 @@ const PixQRCode = ({ qrCode, qrCodeBase64, amount }: { qrCode: string; qrCodeBas
         copiar código
       </button>
     </div>
-    <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.275rem', color: '#000000', textAlign: 'center' }}>
+    <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000', textAlign: 'center' }}>
       R$ {amount.toFixed(2)} — você receberá a confirmação por e-mail assim que o pagamento for processado.
     </p>
   </div>
@@ -417,6 +417,7 @@ const CardForm = ({
             cursor: mpReady && !isSubmitting ? 'pointer' : 'not-allowed',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             transition: 'opacity 0.2s',
+            width: '100%',
           }}
           onMouseEnter={e => { if (mpReady && !isSubmitting) e.currentTarget.style.opacity = '0.88'; }}
           onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
@@ -425,7 +426,7 @@ const CardForm = ({
           {!mpReady ? 'carregando...' : isSubmitting ? 'processando...' : 'finalizar compra'}
         </button>
 
-        <p style={{ textAlign: 'center', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.17rem', color: '#000000' }}>
+        <p style={{ textAlign: 'center', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.9rem', color: '#000000' }}>
           pagamento seguro via Mercado Pago
         </p>
       </div>
@@ -450,6 +451,14 @@ const Checkout = () => {
   const [pixData, setPixData] = useState<{ qr_code: string; qr_code_base64?: string } | null>(null);
   const [shippingStatus, setShippingStatus] = useState<ShippingStatus>('idle');
   const [shippingMessage, setShippingMessage] = useState('');
+  // FIX: estado para detectar mobile e colapsar grid
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
 
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 15;
   const total = subtotal + shipping;
@@ -626,10 +635,65 @@ const Checkout = () => {
         onBlur={e => (e.target.style.borderColor = `${CHAR}22`)}
       />
       {errors[id] && (
-        <p style={{ color: '#c44', fontSize: '1.05rem', marginTop: 4, fontFamily: 'sans-serif' }}>
+        <p style={{ color: '#c44', fontSize: '0.85rem', marginTop: 4, fontFamily: 'sans-serif' }}>
           {errors[id]}
         </p>
       )}
+    </div>
+  );
+
+  // FIX: resumo aparece antes do formulário no mobile (order), depois no desktop (sidebar)
+  const orderSummary = (
+    <div style={{
+      padding: isMobile ? '20px 0 28px' : 28,
+      border: isMobile ? 'none' : `1px solid ${CHAR}14`,
+      borderTop: isMobile ? `1px solid ${CHAR}14` : undefined,
+      borderBottom: isMobile ? `1px solid ${CHAR}14` : undefined,
+      background: isMobile ? 'transparent' : `${CREME}44`,
+      // sticky apenas no desktop
+      position: isMobile ? 'static' : 'sticky' as const,
+      top: isMobile ? undefined : 96,
+    }}>
+      <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>resumo</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
+        {items.map(item => (
+          <div key={item.product.id} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            {item.product.images?.[0] && (
+              <img src={item.product.images[0]} alt={item.product.name}
+                style={{ width: 44, height: 44, objectFit: 'cover', filter: 'saturate(0.6)', flexShrink: 0 }} />
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {item.product.name}
+              </p>
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000000', margin: 0 }}>
+                Qtd: {item.quantity}
+              </p>
+            </div>
+            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000', whiteSpace: 'nowrap' }}>
+              R$ {(item.product.price * item.quantity).toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div style={{ borderTop: `1px solid ${CHAR}14`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000' }}>Subtotal</span>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000' }}>R$ {subtotal.toFixed(2)}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000' }}>Frete</span>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000' }}>
+            {shipping === 0 ? 'Grátis' : `R$ ${shipping.toFixed(2)}`}
+          </span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, borderTop: `1px solid ${CHAR}14` }}>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.15rem', color: '#000000' }}>Total</span>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', fontWeight: 500, color: '#000000' }}>
+            R$ {total.toFixed(2)}
+          </span>
+        </div>
+      </div>
     </div>
   );
 
@@ -639,7 +703,7 @@ const Checkout = () => {
 
         <div style={{ textAlign: 'center', marginBottom: 56 }}>
           <span style={{ ...LABEL, display: 'block', marginBottom: 12 }}>finalizar compra</span>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(3rem,7.5vw,4.8rem)', fontWeight: 300, color: '#000000', margin: 0, letterSpacing: '0.04em' }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2.4rem,6vw,4.8rem)', fontWeight: 300, color: '#000000', margin: 0, letterSpacing: '0.04em' }}>
             Checkout
           </h1>
           <div style={{ width: 40, height: 1, background: `${OLIVA}55`, margin: '20px auto 0' }} />
@@ -648,7 +712,7 @@ const Checkout = () => {
         {step === 'success' ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <CheckCircle size={40} style={{ color: OLIVA, marginBottom: 20 }} />
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '3rem', fontWeight: 300, color: '#000000', marginBottom: 12 }}>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.5rem', fontWeight: 300, color: '#000000', marginBottom: 12 }}>
               Pedido confirmado
             </h2>
             <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', color: '#000000' }}>
@@ -656,16 +720,26 @@ const Checkout = () => {
             </p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 320px', gap: 48, alignItems: 'start' }}>
+          // FIX: grid colapsa para coluna única no mobile
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'minmax(0,1fr) 320px',
+            gap: isMobile ? 32 : 48,
+            alignItems: 'start',
+          }}>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+            {/* No mobile, resumo aparece primeiro (topo) */}
+            {isMobile && orderSummary}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 40, minWidth: 0 }}>
 
               {/* ── Seus dados ── */}
               <section>
                 <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>seus dados</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  {/* FIX: nome/sobrenome em coluna única no mobile */}
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
                     {fieldInput('firstName', 'nome')}
                     {fieldInput('lastName',  'sobrenome')}
                   </div>
@@ -683,7 +757,6 @@ const Checkout = () => {
                 <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>endereço de entrega</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-                  {/* CEP + shipping status */}
                   <div>
                     <label style={{ ...LABEL, display: 'block', marginBottom: 6 }}>cep</label>
                     <input
@@ -698,16 +771,15 @@ const Checkout = () => {
                       onBlur={e => (e.target.style.borderColor = `${CHAR}22`)}
                     />
                     {errors.cep && (
-                      <p style={{ color: '#c44', fontSize: '1.05rem', marginTop: 4, fontFamily: 'sans-serif' }}>
+                      <p style={{ color: '#c44', fontSize: '0.85rem', marginTop: 4, fontFamily: 'sans-serif' }}>
                         {errors.cep}
                       </p>
                     )}
 
-                    {/* Shipping status feedback */}
                     {shippingStatus === 'loading' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                         <Loader2 size={13} className="animate-spin" style={{ color: `${CHAR}66`, flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.23rem', color: '#000000' }}>
+                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.95rem', color: '#000000' }}>
                           Calculando prazo e custo de envio...
                         </span>
                       </div>
@@ -715,7 +787,7 @@ const Checkout = () => {
                     {shippingStatus === 'ready' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                         <CheckCircle size={13} style={{ color: OLIVA, flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.32rem', color: '#000000' }}>
+                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.95rem', color: '#000000' }}>
                           {shippingMessage}
                         </span>
                       </div>
@@ -723,19 +795,21 @@ const Checkout = () => {
                     {shippingStatus === 'error' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                         <AlertCircle size={13} style={{ color: '#c44', flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.23rem', color: '#c44' }}>
+                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.95rem', color: '#c44' }}>
                           CEP não encontrado.
                         </span>
                       </div>
                     )}
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px', gap: 16 }}>
+                  {/* FIX: rua/número em coluna única no mobile */}
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 100px', gap: 16 }}>
                     {fieldInput('street', 'rua')}
                     {fieldInput('number', 'número')}
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: 16 }}>
+                  {/* FIX: bairro/cidade/estado empilhados no mobile */}
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 80px', gap: 16 }}>
                     {fieldInput('neighborhood', 'bairro')}
                     {fieldInput('city',         'cidade')}
                     {fieldInput('state',        'estado')}
@@ -753,7 +827,7 @@ const Checkout = () => {
                 {step === 'form' && (
                   <>
                     {!isFormComplete && (
-                      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.425rem', color: '#000000', marginBottom: 24 }}>
+                      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000', marginBottom: 24 }}>
                         Preencha todos os dados acima para continuar.
                       </p>
                     )}
@@ -768,6 +842,10 @@ const Checkout = () => {
                         fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase',
                         cursor: isFormComplete ? 'pointer' : 'not-allowed',
                         transition: 'background 0.2s',
+                        // FIX: garante que o botão não quebre o texto em mobile
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                       onMouseEnter={e => { if (isFormComplete) e.currentTarget.style.opacity = '0.85'; }}
                       onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
@@ -817,7 +895,7 @@ const Checkout = () => {
                 {step === 'processing' && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '32px 0' }}>
                     <Loader2 size={18} className="animate-spin" style={{ color: CHAR }} />
-                    <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.425rem', color: '#000000' }}>
+                    <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000' }}>
                       processando...
                     </span>
                   </div>
@@ -827,7 +905,7 @@ const Checkout = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                       <AlertCircle size={16} style={{ color: '#c44', flexShrink: 0, marginTop: 2 }} />
-                      <p style={{ color: '#c44', fontSize: '1.23rem', fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.5 }}>
+                      <p style={{ color: '#c44', fontSize: '1rem', fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.5 }}>
                         {errorMessage || 'Erro ao processar pagamento. Tente novamente.'}
                       </p>
                     </div>
@@ -846,49 +924,8 @@ const Checkout = () => {
               </section>
             </div>
 
-            {/* ── Order summary ── */}
-            <div style={{ position: 'sticky', top: 96, padding: 28, border: `1px solid ${CHAR}14`, background: `${CREME}44` }}>
-              <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>resumo</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
-                {items.map(item => (
-                  <div key={item.product.id} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    {item.product.images?.[0] && (
-                      <img src={item.product.images[0]} alt={item.product.name}
-                        style={{ width: 44, height: 44, objectFit: 'cover', filter: 'saturate(0.6)' }} />
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.425rem', color: '#000000', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.product.name}
-                      </p>
-                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '1.02rem', color: '#000000', margin: 0 }}>
-                        Qtd: {item.quantity}
-                      </p>
-                    </div>
-                    <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.35rem', color: '#000000', whiteSpace: 'nowrap' }}>
-                      R$ {(item.product.price * item.quantity).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ borderTop: `1px solid ${CHAR}14`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.32rem', color: '#000000' }}>Subtotal</span>
-                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.32rem', color: '#000000' }}>R$ {subtotal.toFixed(2)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.32rem', color: '#000000' }}>Frete</span>
-                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.32rem', color: '#000000' }}>
-                    {shipping === 0 ? 'Grátis' : `R$ ${shipping.toFixed(2)}`}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, borderTop: `1px solid ${CHAR}14` }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem', color: '#000000' }}>Total</span>
-                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.65rem', fontWeight: 500, color: '#000000' }}>
-                    R$ {total.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            </div>
+            {/* No desktop, resumo aparece como sidebar à direita */}
+            {!isMobile && orderSummary}
 
           </div>
         )}
