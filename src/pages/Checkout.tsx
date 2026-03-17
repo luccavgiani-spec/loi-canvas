@@ -160,10 +160,9 @@ const PixQRCode = ({ qrCode, qrCodeBase64, amount }: { qrCode: string; qrCodeBas
       <button
         onClick={() => navigator.clipboard.writeText(qrCode)}
         style={{
-          padding: '10px 20px', background: 'transparent', border: `1px solid ${CHAR}33`, color: CHAR,
+          padding: '10px 20px', background: 'transparent', border: `1px solid ${CHAR}33`, color: '#000000',
           fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
           fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase', cursor: 'pointer',
-          color: '#ffffff',
         }}
       >
         copiar código
@@ -792,7 +791,7 @@ const Checkout = () => {
                               style={{
                                 flex: 1, padding: '12px 16px',
                                 background: paymentMethod === method ? CHAR : 'transparent',
-                                color: '#ffffff',
+                                color: paymentMethod === method ? '#ffffff' : '#000000',
                                 border: 'none', cursor: 'pointer',
                                 fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
                                 fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase',
@@ -835,7 +834,7 @@ const Checkout = () => {
                     <button
                       onClick={() => { setStep('form'); setErrorMessage(''); setPixData(null); }}
                       style={{
-                        padding: '12px 24px', background: 'transparent', border: `1px solid ${CHAR}33`, color: '#ffffff',
+                        padding: '12px 24px', background: 'transparent', border: `1px solid ${CHAR}33`, color: '#000000',
                         fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
                         fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase', cursor: 'pointer',
                       }}
