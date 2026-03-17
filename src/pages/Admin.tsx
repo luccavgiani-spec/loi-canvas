@@ -8,7 +8,7 @@ import {
   createAdminCollection, updateAdminCollection, deleteAdminCollection,
   createAdminCollab, updateAdminCollab, deleteAdminCollab,
   createAdminCoupon, updateAdminCoupon, deleteAdminCoupon,
-  sendTrackingEmail, sendCampaign,
+  sendTrackingEmail, sendCampaign, shipOrder, sendCampaignEmail, getAdminNewsletterEmails,
 } from '@/lib/api';
 import { mockProducts } from '@/lib/mocks';
 import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Product, Collection, Collab } from '@/types';
@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Mail, Send } from 'lucide-react';
+import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send } from 'lucide-react';
 
 /* ─────────── Shared styles ─────────── */
 const cardCls = 'bg-card border border-border rounded-lg p-4';
@@ -286,6 +286,9 @@ function OrdersTab() {
   const [trackingInputs, setTrackingInputs] = useState<Record<string, string>>({});
   const [emailSentAt, setEmailSentAt] = useState<Record<string, string>>({});
   const [sending, setSending] = useState<Record<string, boolean>>({});
+  const [shipTarget, setShipTarget] = useState<string | null>(null);
+  const [trackingInput, setTrackingInput] = useState('');
+  const [shipping, setShipping] = useState(false);
 
   useEffect(() => {
     getAdminOrders({ status: status || undefined }).then(list => {
@@ -321,6 +324,24 @@ function OrdersTab() {
 
   const statuses = ['', 'pending', 'paid', 'shipped', 'delivered', 'cancelled'];
 
+  const openShip = (orderId: string) => { setShipTarget(orderId); setTrackingInput(''); };
+  const closeShip = () => { setShipTarget(null); setTrackingInput(''); };
+
+  const handleShip = async () => {
+    if (!shipTarget || !trackingInput.trim()) return;
+    setShipping(true);
+    try {
+      await shipOrder(shipTarget, trackingInput.trim());
+      setOrders(prev => prev.map(o => o.id === shipTarget ? { ...o, status: 'shipped' as const, tracking_code: trackingInput.trim() } : o));
+      toast({ title: 'Pedido marcado como enviado', description: `Rastreio: ${trackingInput.trim()}` });
+      closeShip();
+    } catch {
+      toast({ title: 'Erro ao atualizar pedido', variant: 'destructive' });
+    } finally {
+      setShipping(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex gap-2 mb-4 flex-wrap">
@@ -346,7 +367,7 @@ function OrdersTab() {
           <tbody>
             {orders.map(o => (
               <tr key={o.id} className="border-b border-border">
-                <td className={`${tdCls} font-medium text-xs`}>{o.id.slice(0, 8)}…</td>
+                <td className={`${tdCls} font-medium text-xs`}>{o.id.slice(0, 8).toUpperCase()}…</td>
                 <td className={tdCls}>
                   <div>{o.customer.name}</div>
                   <div className="text-xs text-muted-foreground">{o.customer.email}</div>
@@ -388,6 +409,28 @@ function OrdersTab() {
         </table>
         {orders.length === 0 && <EmptyState label="pedido" />}
       </div>
+
+      <Modal open={!!shipTarget} onClose={closeShip} title="Confirmar envio">
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">Informe o código de rastreio dos Correios. O cliente receberá um e-mail automaticamente.</p>
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Código de rastreio</label>
+            <Input
+              value={trackingInput}
+              onChange={e => setTrackingInput(e.target.value)}
+              placeholder="ex: BR123456789BR"
+              className="font-mono"
+              onKeyDown={e => e.key === 'Enter' && handleShip()}
+            />
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button onClick={handleShip} disabled={!trackingInput.trim() || shipping} className="flex-1 gap-2">
+              <Truck size={14} /> {shipping ? 'Enviando...' : 'Confirmar envio'}
+            </Button>
+            <Button type="button" variant="outline" onClick={closeShip}>Cancelar</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
@@ -1204,6 +1247,98 @@ function NewsletterTab() {
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ═══════════ CAMPAIGN ═══════════ */
+function CampaignTab() {
+  const { toast } = useToast();
+  const [subject, setSubject] = useState('');
+  const [content, setContent] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async () => {
+    if (!subject.trim() || !content.trim()) {
+      toast({ title: 'Preencha o assunto e o conteúdo', variant: 'destructive' });
+      return;
+    }
+    setSending(true);
+    try {
+      const emails = await getAdminNewsletterEmails();
+      if (emails.length === 0) {
+        toast({ title: 'Nenhum assinante encontrado' });
+        setSending(false);
+        return;
+      }
+
+      let sent = 0;
+      let failed = 0;
+      for (const email of emails) {
+        try {
+          await sendCampaignEmail(subject.trim(), content.trim(), email);
+          sent++;
+        } catch {
+          failed++;
+        }
+      }
+
+      toast({
+        title: `Campanha enviada`,
+        description: `${sent} e-mail(s) enviado(s)${failed > 0 ? `, ${failed} falha(s)` : ''}`,
+      });
+      setSubject('');
+      setContent('');
+    } catch {
+      toast({ title: 'Erro ao enviar campanha', variant: 'destructive' });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="max-w-2xl space-y-6">
+      <div>
+        <h3 className="text-sm font-medium mb-1">Campanha de e-mail</h3>
+        <p className="text-xs text-muted-foreground">O e-mail será enviado para todos os assinantes da newsletter. Inclui link de descadastro automaticamente.</p>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Assunto</label>
+          <Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="ex: Novidades da Loiê — nova coleção disponível" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Conteúdo (HTML ou texto simples)</label>
+          <textarea
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            rows={10}
+            placeholder={'<p>Olá! Temos novidades para você...</p>\n\n<p>Texto do e-mail aqui.</p>'}
+            className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-y font-mono"
+          />
+        </div>
+
+        {subject && content && (
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Pré-visualização</label>
+            <div
+              className="border border-border rounded-md p-4 bg-[#fcf5e0] text-[#29241f] text-sm"
+              style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
+            >
+              <div className="text-center mb-4 pb-3 border-b border-[#e8dfc8]">
+                <p className="text-base font-normal tracking-[0.3em] uppercase">LOIÊ</p>
+                <p className="text-xs text-[#726f09] mt-1">{subject}</p>
+              </div>
+              <div dangerouslySetInnerHTML={{ __html: content }} />
+            </div>
+          </div>
+        )}
+
+        <Button onClick={handleSend} disabled={!subject.trim() || !content.trim() || sending} className="gap-2">
+          <Send size={14} /> {sending ? 'Enviando...' : 'Enviar para todos os assinantes'}
+        </Button>
+      </div>
     </div>
   );
 }

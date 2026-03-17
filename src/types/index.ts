@@ -40,11 +40,13 @@ export interface Cart {
 export interface Review {
   id: string;
   product_id: string;
-  author: string;
+  author_name: string;
   rating: number;
-  title: string;
-  body: string;
-  created_at: string;
+  title?: string | null;
+  body: string | null;
+  photo_url?: string | null;
+  approved?: boolean | null;
+  created_at: string | null;
 }
 
 export interface Order {
@@ -55,6 +57,7 @@ export interface Order {
   subtotal: number;
   shipping_cost: number;
   total: number;
+  tracking_code?: string;
   created_at: string;
   tracking_code?: string;
   tracking_email_sent_at?: string;

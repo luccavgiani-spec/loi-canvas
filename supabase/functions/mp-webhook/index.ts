@@ -2,6 +2,72 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { corsHeaders } from '../_shared/cors.ts';
 import { getSupabaseAdmin } from '../_shared/supabase.ts';
 
+async function callSendEmail(type: string, payload: Record<string, unknown>): Promise<void> {
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+      apikey: SERVICE_ROLE_KEY ?? '',
+    },
+    body: JSON.stringify({ type, payload }),
+  });
+}
+
+async function sendOrderEmails(supabase: ReturnType<typeof getSupabaseAdmin>, orderId: string): Promise<void> {
+  try {
+    // Fetch order details
+    const { data: order } = await supabase
+      .from('orders')
+      .select('id, customer_name, customer_email, subtotal, shipping_cost, total')
+      .eq('id', orderId)
+      .single();
+
+    if (!order) return;
+
+    // Fetch order items with product names
+    const { data: rawItems } = await supabase
+      .from('order_items')
+      .select('qty, unit_price, products(name)')
+      .eq('order_id', orderId);
+
+    const items = (rawItems ?? []).map((i: any) => ({
+      name: i.products?.name ?? 'Produto',
+      qty: i.qty,
+      price: i.unit_price,
+    }));
+
+    // Send order_confirmed email
+    await callSendEmail('order_confirmed', {
+      customer_name: order.customer_name,
+      customer_email: order.customer_email,
+      order_id: order.id,
+      items,
+      subtotal: order.subtotal,
+      shipping_cost: order.shipping_cost ?? 0,
+      total: order.total,
+    });
+
+    // Check if this is the customer's first paid order → send welcome
+    const { count } = await supabase
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('customer_email', order.customer_email)
+      .eq('status', 'paid');
+
+    if (count === 1) {
+      await callSendEmail('welcome', {
+        customer_name: order.customer_name,
+        customer_email: order.customer_email,
+      });
+    }
+  } catch (err) {
+    console.error('sendOrderEmails error (non-fatal):', err);
+  }
+}
+
 /**
  * Mercado Pago webhook handler.
  * Receives IPN notifications and updates order status accordingly.
@@ -134,6 +200,11 @@ serve(async (req) => {
       .eq('id', orderId);
 
     console.log(`Order ${orderId} updated to status: ${orderStatus} (MP: ${payment.status})`);
+
+    // Send transactional emails when payment is confirmed
+    if (orderStatus === 'paid') {
+      await sendOrderEmails(supabase, orderId);
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,

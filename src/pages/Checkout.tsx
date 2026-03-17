@@ -1,4 +1,4 @@
-// checkout v5 - fix: cardForm race condition + PIX via Payments API
+// checkout v6 - CEP + endereço + frete fixo + validação completa
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -7,6 +7,7 @@ import { createOrder, processPayment } from '@/lib/api';
 import { MP_PUBLIC_KEY, FREE_SHIPPING_THRESHOLD, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
 import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
+import { getShippingInfo } from '@/components/ShippingCalculator';
 
 declare global {
   interface Window {
@@ -15,13 +16,21 @@ declare global {
 }
 
 const customerSchema = z.object({
-  name: z.string().trim().min(2, 'Nome obrigatório').max(100),
-  email: z.string().trim().email('E-mail inválido').max(255),
-  phone: z.string().trim().min(10, 'Telefone inválido').max(20),
+  firstName:    z.string().trim().min(1, 'Nome obrigatório').max(100),
+  lastName:     z.string().trim().min(1, 'Sobrenome obrigatório').max(100),
+  email:        z.string().trim().email('E-mail inválido').max(255),
+  phone:        z.string().trim().min(10, 'Telefone inválido').max(20),
+  cep:          z.string().trim().min(8, 'CEP inválido'),
+  street:       z.string().trim().min(1, 'Rua obrigatória'),
+  number:       z.string().trim().min(1, 'Número obrigatório'),
+  neighborhood: z.string().trim().min(1, 'Bairro obrigatório'),
+  city:         z.string().trim().min(1, 'Cidade obrigatória'),
+  state:        z.string().trim().min(1, 'Estado obrigatório'),
 });
 
 type CheckoutStep = 'form' | 'payment' | 'processing' | 'success' | 'error';
 type PaymentMethod = 'card' | 'pix';
+type ShippingStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 const CHAR  = '#29241f';
 const OLIVA = '#565600';
@@ -61,7 +70,6 @@ const IFRAME_CONTAINER: React.CSSProperties = {
   display: 'block',
 };
 
-// Estilo injetado globalmente para ajustar iframes do MP SDK
 const MP_IFRAME_CSS = `
   div[id^="mp__"] iframe {
     width: 100% !important;
@@ -168,7 +176,6 @@ const PixQRCode = ({ qrCode, qrCodeBase64, amount }: { qrCode: string; qrCodeBas
 
 // ─── Card form ────────────────────────────────────────────────────────────────
 const SCRIPT_ID = 'mp-sdk-v2';
-// Instância singleton do MP — evita "Cardform already instantiated" no StrictMode
 let mpInstance: any = null;
 let cardFormInstance: any = null;
 
@@ -187,7 +194,6 @@ const CardForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Só inicializa quando o container DOM já estiver pintado
     if (!containerRef.current) return;
 
     let mounted = true;
@@ -196,7 +202,6 @@ const CardForm = ({
     const init = () => {
       if (!mounted) return;
 
-      // Confirma que todos os elementos alvo existem antes de chamar cardForm
       const requiredIds = [
         'mp__cardNumber', 'mp__expirationDate', 'mp__securityCode',
         'mp__cardholderName', 'mp__identificationNumber',
@@ -207,11 +212,9 @@ const CardForm = ({
         return;
       }
 
-      // Verifica que os elementos estão realmente attached e visíveis no documento
       const firstEl = document.getElementById('mp__cardNumber');
       const rect = firstEl?.getBoundingClientRect();
       if (!rect || (rect.width === 0 && rect.height === 0)) {
-        // Elemento existe mas ainda não foi pintado — aguarda próximo frame
         requestAnimationFrame(() => setTimeout(init, 100));
         return;
       }
@@ -279,7 +282,6 @@ const CardForm = ({
       cardFormInstance = cardForm;
     };
 
-    // Polling: aguarda window.MercadoPago estar disponível (máx 10s)
     const waitForSDK = () => {
       if (window.MercadoPago) { init(); return; }
       let attempts = 0;
@@ -309,7 +311,6 @@ const CardForm = ({
     return () => {
       mounted = false;
       if (intervalRef) clearInterval(intervalRef);
-      // Limpa instâncias ao desmontar para permitir remontagem correta
       if (cardFormInstance) {
         try { cardFormInstance.unmount?.(); } catch (_) {}
         cardFormInstance = null;
@@ -321,7 +322,6 @@ const CardForm = ({
   return (
     <div ref={containerRef}>
       <style dangerouslySetInnerHTML={{ __html: MP_IFRAME_CSS }} />
-      {/* Container do MP SDK — id obrigatório para o cardForm localizar os campos */}
       <div id="loie-card-form" style={{ display: 'none' }}>
         <input type="hidden" id="mp__cardholderEmail" value={email} readOnly />
         <select id="mp__installments" style={{ display: 'none' }} />
@@ -438,15 +438,73 @@ const Checkout = () => {
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
   const [step, setStep] = useState<CheckoutStep>('form');
-  const [form, setForm] = useState({ name: '', email: '', phone: '' });
+  const [form, setForm] = useState({
+    firstName: '', lastName: '',
+    email: '', phone: '',
+    cep: '', street: '', number: '', neighborhood: '', city: '', state: '',
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [orderId, setOrderId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [errorMessage, setErrorMessage] = useState('');
   const [pixData, setPixData] = useState<{ qr_code: string; qr_code_base64?: string } | null>(null);
+  const [shippingStatus, setShippingStatus] = useState<ShippingStatus>('idle');
+  const [shippingMessage, setShippingMessage] = useState('');
 
-  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 19.9;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 15;
   const total = subtotal + shipping;
+
+  const isFormComplete = !!(
+    form.firstName.trim() && form.lastName.trim() &&
+    form.email.trim() && form.phone.trim() &&
+    form.cep.replace(/\D/g, '').length >= 8 &&
+    form.street.trim() && form.number.trim() &&
+    form.neighborhood.trim() && form.city.trim() && form.state.trim()
+  );
+
+  const handleCepChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, '').slice(0, 8);
+    const formatted = digits.length > 5
+      ? `${digits.slice(0, 5)}-${digits.slice(5)}`
+      : digits;
+    setForm(f => ({ ...f, cep: formatted }));
+
+    if (digits.length === 8) {
+      setShippingStatus('loading');
+      setShippingMessage('');
+
+      const delay = 1500 + Math.random() * 500;
+
+      fetch(`https://viacep.com.br/ws/${digits}/json/`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.erro) {
+            setTimeout(() => setShippingStatus('error'), delay);
+          } else {
+            setForm(f => ({
+              ...f,
+              street:       data.logradouro || f.street,
+              neighborhood: data.bairro      || f.neighborhood,
+              city:         data.localidade  || f.city,
+              state:        data.uf          || f.state,
+            }));
+            setTimeout(() => {
+              setShippingMessage(getShippingInfo(digits));
+              setShippingStatus('ready');
+            }, delay);
+          }
+        })
+        .catch(() => {
+          setTimeout(() => {
+            setShippingMessage(getShippingInfo(digits));
+            setShippingStatus('ready');
+          }, delay);
+        });
+    } else {
+      setShippingStatus('idle');
+      setShippingMessage('');
+    }
+  };
 
   const handleContinueToPayment = async () => {
     const result = customerSchema.safeParse(form);
@@ -466,7 +524,19 @@ const Checkout = () => {
       }));
       const orderRes = await createOrder({
         items: orderItems,
-        customer: result.data as { name: string; email: string; phone: string },
+        customer: {
+          name: `${result.data.firstName} ${result.data.lastName}`,
+          email: result.data.email,
+          phone: result.data.phone,
+          address: {
+            cep:          result.data.cep,
+            street:       result.data.street,
+            number:       result.data.number,
+            neighborhood: result.data.neighborhood,
+            city:         result.data.city,
+            state:        result.data.state,
+          },
+        } as any,
       });
       setOrderId(orderRes.order_id);
       setStep('payment');
@@ -483,8 +553,7 @@ const Checkout = () => {
       if (result.status === 'paid') {
         clear();
         navigate(`/pedido-confirmado?order_id=${orderId}`);
-      }
-      else if (result.status === 'pending') {
+      } else if (result.status === 'pending') {
         setErrorMessage('Pagamento em análise. Você será notificado por e-mail.');
         setStep('error');
       } else {
@@ -535,6 +604,35 @@ const Checkout = () => {
     );
   }
 
+  const fieldDisabled = step !== 'form';
+
+  const fieldInput = (
+    id: keyof typeof form,
+    label: string,
+    type = 'text',
+    placeholder = '',
+    extraStyle: React.CSSProperties = {},
+  ) => (
+    <div key={id}>
+      <label style={{ ...LABEL, display: 'block', marginBottom: 6 }}>{label}</label>
+      <input
+        type={type}
+        value={form[id]}
+        onChange={e => setForm(f => ({ ...f, [id]: e.target.value }))}
+        disabled={fieldDisabled}
+        placeholder={placeholder}
+        style={{ ...INPUT, opacity: fieldDisabled ? 0.5 : 1, ...extraStyle }}
+        onFocus={e => (e.target.style.borderColor = `${CHAR}55`)}
+        onBlur={e => (e.target.style.borderColor = `${CHAR}22`)}
+      />
+      {errors[id] && (
+        <p style={{ color: '#c44', fontSize: '0.7rem', marginTop: 4, fontFamily: 'sans-serif' }}>
+          {errors[id]}
+        </p>
+      )}
+    </div>
+  );
+
   return (
     <Layout>
       <div style={{ maxWidth: 960, margin: '0 auto', padding: 'clamp(40px,6vw,80px) 24px' }}>
@@ -562,56 +660,117 @@ const Checkout = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
 
-              {/* Customer data */}
+              {/* ── Seus dados ── */}
               <section>
                 <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>seus dados</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {[
-                    { id: 'name', label: 'nome completo', type: 'text' },
-                    { id: 'email', label: 'e-mail', type: 'email' },
-                    { id: 'phone', label: 'telefone', type: 'tel' },
-                  ].map(field => (
-                    <div key={field.id}>
-                      <label style={{ ...LABEL, display: 'block', marginBottom: 6 }}>{field.label}</label>
-                      <input
-                        type={field.type}
-                        value={form[field.id as keyof typeof form]}
-                        onChange={e => setForm(f => ({ ...f, [field.id]: e.target.value }))}
-                        disabled={step !== 'form'}
-                        style={{ ...INPUT, opacity: step !== 'form' ? 0.5 : 1 }}
-                        onFocus={e => (e.target.style.borderColor = `${CHAR}55`)}
-                        onBlur={e => (e.target.style.borderColor = `${CHAR}22`)}
-                      />
-                      {errors[field.id] && (
-                        <p style={{ color: '#c44', fontSize: '0.7rem', marginTop: 4, fontFamily: 'sans-serif' }}>
-                          {errors[field.id]}
-                        </p>
-                      )}
-                    </div>
-                  ))}
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    {fieldInput('firstName', 'nome')}
+                    {fieldInput('lastName',  'sobrenome')}
+                  </div>
+
+                  {fieldInput('email', 'e-mail', 'email')}
+                  {fieldInput('phone', 'telefone', 'tel')}
+
                 </div>
               </section>
 
               <div style={{ height: 1, background: `${CHAR}11` }} />
 
-              {/* Payment */}
+              {/* ── Endereço de entrega ── */}
+              <section>
+                <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>endereço de entrega</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                  {/* CEP + shipping status */}
+                  <div>
+                    <label style={{ ...LABEL, display: 'block', marginBottom: 6 }}>cep</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="00000-000"
+                      value={form.cep}
+                      onChange={e => handleCepChange(e.target.value)}
+                      disabled={fieldDisabled}
+                      style={{ ...INPUT, maxWidth: 160, opacity: fieldDisabled ? 0.5 : 1 }}
+                      onFocus={e => (e.target.style.borderColor = `${CHAR}55`)}
+                      onBlur={e => (e.target.style.borderColor = `${CHAR}22`)}
+                    />
+                    {errors.cep && (
+                      <p style={{ color: '#c44', fontSize: '0.7rem', marginTop: 4, fontFamily: 'sans-serif' }}>
+                        {errors.cep}
+                      </p>
+                    )}
+
+                    {/* Shipping status feedback */}
+                    {shippingStatus === 'loading' && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                        <Loader2 size={13} className="animate-spin" style={{ color: `${CHAR}66`, flexShrink: 0 }} />
+                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.82rem', color: `${CHAR}77` }}>
+                          Calculando prazo e custo de envio...
+                        </span>
+                      </div>
+                    )}
+                    {shippingStatus === 'ready' && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                        <CheckCircle size={13} style={{ color: OLIVA, flexShrink: 0 }} />
+                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.88rem', color: CHAR }}>
+                          {shippingMessage}
+                        </span>
+                      </div>
+                    )}
+                    {shippingStatus === 'error' && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                        <AlertCircle size={13} style={{ color: '#c44', flexShrink: 0 }} />
+                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.82rem', color: '#c44' }}>
+                          CEP não encontrado.
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px', gap: 16 }}>
+                    {fieldInput('street', 'rua')}
+                    {fieldInput('number', 'número')}
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: 16 }}>
+                    {fieldInput('neighborhood', 'bairro')}
+                    {fieldInput('city',         'cidade')}
+                    {fieldInput('state',        'estado')}
+                  </div>
+
+                </div>
+              </section>
+
+              <div style={{ height: 1, background: `${CHAR}11` }} />
+
+              {/* ── Pagamento ── */}
               <section>
                 <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>pagamento</span>
 
                 {step === 'form' && (
                   <>
-                    <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.95rem', color: `${CHAR}55`, marginBottom: 24 }}>
-                      Preencha seus dados acima para continuar.
-                    </p>
+                    {!isFormComplete && (
+                      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.95rem', color: `${CHAR}55`, marginBottom: 24 }}>
+                        Preencha todos os dados acima para continuar.
+                      </p>
+                    )}
                     <button
                       onClick={handleContinueToPayment}
+                      disabled={!isFormComplete}
                       style={{
-                        width: '100%', padding: '14px 24px', background: CHAR, color: CREME, border: 'none',
+                        width: '100%', padding: '14px 24px',
+                        background: isFormComplete ? CHAR : `${CHAR}44`,
+                        color: CREME, border: 'none',
                         fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
-                        fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', cursor: 'pointer',
+                        fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase',
+                        cursor: isFormComplete ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s',
                       }}
-                      onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
-                      onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                      onMouseEnter={e => { if (isFormComplete) e.currentTarget.style.opacity = '0.85'; }}
+                      onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
                     >
                       continuar para pagamento
                     </button>
@@ -624,7 +783,6 @@ const Checkout = () => {
                       <PixQRCode qrCode={pixData.qr_code} qrCodeBase64={pixData.qr_code_base64} amount={total} />
                     ) : (
                       <>
-                        {/* Method selector */}
                         <div style={{ display: 'flex', gap: 0, border: `1px solid ${CHAR}22` }}>
                           {(['card', 'pix'] as PaymentMethod[]).map(method => (
                             <button
@@ -688,7 +846,7 @@ const Checkout = () => {
               </section>
             </div>
 
-            {/* Order summary */}
+            {/* ── Order summary ── */}
             <div style={{ position: 'sticky', top: 96, padding: 28, border: `1px solid ${CHAR}14`, background: `${CREME}44` }}>
               <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>resumo</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
