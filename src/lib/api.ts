@@ -232,11 +232,61 @@ export const getCollections = async (): Promise<Collection[]> => {
 };
 
 // Reviews
-export const getReviews = (productId: string) =>
-  fetchApi<Review[]>(`/reviews?productId=${productId}`, undefined, mockReviews.filter(r => r.product_id === productId));
+export const getReviews = async (productId: string): Promise<Review[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('product_id', productId)
+      .eq('approved', true)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map((row) => ({
+      id: row.id,
+      product_id: row.product_id ?? '',
+      author_name: row.author_name,
+      rating: row.rating,
+      title: row.title ?? null,
+      body: row.body ?? null,
+      photo_url: row.photo_url ?? null,
+      approved: row.approved ?? null,
+      created_at: row.created_at ?? null,
+    }));
+  } catch (err) {
+    console.warn('[getReviews] Supabase query failed, using mock fallback:', err);
+    return mockReviews.filter((r) => r.product_id === productId);
+  }
+};
 
-export const createReview = (data: { product_id: string; author: string; rating: number; title: string; body: string }) =>
-  fetchApi<Review>('/reviews', { method: 'POST', body: JSON.stringify(data) });
+export const submitReview = async (input: {
+  product_id: string;
+  author_name: string;
+  rating: number;
+  body: string;
+  photo_url?: string | null;
+}): Promise<void> => {
+  const { error } = await supabase.from('reviews').insert({
+    product_id: input.product_id,
+    author_name: input.author_name,
+    rating: input.rating,
+    body: input.body,
+    photo_url: input.photo_url ?? null,
+    approved: false,
+  });
+  if (error) throw error;
+};
+
+export const uploadReviewPhoto = async (file: File): Promise<string> => {
+  const ext = file.name.split('.').pop() ?? 'jpg';
+  const fileName = `${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage.from('review-photos').upload(fileName, file, {
+    cacheControl: '3600',
+    upsert: false,
+    contentType: file.type,
+  });
+  if (error) throw error;
+  return supabase.storage.from('review-photos').getPublicUrl(fileName).data.publicUrl;
+};
 
 // Shipping
 export const quoteShipping = (data: { items: { product_id: string; quantity: number }[] }) =>

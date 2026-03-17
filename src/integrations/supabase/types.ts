@@ -340,32 +340,43 @@ export type Database = {
           body: string | null
           created_at: string | null
           id: string
-          is_published: boolean | null
+          approved: boolean | null
           product_id: string | null
           rating: number
           title: string | null
+          photo_url: string | null
         }
         Insert: {
           author_name: string
           body?: string | null
           created_at?: string | null
           id?: string
-          is_published?: boolean | null
+          approved?: boolean | null
           product_id?: string | null
           rating: number
           title?: string | null
+          photo_url?: string | null
         }
         Update: {
           author_name?: string
           body?: string | null
           created_at?: string | null
           id?: string
-          is_published?: boolean | null
+          approved?: boolean | null
           product_id?: string | null
           rating?: number
           title?: string | null
+          photo_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shipping_rules: {
         Row: {
