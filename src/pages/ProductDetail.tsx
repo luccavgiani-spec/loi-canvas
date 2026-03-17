@@ -80,12 +80,12 @@ const ProductDetail = () => {
               )}
             </div>
             {product.images.length > 1 && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setSelectedImage(i)}
-                    className="w-16 h-16 overflow-hidden transition-all"
+                    className="w-16 h-16 overflow-hidden transition-all flex-shrink-0"
                     style={{
                       border: i === selectedImage ? '2px solid #000' : '2px solid transparent',
                       opacity: i === selectedImage ? 1 : 0.5,
@@ -259,7 +259,7 @@ const ProductDetail = () => {
             </div>
 
             {/* CTAs */}
-            <div className="flex gap-3 mb-10">
+            <div className="flex flex-col sm:flex-row gap-3 mb-10">
               <button onClick={() => addItem(product)} className="loi-btn flex-1 justify-center">
                 adicionar ao carrinho
               </button>
