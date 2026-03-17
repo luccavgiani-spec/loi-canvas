@@ -6,6 +6,7 @@ import type { Product } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { Star, Truck, RefreshCw, Leaf, Package } from 'lucide-react';
 import ReviewSection from '@/components/product/ReviewSection';
+import ShippingCalculator from '@/components/ShippingCalculator';
 
 const benefits = [
   { icon: Truck, label: 'Frete grátis acima de R$ 299' },
@@ -232,6 +233,11 @@ const ProductDetail = () => {
             >
               {product.description}
             </p>
+
+            {/* Shipping calculator */}
+            <div className="mb-8">
+              <ShippingCalculator />
+            </div>
 
             {/* Benefits */}
             <div className="grid grid-cols-2 gap-3 mb-8">
