@@ -188,7 +188,7 @@ const ProductFocusBanner = memo(({
       <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#f4edd2' : '#f4edd2' }}>
         <div
           className="relative overflow-hidden w-full"
-          style={{ aspectRatio: '4 / 3' }}
+          style={{ aspectRatio: '4 / 3', background: '#29241f' }}
         >
           {videoSrc ? (
             <LazyVideo
@@ -206,13 +206,24 @@ const ProductFocusBanner = memo(({
               decoding="async"
             />
           )}
-          {/* gradient vignette — funde as bordas do vídeo com o fundo */}
+          {/* overlay atmosférico — mesmo estilo da hero */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              zIndex: 9,
+              background: `
+                radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.45) 100%),
+                linear-gradient(to bottom, rgba(41,36,31,0.45) 0%, rgba(41,36,31,0.00) 30%, rgba(41,36,31,0.00) 70%, rgba(41,36,31,0.55) 100%)
+              `,
+            }}
+          />
+          {/* vignette cream — funde bordas com o fundo #f4edd2 */}
           <div
             className="absolute inset-0 pointer-events-none z-10"
             style={{
               background: `
-                linear-gradient(to right, #f4edd2 0%, transparent 16%, transparent 84%, #f4edd2 100%),
-                linear-gradient(to bottom, #f4edd2 0%, transparent 16%, transparent 84%, #f4edd2 100%)
+                linear-gradient(to right, #f4edd2 0%, transparent 18%, transparent 82%, #f4edd2 100%),
+                linear-gradient(to bottom, #f4edd2 0%, transparent 18%, transparent 82%, #f4edd2 100%)
               `,
             }}
           />
@@ -365,7 +376,7 @@ const HomeSections = () => {
       <div
         style={{
           height: 'clamp(120px, 18vw, 240px)',
-          background: 'linear-gradient(to bottom, #565600 0%, #989857 40%, #c8be8a 65%, #f4edd2 100%)',
+          background: 'linear-gradient(to bottom, #29241f 0%, #3a3228 20%, #6e6455 45%, #b5a890 70%, #e8e0cc 88%, #fcf5e0 100%)',
         }}
       />
 
