@@ -228,6 +228,7 @@ const Header = () => {
               width: 'clamp(70px, 8vw, 110px)',
               height: 'auto',
               transition: 'opacity 0.5s ease',
+              mixBlendMode: showDark ? 'multiply' : 'normal',
             }}
           />
         </Link>

@@ -222,8 +222,8 @@ const ProductFocusBanner = memo(({
             className="absolute inset-0 pointer-events-none z-10"
             style={{
               background: `
-                linear-gradient(to right, #f4edd2 0%, transparent 18%, transparent 82%, #f4edd2 100%),
-                linear-gradient(to bottom, #f4edd2 0%, transparent 18%, transparent 82%, #f4edd2 100%)
+                linear-gradient(to right, #29241f 0%, transparent 18%, transparent 82%, #29241f 100%),
+                linear-gradient(to bottom, #29241f 0%, transparent 18%, transparent 82%, #29241f 100%)
               `,
             }}
           />
