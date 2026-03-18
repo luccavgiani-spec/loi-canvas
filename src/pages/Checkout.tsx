@@ -584,10 +584,9 @@ const Checkout = () => {
   }, [orderId, clear]);
 
   const handlePixSuccess = useCallback((result: any) => {
-    const qr = result.pix_qr_code
-      || result.point_of_interaction?.transaction_data?.qr_code;
-    const qrBase64 = result.pix_qr_code_base64
-      || result.point_of_interaction?.transaction_data?.qr_code_base64;
+    const qr = result.pix?.qr_code;
+    const qrBase64 = result.pix?.qr_code_base64;
+
     if (qr) {
       setPixData({ qr_code: qr, qr_code_base64: qrBase64 });
     } else {
