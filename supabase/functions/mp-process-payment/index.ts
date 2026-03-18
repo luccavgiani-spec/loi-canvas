@@ -3,8 +3,9 @@ import { corsHeaders } from '../_shared/cors.ts';
 import { getSupabaseAdmin } from '../_shared/supabase.ts';
 
 /**
- * Processes a payment via Mercado Pago Orders API (automatic mode).
- * Receives tokenized card data from the Payment Brick and creates an Order.
+ * Processes a payment via Mercado Pago.
+ * - PIX: Payments API (/v1/payments) → returns qr_code data
+ * - Card: Orders API (/v1/orders, automatic mode)
  */
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -13,11 +14,11 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { order_id, token, payment_method_id, issuer_id, installments, transaction_amount, payer } = body;
+    const { order_id, token, payment_method_id, issuer_id, installments, transaction_amount, payer, device_id } = body;
 
-    if (!order_id || !token || !payment_method_id) {
+    if (!order_id || !payment_method_id) {
       return new Response(
-        JSON.stringify({ error: 'order_id, token e payment_method_id são obrigatórios' }),
+        JSON.stringify({ error: 'order_id e payment_method_id são obrigatórios' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
@@ -43,6 +44,101 @@ serve(async (req) => {
       );
     }
 
+    // Fetch order items with product info for enriched payload
+    const { data: orderItems } = await supabase
+      .from('order_items')
+      .select('*, products(name, id)')
+      .eq('order_id', order_id);
+
+    const items = (orderItems || []).map((item: any) => ({
+      id: item.product_id,
+      title: item.products?.name || 'Produto Loiê',
+      description: item.products?.name || 'Produto Loiê',
+      category_id: 'home_deco',
+      quantity: item.qty,
+      unit_price: Number(item.unit_price),
+    }));
+
+    // Build enriched payer object
+    const payerObj: Record<string, any> = {
+      email: payer?.email || order.customer_email,
+      first_name: payer?.first_name || order.customer_name?.split(' ')[0] || '',
+      last_name: payer?.last_name || order.customer_name?.split(' ').slice(1).join(' ') || '',
+    };
+    if (payer?.identification) payerObj.identification = payer.identification;
+    if (payer?.phone) {
+      const digits = String(payer.phone).replace(/\D/g, '');
+      payerObj.phone = { area_code: digits.slice(0, 2), number: digits.slice(2) };
+    }
+    if (payer?.address) {
+      payerObj.address = {
+        zip_code: payer.address.zip_code || '',
+        street_name: payer.address.street_name || '',
+        street_number: payer.address.street_number || '',
+      };
+    }
+
+    // ── PIX flow via Payments API ──────────────────────────────────────────────
+    if (payment_method_id === 'pix') {
+      const pixBody: Record<string, any> = {
+        transaction_amount: Number(transaction_amount || order.total),
+        payment_method_id: 'pix',
+        statement_descriptor: 'LOIE',
+        external_reference: order_id,
+        items,
+        payer: payerObj,
+      };
+
+      console.log('Creating PIX payment:', JSON.stringify(pixBody));
+
+      const pixRes = await fetch('https://api.mercadopago.com/v1/payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${MP_ACCESS_TOKEN}`,
+          'X-Idempotency-Key': `pix-${order_id}-${Date.now()}`,
+        },
+        body: JSON.stringify(pixBody),
+      });
+
+      const pixResult = await pixRes.json();
+      console.log('PIX payment response:', JSON.stringify(pixResult));
+
+      if (!pixRes.ok) {
+        const errorMsg = pixResult.message || pixResult.error || `Mercado Pago error: ${pixRes.status}`;
+        return new Response(
+          JSON.stringify({ error: errorMsg, details: pixResult }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
+
+      await supabase
+        .from('orders')
+        .update({ status: 'pending', mp_payment_id: String(pixResult.id) })
+        .eq('id', order_id);
+
+      return new Response(
+        JSON.stringify({
+          status: 'pending',
+          mp_status: pixResult.status,
+          mp_payment_id: pixResult.id,
+          pix: {
+            qr_code: pixResult.point_of_interaction?.transaction_data?.qr_code,
+            qr_code_base64: pixResult.point_of_interaction?.transaction_data?.qr_code_base64,
+          },
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // ── Card flow via Orders API ───────────────────────────────────────────────
+    if (!token) {
+      return new Response(
+        JSON.stringify({ error: 'token é obrigatório para pagamento com cartão' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
     const amount = String(transaction_amount || order.total);
 
     // Determine payment method type based on payment_method_id
@@ -52,15 +148,14 @@ serve(async (req) => {
       paymentType = 'debit_card';
     }
 
-    // Create Order via Mercado Pago Orders API (automatic mode)
-    const orderBody = {
+    const orderBody: Record<string, any> = {
       type: 'online',
       processing_mode: 'automatic',
       external_reference: order_id,
       total_amount: amount,
-      payer: {
-        email: payer?.email || order.customer_email,
-      },
+      statement_descriptor: 'LOIE',
+      items,
+      payer: payerObj,
       transactions: {
         payments: [
           {
@@ -76,6 +171,8 @@ serve(async (req) => {
         ],
       },
     };
+
+    if (device_id) orderBody.device_id = device_id;
 
     console.log('Creating MP Order:', JSON.stringify(orderBody));
 
