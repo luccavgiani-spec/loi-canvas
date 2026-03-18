@@ -85,9 +85,11 @@ const MP_IFRAME_CSS = `
 
 // ─── PIX form ─────────────────────────────────────────────────────────────────
 const PixForm = ({
-  total, email, orderId, onSuccess, onError,
+  total, email, orderId, firstName, lastName, phone, address, onSuccess, onError,
 }: {
   total: number; email: string; orderId: string;
+  firstName: string; lastName: string; phone: string;
+  address: { zip_code: string; street_name: string; street_number: string };
   onSuccess: (data: any) => void; onError: (msg: string) => void;
 }) => {
   const [loading, setLoading] = useState(false);
@@ -106,7 +108,13 @@ const PixForm = ({
           order_id: orderId,
           payment_method_id: 'pix',
           transaction_amount: total,
-          payer: { email },
+          payer: {
+            email,
+            first_name: firstName,
+            last_name: lastName,
+            phone,
+            address,
+          },
         }),
       });
       const result = await res.json();
@@ -180,9 +188,11 @@ let mpInstance: any = null;
 let cardFormInstance: any = null;
 
 const CardForm = ({
-  total, email, onSuccess, onError,
+  total, email, firstName, lastName, phone, address, onSuccess, onError,
 }: {
   total: number; email: string;
+  firstName: string; lastName: string; phone: string;
+  address: { zip_code: string; street_name: string; street_number: string };
   onSuccess: (data: any) => void; onError: (msg: string) => void;
 }) => {
   const formRef = useRef<any>(null);
@@ -222,6 +232,7 @@ const CardForm = ({
       if (!mpInstance) {
         mpInstance = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
       }
+      const deviceId = mpInstance.getDeviceId?.() || '';
       const mp = mpInstance;
       const cardForm = mp.cardForm({
         amount: String(total),
@@ -270,9 +281,14 @@ const CardForm = ({
               issuer_id: d.issuerId,
               installments: Number(d.installments) || selectedInstallment || 1,
               transaction_amount: Number(d.amount),
+              device_id: deviceId,
               payer: {
                 email: d.cardholderEmail || email,
+                first_name: firstName,
+                last_name: lastName,
+                phone,
                 identification: { type: d.identificationType, number: d.identificationNumber },
+                address,
               },
             });
           },
@@ -881,10 +897,37 @@ const Checkout = () => {
                         </div>
 
                         {paymentMethod === 'card' && (
-                          <CardForm total={total} email={form.email} onSuccess={handleCardSuccess} onError={handlePaymentError} />
+                          <CardForm
+                            total={total}
+                            email={form.email}
+                            firstName={form.firstName}
+                            lastName={form.lastName}
+                            phone={form.phone.replace(/\D/g, '')}
+                            address={{
+                              zip_code: form.cep.replace(/\D/g, ''),
+                              street_name: form.street,
+                              street_number: form.number,
+                            }}
+                            onSuccess={handleCardSuccess}
+                            onError={handlePaymentError}
+                          />
                         )}
                         {paymentMethod === 'pix' && (
-                          <PixForm total={total} email={form.email} orderId={orderId} onSuccess={handlePixSuccess} onError={handlePaymentError} />
+                          <PixForm
+                            total={total}
+                            email={form.email}
+                            orderId={orderId}
+                            firstName={form.firstName}
+                            lastName={form.lastName}
+                            phone={form.phone.replace(/\D/g, '')}
+                            address={{
+                              zip_code: form.cep.replace(/\D/g, ''),
+                              street_name: form.street,
+                              street_number: form.number,
+                            }}
+                            onSuccess={handlePixSuccess}
+                            onError={handlePaymentError}
+                          />
                         )}
                       </>
                     )}
