@@ -185,7 +185,7 @@ const ProductFocusBanner = memo(({
 }) => {
   return (
     <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
-      <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#29241f' : '#f4edd2' }}>
+      <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#989857' : '#f4edd2' }}>
         <div
           className="relative overflow-hidden w-[92%] md:w-[85%] my-8 md:my-12"
           style={{
@@ -213,7 +213,7 @@ const ProductFocusBanner = memo(({
           )}
         </div>
       </div>
-      <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: dark ? '#29241f' : '#f4edd2' }}>
+      <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: dark ? '#989857' : '#f4edd2' }}>
         <div className="max-w-md">
           <span className="loi-label block mb-4" style={dark ? { color: 'rgba(244,237,210,0.4)' } : undefined}>{product.collection}</span>
           <h3
@@ -365,19 +365,19 @@ const HomeSections = () => {
       />
 
       {/* ── 1. Bestsellers — Carousel ── */}
-      <section className="py-16 px-6 md:py-0 loi-section-lazy" style={{ background: '#989857' }}>
+      <section className="py-16 px-6 md:py-0 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4" style={{ color: '#f4edd2' }}>mais amados</span>
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#f4edd2' }}>
+            <span className="reveal loi-label block mb-4">mais amados</span>
+            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
               Bestsellers
             </h2>
           </div>
           <div className="reveal">
-            <ProductCarousel products={salaOuEstar} addItem={addItem} dark={true} />
+            <ProductCarousel products={salaOuEstar} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/shop/sala-ou-estar" className="loi-ghost group" style={{ color: '#f4edd2' }}>
+            <Link to="/shop/sala-ou-estar" className="loi-ghost group">
               <span>ver toda a coleção</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -395,9 +395,9 @@ const HomeSections = () => {
       />
 
       {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) — DARK THEME ── */}
-      <section style={{ background: '#29241f' }} className="loi-section-lazy">
+      <section style={{ background: '#989857' }} className="loi-section-lazy">
         {loading ? (
-          <div style={{ minHeight: '50vh', background: '#29241f' }} />
+          <div style={{ minHeight: '50vh', background: '#989857' }} />
         ) : (
           <>
             {focusBosque && (
@@ -484,8 +484,8 @@ const HomeSections = () => {
       <section className="py-16 md:py-20 px-6 loi-section-lazy">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4">dúvidas</span>
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
+            <span className="reveal loi-label block mb-4" style={{ color: '#29241f' }}>dúvidas</span>
+            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#29241f' }}>
               Perguntas Frequentes
             </h2>
           </div>
@@ -504,15 +504,12 @@ const HomeSections = () => {
             ].map((faq, i) => (
               <details key={i} className="group" style={{ borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
                 <summary
-                  className="flex items-center justify-between py-5 cursor-pointer list-none"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#000' }}
+                  className="flex items-center py-5 cursor-pointer list-none"
+                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#29241f' }}
                 >
                   {faq.q}
-                  <span className="ml-4 flex-shrink-0 transition-transform duration-300 group-open:rotate-45" style={{ color: '#000', fontSize: '1.5rem', fontWeight: 200 }}>
-                    +
-                  </span>
                 </summary>
-                <p className="pb-5" style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.82rem', color: '#000', lineHeight: 1.8, maxWidth: 520 }}>
+                <p className="pb-5" style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.82rem', color: '#29241f', lineHeight: 1.8, maxWidth: 520 }}>
                   {faq.a}
                 </p>
               </details>
