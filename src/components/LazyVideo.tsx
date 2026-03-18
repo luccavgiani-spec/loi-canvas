@@ -12,30 +12,31 @@ interface LazyVideoProps {
 }
 
 /**
- * LazyVideo: only mounts the <video> element when it enters (or nears)
- * the viewport. Pauses and removes src when it leaves to free memory
- * and network bandwidth.
+ * LazyVideo: mounts the <video> once when first visible, then keeps it
+ * in the DOM (pausing when off-screen) to preserve the buffer.
  */
 const LazyVideo = memo(({
   src,
   poster,
   className,
   style,
-  width,
-  height,
   rootMargin = '200px 0px',
 }: LazyVideoProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
+  // Track visibility
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        const visible = entry.isIntersecting;
+        setIsVisible(visible);
+        if (visible) setMounted(true); // mount once, never unmount
       },
       { rootMargin }
     );
@@ -44,30 +45,32 @@ const LazyVideo = memo(({
     return () => observer.disconnect();
   }, [rootMargin]);
 
+  // Pause/resume based on visibility (don't unmount)
   useEffect(() => {
     const v = videoRef.current;
-    if (!v || !isVisible) {
-      videoRef.current?.pause();
-      return;
-    }
+    if (!v) return;
 
-    const tryPlay = () => { v.play().catch(() => {}); };
-
-    if (v.readyState >= 3) {
-      tryPlay();
+    if (isVisible) {
+      const tryPlay = () => { v.play().catch(() => {}); };
+      if (v.readyState >= 3) {
+        tryPlay();
+      } else {
+        v.addEventListener('canplay', tryPlay, { once: true });
+        return () => v.removeEventListener('canplay', tryPlay);
+      }
     } else {
-      v.addEventListener('canplay', tryPlay, { once: true });
-      return () => v.removeEventListener('canplay', tryPlay);
+      v.pause();
     }
   }, [isVisible]);
 
   return (
     <div ref={containerRef} className={className} style={style}>
-      {isVisible ? (
+      {mounted ? (
         <VideoPlayer
           ref={videoRef}
           src={src}
           poster={poster}
+          preload={isVisible ? 'auto' : 'metadata'}
           className="absolute inset-0 w-full h-full object-cover"
         />
       ) : poster ? (
