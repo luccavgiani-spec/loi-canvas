@@ -185,16 +185,20 @@ const ProductFocusBanner = memo(({
 }) => {
   return (
     <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
-      <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#f4edd2' : '#f4edd2' }}>
-        {/* fade top — cream into video, same style as hero→bestsellers */}
+      <div className="md:w-1/2 relative md:flex md:items-center md:justify-center" style={{ minHeight: 350, background: dark ? '#f4edd2' : '#f4edd2' }}>
+        {/* desktop-only: absolute overlays that blend the video edges with the cream background */}
         <div
-          className="absolute inset-x-0 top-0 pointer-events-none"
+          className="hidden md:block absolute inset-x-0 top-0 pointer-events-none"
           style={{ height: '35%', background: 'linear-gradient(to bottom, #f4edd2 0%, transparent 100%)', zIndex: 20 }}
         />
-        {/* fade bottom — video into cream */}
         <div
-          className="absolute inset-x-0 bottom-0 pointer-events-none"
+          className="hidden md:block absolute inset-x-0 bottom-0 pointer-events-none"
           style={{ height: '35%', background: 'linear-gradient(to top, #f4edd2 0%, transparent 100%)', zIndex: 20 }}
+        />
+        {/* mobile-only: gradient strip above the video, outside/adjacent (not a mask) */}
+        <div
+          className="md:hidden w-full pointer-events-none"
+          style={{ height: '3rem', background: 'linear-gradient(to bottom, #f4edd2 0%, transparent 100%)', flexShrink: 0 }}
         />
         <div
           className="relative overflow-hidden w-full"
@@ -237,6 +241,11 @@ const ProductFocusBanner = memo(({
             }}
           />
         </div>
+        {/* mobile-only: gradient strip below the video, outside/adjacent (not a mask) */}
+        <div
+          className="md:hidden w-full pointer-events-none"
+          style={{ height: '3rem', background: 'linear-gradient(to top, #f4edd2 0%, transparent 100%)', flexShrink: 0 }}
+        />
       </div>
       <div className="md:w-1/2 flex items-center px-6 md:px-10 lg:px-16 py-12 md:py-0" style={{ background: '#f4edd2' }}>
         <div className="max-w-md">
