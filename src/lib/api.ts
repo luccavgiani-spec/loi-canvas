@@ -35,25 +35,12 @@ async function callEdgeFunction<T>(fnName: string, body: Record<string, unknown>
   return res.json();
 }
 
-/** Build image URLs from asset_folder in Supabase Storage */
+/** Build a public URL for a file in the "produtos" bucket */
 const SUPABASE_STORAGE_URL =
   'https://xigituxddrtsqhmrmsvy.supabase.co/storage/v1/object/public/produtos';
 
-const IMAGE_SUFFIXES = [
-  '_principal.JPG',
-  '_imagem.JPG',
-  '_imagem_2.JPG',
-  '_ultima.JPG',
-  '_principal.jpg',
-  '_imagem.jpg',
-  '_ultima.jpg',
-];
-
-function buildImageUrls(assetFolder: string | null | undefined): string[] {
-  if (!assetFolder || typeof assetFolder !== 'string') return [];
-  return IMAGE_SUFFIXES.map(
-    (suffix) => `${SUPABASE_STORAGE_URL}/${assetFolder}${suffix}`,
-  );
+function fileToUrl(filename: string): string {
+  return `${SUPABASE_STORAGE_URL}/${encodeURIComponent(filename)}`;
 }
 
 /** Map Supabase row to Product type */
@@ -76,7 +63,10 @@ function mapDbProduct(row: any): Product {
     notes: row.notes ?? '',
     ritual: row.ritual ?? '',
     is_bestseller: row.is_bestseller ?? false,
-    images: buildImageUrls(row.asset_folder),
+    images: (row.product_images as { filename: string; sort_order: number }[] | null | undefined ?? [])
+      .slice()
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((img) => fileToUrl(img.filename)),
     tags: [],
     rating_avg: 0,
     rating_count: 0,
@@ -87,7 +77,7 @@ function mapDbProduct(row: any): Product {
 // Products (query Supabase directly, mock fallback)
 export const getProducts = async (params?: { collection?: string; tag?: string; minPrice?: number; maxPrice?: number; sort?: string }): Promise<Product[]> => {
   try {
-    let query = supabase.from('products').select('*, collections(name, slug)');
+    let query = supabase.from('products').select('*, collections(name, slug), product_images(filename, sort_order)');
 
     if (params?.minPrice) query = query.gte('price', params.minPrice);
     if (params?.maxPrice) query = query.lte('price', params.maxPrice);
@@ -122,7 +112,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
   try {
     const { data, error } = await supabase
       .from('products')
-      .select('*, collections(name, slug)')
+      .select('*, collections(name, slug), product_images(filename, sort_order)')
       .eq('slug', slug)
       .single();
     if (error) throw error;
@@ -143,7 +133,7 @@ export const getRelatedProducts = async (id: string): Promise<Product[]> => {
 
     const { data, error } = await supabase
       .from('products')
-      .select('*, collections(name, slug)')
+      .select('*, collections(name, slug), product_images(filename, sort_order)')
       .eq('collection_id', current?.collection_id || '')
       .neq('id', id)
       .limit(4);
@@ -172,7 +162,7 @@ export const getProductsByCollectionSlug = async (collectionSlug: string): Promi
     // Get products for that collection
     const { data, error } = await supabase
       .from('products')
-      .select('*, collections(name, slug)')
+      .select('*, collections(name, slug), product_images(filename, sort_order)')
       .eq('collection_id', colRow.id)
       .order('created_at', { ascending: false });
 
