@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
 import { getAdminCollabs } from '@/lib/api';
 import { storageUrl } from '@/lib/storage';
+import { VideoPlayer } from '@/components/ui/VideoPlayer';
 import type { Collab } from '@/types';
 
 const COLLAB_POSTER = storageUrl('loie_vela_campos_principal.JPG');
@@ -38,18 +39,17 @@ const CollabDetailCard = ({ collab }: { collab: Collab }) => {
     <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
       <div ref={containerRef} className="relative overflow-hidden aspect-[4/5]">
         {isVisible ? collab.images.map((src, i) => (
-          <video
+          <div
             key={src}
-            src={src}
-            muted
-            playsInline
-            autoPlay
-            loop
-            preload="none"
-            poster={COLLAB_POSTER}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-            style={{ opacity: currentImage === i ? 1 : 0 }}
-          />
+            className="absolute inset-0 transition-opacity duration-1000"
+            style={{ opacity: currentImage === i ? 1 : 0, willChange: 'opacity' }}
+          >
+            <VideoPlayer
+              src={src}
+              poster={COLLAB_POSTER}
+              className="w-full h-full object-cover"
+            />
+          </div>
         )) : (
           <img src={COLLAB_POSTER} alt="" className="absolute inset-0 w-full h-full object-cover" />
         )}
