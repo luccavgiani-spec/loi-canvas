@@ -1,77 +1,98 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 /**
  * Hook que garante que um elemento <video> comece a tocar,
- * com fallback de tentativas e degradação de qualidade.
+ * com retry infinito (backoff exponencial) e degradação de qualidade.
+ * Dispara onPlaybackFailed após timeout para exibir tap-to-play.
  */
-export function useVideoAutoplay(lowSrc?: string) {
+export function useVideoAutoplay(
+  lowSrc?: string,
+  onPlaybackFailed?: () => void,
+  failTimeout = 12000,
+) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const playingRef = useRef(false);
+  const unmountedRef = useRef(false);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+  const tryPlay = useCallback(async (video: HTMLVideoElement, attempt = 0) => {
+    if (unmountedRef.current || playingRef.current) return;
 
-    // Garante atributos críticos programaticamente (redundância)
+    // Ensure critical attributes
     video.muted = true;
     video.playsInline = true;
 
-    let attempts = 0;
-    const maxAttempts = 3;
+    try {
+      await video.play();
+      playingRef.current = true;
+    } catch {
+      if (unmountedRef.current) return;
 
-    const tryPlay = async () => {
-      attempts++;
-      try {
-        await video.play();
-      } catch (err) {
-        if (attempts < maxAttempts) {
-          // Aguarda 500ms e tenta novamente
-          setTimeout(tryPlay, 500);
-        } else if (lowSrc && video.src !== lowSrc) {
-          // Última tentativa: troca para versão de baixa qualidade
-          video.src = lowSrc;
-          video.load();
-          try {
-            await video.play();
-          } catch {
-            // Falhou mesmo com low quality — nada mais a fazer
-          }
-        }
+      // After several attempts with high-quality, try low-quality
+      if (attempt === 4 && lowSrc && video.src !== lowSrc) {
+        video.src = lowSrc;
+        video.load();
       }
-    };
 
-    // Tenta reproduzir quando o componente monta
-    if (video.readyState >= 2) {
-      tryPlay();
+      // Backoff: 300, 600, 1200, 2400, 4000, 4000, ...
+      const delay = Math.min(300 * Math.pow(2, attempt), 4000);
+      setTimeout(() => tryPlay(video, attempt + 1), delay);
+    }
+  }, [lowSrc]);
+
+  useEffect(() => {
+    unmountedRef.current = false;
+    playingRef.current = false;
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Fail timeout — trigger tap-to-play fallback
+    const failTimer = setTimeout(() => {
+      if (!playingRef.current && onPlaybackFailed) {
+        onPlaybackFailed();
+      }
+    }, failTimeout);
+
+    const startPlay = () => tryPlay(video);
+
+    // Use canplaythrough for more reliable playback on mobile
+    if (video.readyState >= 4) {
+      startPlay();
     } else {
-      video.addEventListener('canplay', tryPlay, { once: true });
+      video.addEventListener('canplaythrough', startPlay, { once: true });
+      // Also try on loadeddata as a secondary trigger
+      video.addEventListener('loadeddata', startPlay, { once: true });
     }
 
-    // Retry ao visibilidade da aba voltar (usuário volta pro app)
+    // Retry when tab becomes visible again
     const handleVisibility = () => {
-      if (!document.hidden && video.paused) {
-        tryPlay();
+      if (!document.hidden && video.paused && !unmountedRef.current) {
+        playingRef.current = false;
+        tryPlay(video);
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
 
-    // Retry ao IntersectionObserver (vídeo entra na viewport)
+    // Retry when video enters viewport
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && video.paused) {
-            tryPlay();
-          }
-        });
+      ([entry]) => {
+        if (entry.isIntersecting && video.paused && !unmountedRef.current) {
+          playingRef.current = false;
+          tryPlay(video);
+        }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
     observer.observe(video);
 
     return () => {
+      unmountedRef.current = true;
+      clearTimeout(failTimer);
       document.removeEventListener('visibilitychange', handleVisibility);
       observer.disconnect();
+      video.removeEventListener('canplaythrough', startPlay);
+      video.removeEventListener('loadeddata', startPlay);
     };
-  }, [lowSrc]);
+  }, [lowSrc, tryPlay, onPlaybackFailed, failTimeout]);
 
   return videoRef;
 }

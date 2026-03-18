@@ -461,7 +461,7 @@ export const getAdminCoupons = async (): Promise<Coupon[]> => {
 };
 
 export const updateOrderTracking = (order_id: string, tracking_code: string) =>
-  supabase.from('orders').update({ tracking_code }).eq('id', order_id);
+  supabase.from('orders').update({ tracking_code } as any).eq('id', order_id);
 
 export const sendTrackingEmail = (order_id: string, tracking_code: string) =>
   callEdgeFunction<{ sent_at: string }>('send-tracking-email', { order_id, tracking_code });

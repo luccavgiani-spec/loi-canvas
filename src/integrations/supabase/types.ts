@@ -208,6 +208,8 @@ export type Database = {
           status: string | null
           subtotal: number
           total: number
+          tracking_code: string | null
+          tracking_email_sent_at: string | null
         }
         Insert: {
           created_at?: string | null
@@ -222,6 +224,8 @@ export type Database = {
           status?: string | null
           subtotal: number
           total: number
+          tracking_code?: string | null
+          tracking_email_sent_at?: string | null
         }
         Update: {
           created_at?: string | null
@@ -236,8 +240,42 @@ export type Database = {
           status?: string | null
           subtotal?: number
           total?: number
+          tracking_code?: string | null
+          tracking_email_sent_at?: string | null
         }
         Relationships: []
+      }
+      product_images: {
+        Row: {
+          created_at: string | null
+          filename: string
+          id: string
+          product_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string | null
+          filename: string
+          id?: string
+          product_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string | null
+          filename?: string
+          id?: string
+          product_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_variants: {
         Row: {
@@ -336,37 +374,37 @@ export type Database = {
       }
       reviews: {
         Row: {
+          approved: boolean | null
           author_name: string
           body: string | null
           created_at: string | null
           id: string
-          approved: boolean | null
+          photo_url: string | null
           product_id: string | null
           rating: number
           title: string | null
-          photo_url: string | null
         }
         Insert: {
+          approved?: boolean | null
           author_name: string
           body?: string | null
           created_at?: string | null
           id?: string
-          approved?: boolean | null
+          photo_url?: string | null
           product_id?: string | null
           rating: number
           title?: string | null
-          photo_url?: string | null
         }
         Update: {
+          approved?: boolean | null
           author_name?: string
           body?: string | null
           created_at?: string | null
           id?: string
-          approved?: boolean | null
+          photo_url?: string | null
           product_id?: string | null
           rating?: number
           title?: string | null
-          photo_url?: string | null
         }
         Relationships: [
           {
