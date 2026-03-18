@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
 import { storageUrl } from '@/lib/storage';
+import { VideoPlayer } from '@/components/ui/VideoPlayer';
 
 /* ─── video config ─── */
 const VIDEO_SRC = storageUrl('escritorio_cadeira__1_.mp4');
@@ -9,24 +9,6 @@ const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 
 /* ─── component ─── */
 const HeroSection = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    // Lazy-load: set src only now, not in JSX
-    if (!v.src) {
-      v.src = VIDEO_SRC;
-      v.load();
-    }
-    // Start playback as soon as enough data is buffered
-    const tryPlay = () => { v.play().catch(() => {}); };
-    if (v.readyState >= 3) {
-      tryPlay();
-    } else {
-      v.addEventListener('canplay', tryPlay, { once: true });
-    }
-  }, []);
 
   return (
     <section
@@ -34,16 +16,9 @@ const HeroSection = () => {
       style={{ background: '#29241f' }}
     >
       {/* ── video ── */}
-      <video
-        ref={videoRef}
-        muted
-        playsInline
-        autoPlay
-        loop
-        preload="none"
+      <VideoPlayer
+        src={VIDEO_SRC}
         poster="/hero/hero-poster.jpg"
-        width={1920}
-        height={1080}
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           filter: 'saturate(0.65) brightness(0.60) contrast(1.05)',

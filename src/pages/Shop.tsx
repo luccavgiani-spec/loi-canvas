@@ -7,6 +7,7 @@ import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { storageUrl } from '@/lib/storage';
+import { VideoPlayer } from '@/components/ui/VideoPlayer';
 
 
 /* ── Horizontal carousel with snap scrolling ── */
@@ -212,14 +213,9 @@ const Shop = () => {
           style={{ background: '#29241f' }}>
 
           {/* Background video */}
-          <video
-            autoPlay
-            muted
-            playsInline
-            loop
-            preload="metadata"
-            poster={storageUrl('loie_vela_campos_principal.JPG')}
+          <VideoPlayer
             src={storageUrl('Cartao_Postal_Loie.mp4')}
+            poster={storageUrl('loie_vela_campos_principal.JPG')}
             className="absolute inset-0 w-full h-full object-cover"
             style={{
               filter: 'saturate(0.5) brightness(0.35) contrast(1.05)',

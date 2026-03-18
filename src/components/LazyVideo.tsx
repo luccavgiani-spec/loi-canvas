@@ -1,14 +1,11 @@
 import { useRef, useEffect, useState, memo } from 'react';
+import { VideoPlayer } from '@/components/ui/VideoPlayer';
 
 interface LazyVideoProps {
   src: string;
   poster?: string;
   className?: string;
   style?: React.CSSProperties;
-  muted?: boolean;
-  loop?: boolean;
-  playsInline?: boolean;
-  autoPlay?: boolean;
   width?: number;
   height?: number;
   rootMargin?: string;
@@ -24,10 +21,6 @@ const LazyVideo = memo(({
   poster,
   className,
   style,
-  muted = true,
-  loop = true,
-  playsInline = true,
-  autoPlay = true,
   width,
   height,
   rootMargin = '200px 0px',
@@ -71,17 +64,10 @@ const LazyVideo = memo(({
   return (
     <div ref={containerRef} className={className} style={style}>
       {isVisible ? (
-        <video
+        <VideoPlayer
           ref={videoRef}
           src={src}
           poster={poster}
-          muted={muted}
-          loop={loop}
-          playsInline={playsInline}
-          autoPlay={autoPlay}
-          preload="none"
-          width={width}
-          height={height}
           className="absolute inset-0 w-full h-full object-cover"
         />
       ) : poster ? (

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
+import { VideoPlayer } from '@/components/ui/VideoPlayer';
 import { getProductBySlug, getRelatedProducts } from '@/lib/api';
 import type { Product } from '@/types';
 import { useCart } from '@/contexts/CartContext';
@@ -61,14 +62,9 @@ const ProductDetail = () => {
             <div className="min-w-0">
               <div className="aspect-square overflow-hidden mb-3 w-full">
                 {product.images[selectedImage]?.match(/\.mp4$/i) ? (
-                  <video
+                  <VideoPlayer
                     key={selectedImage}
                     src={product.images[selectedImage]}
-                    muted
-                    playsInline
-                    autoPlay
-                    loop
-                    preload="metadata"
                     poster={product.images.find(s => !s.match(/\.mp4$/i))}
                     className="w-full h-full object-cover"
                     style={{ filter: 'saturate(0.85) brightness(0.9)' }}
@@ -96,11 +92,8 @@ const ProductDetail = () => {
                       }}
                     >
                       {img.match(/\.mp4$/i) ? (
-                        <video
+                        <VideoPlayer
                           src={img}
-                          muted
-                          playsInline
-                          preload="none"
                           poster={product.images.find(s => !s.match(/\.mp4$/i))}
                           className="w-full h-full object-cover"
                           style={{ filter: 'saturate(0.7) brightness(0.8)' }}
@@ -343,13 +336,8 @@ const ProductDetail = () => {
                   <div key={p.id} className="group">
                     <Link to={`/product/${p.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
                       {p.images[0]?.match(/\.mp4$/i) ? (
-                        <video
+                        <VideoPlayer
                           src={p.images[0]}
-                          muted
-                          playsInline
-                          autoPlay
-                          loop
-                          preload="none"
                           poster={p.images.find(s => !s.match(/\.mp4$/i))}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           style={{ filter: 'saturate(0.85) brightness(0.9)' }}

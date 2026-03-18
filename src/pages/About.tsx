@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
+import { VideoPlayer } from '@/components/ui/VideoPlayer';
 import { storageUrl } from '@/lib/storage';
 
 const banner01 = storageUrl('loie_vela_campos_imagem.JPG');
@@ -49,13 +50,8 @@ const About = () => {
         {/* Hero banner */}
         <section className="relative w-full overflow-hidden" style={{ height: 'clamp(350px, 60vh, 720px)', background: '#29241f' }}>
           {/* video */}
-          <video
+          <VideoPlayer
             src={heroVideo}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
             poster={banner01}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ filter: 'saturate(0.70) brightness(0.72) contrast(1.05)' }}
@@ -242,21 +238,22 @@ const About = () => {
                     `,
                   }}
                 />
-                <video
-                  ref={videoRef}
-                  src={manifestoVideo}
-                  muted
-                  loop
-                  playsInline
-                  preload="none"
-                  poster={banner01}
-                  className="w-full aspect-[9/16] object-cover transition-all duration-700"
+                <div
+                  className="transition-all duration-700"
                   style={{
                     opacity: isVisible ? 1 : 0.3,
-                    filter: 'saturate(0.7) brightness(0.85)',
                     transform: isVisible ? 'scale(1)' : 'scale(0.97)',
+                    willChange: 'opacity, transform',
                   }}
-                />
+                >
+                  <VideoPlayer
+                    ref={videoRef}
+                    src={manifestoVideo}
+                    poster={banner01}
+                    className="w-full aspect-[9/16] object-cover"
+                    style={{ filter: 'saturate(0.7) brightness(0.85)' }}
+                  />
+                </div>
               </div>
             </div>
           </div>

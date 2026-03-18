@@ -6,6 +6,7 @@ import { storageUrl } from '@/lib/storage';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/LazyVideo';
+import { VideoPlayer } from '@/components/ui/VideoPlayer';
 import type { Product } from '@/types';
 
 /* ── Horizontal carousel with snap scrolling ── */
@@ -324,18 +325,17 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
       <Link to={`/collabs?collab=${collab.slug}`} className="block">
         <div className="relative overflow-hidden mb-3" style={{ aspectRatio: '4/5' }}>
           {isVisible && collab.images.map((src, i) => (
-            <video
+            <div
               key={src}
-              src={src}
-              muted
-              playsInline
-              autoPlay
-              loop
-              preload="none"
-              poster={storageUrl('loie_vela_campos_principal.JPG')}
-              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
-              style={{ opacity: currentImage === i ? 1 : 0 }}
-            />
+              className="absolute inset-0 transition-opacity duration-1000"
+              style={{ opacity: currentImage === i ? 1 : 0, willChange: 'opacity' }}
+            >
+              <VideoPlayer
+                src={src}
+                poster={storageUrl('loie_vela_campos_principal.JPG')}
+                className="w-full h-full object-cover"
+              />
+            </div>
           ))}
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
