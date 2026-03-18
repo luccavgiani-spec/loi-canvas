@@ -185,15 +185,10 @@ const ProductFocusBanner = memo(({
 }) => {
   return (
     <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
-      <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#989857' : '#f4edd2' }}>
+      <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#f4edd2' : '#f4edd2' }}>
         <div
           className="relative overflow-hidden w-full"
-          style={{
-            aspectRatio: '4 / 3',
-            boxShadow: dark
-              ? 'inset 0 0 60px 24px #989857'
-              : 'inset 0 0 60px 24px #f4edd2',
-          }}
+          style={{ aspectRatio: '4 / 3' }}
         >
           {videoSrc ? (
             <LazyVideo
@@ -211,35 +206,45 @@ const ProductFocusBanner = memo(({
               decoding="async"
             />
           )}
+          {/* gradient vignette — funde as bordas do vídeo com o fundo */}
+          <div
+            className="absolute inset-0 pointer-events-none z-10"
+            style={{
+              background: `
+                linear-gradient(to right, #f4edd2 0%, transparent 16%, transparent 84%, #f4edd2 100%),
+                linear-gradient(to bottom, #f4edd2 0%, transparent 16%, transparent 84%, #f4edd2 100%)
+              `,
+            }}
+          />
         </div>
       </div>
-      <div className="md:w-1/2 flex items-center px-6 md:px-10 lg:px-16 py-12 md:py-0" style={{ background: dark ? '#989857' : '#f4edd2' }}>
+      <div className="md:w-1/2 flex items-center px-6 md:px-10 lg:px-16 py-12 md:py-0" style={{ background: '#f4edd2' }}>
         <div className="max-w-md">
-          <span className="loi-label block mb-4" style={dark ? { color: 'rgba(244,237,210,0.4)' } : undefined}>{product.collection}</span>
+          <span className="loi-label block mb-4">{product.collection}</span>
           <h3
             className="heading-display mb-4"
-            style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: dark ? '#f4edd2' : '#000', lineHeight: 1.15 }}
+            style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: '#29241f', lineHeight: 1.15 }}
           >
             {product.name}
           </h3>
-          <div className="loi-divider mb-6" style={dark ? { background: 'rgba(244,237,210,0.3)' } : undefined} />
+          <div className="loi-divider mb-6" />
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: '1.05rem',
-              color: dark ? 'rgba(244,237,210,0.8)' : '#000',
+              color: '#29241f',
               lineHeight: 1.8,
               marginBottom: '1.5rem',
             }}
           >
             {product.description}
           </p>
-          <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.85rem', color: dark ? '#f4edd2' : '#000', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.85rem', color: '#29241f', marginBottom: '1.5rem' }}>
             R$ {product.price.toFixed(2)}
           </p>
-          <Link to={`/product/${product.slug}`} className={dark ? 'hero-btn-primary' : 'loi-btn-outline'}>
+          <Link to={`/product/${product.slug}`} className="loi-btn-outline">
             ver produto
           </Link>
         </div>
@@ -386,18 +391,13 @@ const HomeSections = () => {
         </div>
       </section>
 
-      {/* ── Degradê cream → dark (transição para produtos em destaque) ── */}
-      <div
-        style={{
-          height: 'clamp(120px, 18vw, 240px)',
-          background: 'linear-gradient(to bottom, #f4edd2 0%, #c8be8a 35%, #989857 100%)',
-        }}
-      />
+      {/* ── Separador cream → cream (sutil) ── */}
+      <div style={{ height: 'clamp(40px, 6vw, 80px)', background: '#f4edd2' }} />
 
-      {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) — DARK THEME ── */}
-      <section style={{ background: '#989857' }} className="loi-section-lazy">
+      {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) ── */}
+      <section style={{ background: '#f4edd2' }} className="loi-section-lazy">
         {loading ? (
-          <div style={{ minHeight: '50vh', background: '#989857' }} />
+          <div style={{ minHeight: '50vh', background: '#f4edd2' }} />
         ) : (
           <>
             {focusBosque && (
@@ -428,13 +428,8 @@ const HomeSections = () => {
         )}
       </section>
 
-      {/* ── Degradê dark → cream (transição para Descubra Novos Aromas) ── */}
-      <div
-        style={{
-          height: 'clamp(120px, 18vw, 240px)',
-          background: 'linear-gradient(to bottom, #989857 0%, #c8be8a 50%, #f4edd2 100%)',
-        }}
-      />
+      {/* ── Separador cream → cream (sutil) ── */}
+      <div style={{ height: 'clamp(40px, 6vw, 80px)', background: '#f4edd2' }} />
 
       {/* ── 3. Descubra Novos Aromas — Carousel ── */}
       <section className="py-16 md:py-20 px-6 loi-section-lazy">
