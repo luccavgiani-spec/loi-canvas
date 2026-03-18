@@ -69,9 +69,9 @@ const Header = () => {
   // Non-home pages always use dark navbar; home uses dark only after scrolling past hero
   const showDark = !isHome || scrolled;
   const linkClass = showDark ? 'loi-nav-link' : 'hero-nav-link';
-  const iconColor = showDark ? '#fcf5e0' : 'rgba(244,237,210,0.5)';
-  const iconHoverColor = '#f4edd2';
-  const activeLinkColor = '#f4edd2';
+  const iconColor = showDark ? '#29241f' : 'rgba(244,237,210,0.5)';
+  const iconHoverColor = '#29241f';
+  const activeLinkColor = '#29241f';
 
   const dropdownBg = 'rgba(41,36,31,0.95)';
   const dropdownBorder = 'rgba(244,237,210,0.1)';
@@ -117,9 +117,9 @@ const Header = () => {
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
       style={{
-        background: showDark ? 'rgba(41,36,31,0.95)' : 'transparent',
-        backdropFilter: showDark ? 'blur(12px)' : 'none',
-        borderBottom: showDark ? '1px solid rgba(244,237,210,0.08)' : '1px solid transparent',
+        background: showDark ? '#f4edd2' : 'transparent',
+        backdropFilter: 'none',
+        borderBottom: showDark ? '1px solid rgba(41,36,31,0.1)' : '1px solid transparent',
       }}
     >
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-6 md:px-10" style={{ height: '5rem' }}>
@@ -219,7 +219,7 @@ const Header = () => {
         {/* Logo center */}
         <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ borderRadius: 4 }}>
           <img
-            src="/hero/LOGO_BRANCA_t.png"
+            src={showDark ? '/hero/Logo_Marrom.jpg' : '/hero/LOGO_BRANCA_t.png'}
             alt="Loiê"
             width={110}
             height={40}
