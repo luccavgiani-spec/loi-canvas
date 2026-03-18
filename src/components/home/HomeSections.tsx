@@ -365,19 +365,19 @@ const HomeSections = () => {
       />
 
       {/* ── 1. Bestsellers — Carousel ── */}
-      <section className="py-16 px-6 md:py-0 loi-section-lazy">
+      <section className="py-16 px-6 md:py-0 loi-section-lazy" style={{ background: '#989857' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4">mais amados</span>
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
+            <span className="reveal loi-label block mb-4" style={{ color: '#f4edd2' }}>mais amados</span>
+            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#f4edd2' }}>
               Bestsellers
             </h2>
           </div>
           <div className="reveal">
-            <ProductCarousel products={salaOuEstar} addItem={addItem} />
+            <ProductCarousel products={salaOuEstar} addItem={addItem} dark={true} />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/shop/sala-ou-estar" className="loi-ghost group">
+            <Link to="/shop/sala-ou-estar" className="loi-ghost group" style={{ color: '#f4edd2' }}>
               <span>ver toda a coleção</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
