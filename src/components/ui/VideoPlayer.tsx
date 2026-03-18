@@ -49,7 +49,7 @@ export const VideoPlayer = React.forwardRef<HTMLVideoElement, VideoPlayerProps>(
     }, [internalRef]);
 
     return (
-      <div className="relative" style={{ width: '100%', height: '100%' }}>
+      <div className={className} style={{ ...style, position: 'relative' }}>
         <video
           ref={setRef}
           src={initialSrc}
@@ -61,8 +61,7 @@ export const VideoPlayer = React.forwardRef<HTMLVideoElement, VideoPlayerProps>(
           disablePictureInPicture
           disableRemotePlayback
           poster={poster}
-          className={className}
-          style={style}
+          className="w-full h-full object-cover"
           onLoadedData={onLoadedData}
           onPlaying={handlePlaying}
         />
