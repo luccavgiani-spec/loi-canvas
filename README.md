@@ -71,3 +71,18 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Scripts de vídeo
+
+### Verificar vídeos existentes
+```bash
+bash scripts/compress-videos-check.sh
+```
+
+### Gerar versões comprimidas para mobile
+Requer ffmpeg instalado (`brew install ffmpeg` no macOS).
+```bash
+bash scripts/compress-videos.sh
+```
+
+Os arquivos `_low.mp4` gerados devem ser commitados junto com os originais no repositório para ficarem disponíveis no `public/` do Lovable/Vite.
