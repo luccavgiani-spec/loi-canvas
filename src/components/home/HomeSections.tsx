@@ -187,12 +187,12 @@ const ProductFocusBanner = memo(({
     <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
       <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#989857' : '#f4edd2' }}>
         <div
-          className="relative overflow-hidden w-[92%] md:w-[85%] my-8 md:my-12"
+          className="relative overflow-hidden w-full"
           style={{
             aspectRatio: '4 / 3',
-            transform: reverse ? 'rotate(-0.8deg)' : 'rotate(0.8deg)',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.35), 0 2px 12px rgba(0,0,0,0.2)',
-            border: `1px solid ${dark ? 'rgba(244,237,210,0.08)' : 'rgba(0,0,0,0.06)'}`,
+            boxShadow: dark
+              ? 'inset 0 0 60px 24px #989857'
+              : 'inset 0 0 60px 24px #f4edd2',
           }}
         >
           {videoSrc ? (
@@ -213,7 +213,7 @@ const ProductFocusBanner = memo(({
           )}
         </div>
       </div>
-      <div className="md:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-16 md:py-0" style={{ background: dark ? '#989857' : '#f4edd2' }}>
+      <div className="md:w-1/2 flex items-center px-6 md:px-10 lg:px-16 py-12 md:py-0" style={{ background: dark ? '#989857' : '#f4edd2' }}>
         <div className="max-w-md">
           <span className="loi-label block mb-4" style={dark ? { color: 'rgba(244,237,210,0.4)' } : undefined}>{product.collection}</span>
           <h3
@@ -360,7 +360,7 @@ const HomeSections = () => {
       <div
         style={{
           height: 'clamp(120px, 18vw, 240px)',
-          background: 'linear-gradient(to bottom, #29241f 0%, #3a3228 15%, #5c5040 30%, #8a7d6a 45%, #b8ad97 58%, #ddd5c0 72%, #efe9d3 85%, #fcf5e0 100%)',
+          background: 'linear-gradient(to bottom, #565600 0%, #989857 40%, #c8be8a 65%, #f4edd2 100%)',
         }}
       />
 
@@ -390,7 +390,7 @@ const HomeSections = () => {
       <div
         style={{
           height: 'clamp(120px, 18vw, 240px)',
-          background: 'linear-gradient(to bottom, #fcf5e0 0%, #efe9d3 15%, #ddd5c0 28%, #b8ad97 42%, #8a7d6a 55%, #5c5040 70%, #3a3228 85%, #29241f 100%)',
+          background: 'linear-gradient(to bottom, #f4edd2 0%, #c8be8a 35%, #989857 100%)',
         }}
       />
 
@@ -432,7 +432,7 @@ const HomeSections = () => {
       <div
         style={{
           height: 'clamp(120px, 18vw, 240px)',
-          background: 'linear-gradient(to bottom, #29241f 0%, #3a3228 15%, #5c5040 30%, #8a7d6a 45%, #b8ad97 58%, #ddd5c0 72%, #efe9d3 85%, #fcf5e0 100%)',
+          background: 'linear-gradient(to bottom, #989857 0%, #c8be8a 50%, #f4edd2 100%)',
         }}
       />
 
