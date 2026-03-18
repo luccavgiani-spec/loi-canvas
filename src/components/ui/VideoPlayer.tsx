@@ -50,7 +50,7 @@ export const VideoPlayer = React.forwardRef<HTMLVideoElement, VideoPlayerProps>(
     }, [internalRef]);
 
     return (
-      <div className={className} style={{ ...style, position: 'relative' }}>
+      <div className={cn('relative', className)} style={style}>
         <video
           ref={setRef}
           src={initialSrc}
