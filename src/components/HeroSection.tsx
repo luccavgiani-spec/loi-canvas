@@ -31,7 +31,7 @@ const HeroSection = () => {
   return (
     <section
       className="relative w-full h-screen overflow-hidden"
-      style={{ background: '#565600' }}
+      style={{ background: '#29241f' }}
     >
       {/* ── video ── */}
       <video
@@ -55,8 +55,8 @@ const HeroSection = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(ellipse 65% 70% at 50% 50%, rgba(86,86,0,0.05) 0%, rgba(86,86,0,0.55) 100%),
-            linear-gradient(to bottom, rgba(86,86,0,0.55) 0%, rgba(86,86,0,0.00) 28%, rgba(86,86,0,0.00) 72%, rgba(86,86,0,0.65) 100%)
+            radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.60) 100%),
+            linear-gradient(to bottom, rgba(41,36,31,0.62) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 72%, rgba(41,36,31,0.72) 100%)
           `,
         }}
       />
