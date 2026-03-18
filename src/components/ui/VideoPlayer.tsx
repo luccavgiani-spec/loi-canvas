@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { cn } from '@/lib/utils';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { selectVideoSrc } from '@/lib/videoQuality';
 import { Play } from 'lucide-react';
