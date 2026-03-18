@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { cn } from '@/lib/utils';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { selectVideoSrc } from '@/lib/videoQuality';
 import { Play } from 'lucide-react';
@@ -49,7 +50,7 @@ export const VideoPlayer = React.forwardRef<HTMLVideoElement, VideoPlayerProps>(
     }, [internalRef]);
 
     return (
-      <div className={className} style={{ ...style, position: 'relative' }}>
+      <div className={cn('relative', className)} style={style}>
         <video
           ref={setRef}
           src={initialSrc}
