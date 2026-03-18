@@ -186,6 +186,16 @@ const ProductFocusBanner = memo(({
   return (
     <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
       <div className="md:w-1/2 relative flex items-center justify-center" style={{ minHeight: 350, background: dark ? '#f4edd2' : '#f4edd2' }}>
+        {/* fade top — cream into video, same style as hero→bestsellers */}
+        <div
+          className="absolute inset-x-0 top-0 pointer-events-none"
+          style={{ height: '35%', background: 'linear-gradient(to bottom, #f4edd2 0%, transparent 100%)', zIndex: 20 }}
+        />
+        {/* fade bottom — video into cream */}
+        <div
+          className="absolute inset-x-0 bottom-0 pointer-events-none"
+          style={{ height: '35%', background: 'linear-gradient(to top, #f4edd2 0%, transparent 100%)', zIndex: 20 }}
+        />
         <div
           className="relative overflow-hidden w-full"
           style={{ aspectRatio: '4 / 3', background: '#29241f' }}
@@ -222,8 +232,7 @@ const ProductFocusBanner = memo(({
             className="absolute inset-0 pointer-events-none z-10"
             style={{
               background: `
-                linear-gradient(to right, #29241f 0%, transparent 18%, transparent 82%, #29241f 100%),
-                linear-gradient(to bottom, #29241f 0%, transparent 18%, transparent 82%, #29241f 100%)
+                linear-gradient(to right, #f4edd2 0%, transparent 18%, transparent 82%, #f4edd2 100%)
               `,
             }}
           />
