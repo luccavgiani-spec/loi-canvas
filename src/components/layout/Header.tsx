@@ -219,16 +219,16 @@ const Header = () => {
         {/* Logo center */}
         <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ borderRadius: 4 }}>
           <img
-            src="/hero/LOGO_BRANCA_t.png"
+            src="/hero/logo_navbar_preta_semfundo.png"
             alt="Loiê"
-            width={110}
-            height={40}
+            width={132}
+            height={48}
             fetchPriority="high"
             style={{
-              width: 'clamp(70px, 8vw, 110px)',
+              width: 'clamp(84px, 9.6vw, 132px)',
               height: 'auto',
               transition: 'filter 0.5s ease, opacity 0.5s ease',
-              filter: showDark ? 'brightness(0.12) sepia(1)' : 'none',
+              filter: showDark ? 'none' : 'brightness(10)',
             }}
           />
         </Link>
