@@ -3,6 +3,30 @@
    Montserrat: 200, 300, 400
    DM Sans removed (unused) */
 
+@font-face {
+  font-family: 'Sackers Gothic';
+  src: url('/sackersgothicstd-light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sackers Gothic';
+  src: url('/sackersgothicstd-medium.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sackers Gothic';
+  src: url('/sackersgothicstd-heavy.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /*
  * ══════════════════════════════════════════════════════
  * PALETA AROMÁTICA LOIÊ — Referência de cores
@@ -85,7 +109,7 @@
     --sidebar-ring: 42 75% 31%;
 
     --font-heading: 'Wagon', 'Cormorant Garamond', serif;
-    --font-body: 'Sackers Gothic Std', 'Montserrat', sans-serif;
+    --font-body: 'Sackers Gothic', sans-serif;
 
     --badge-sale: 0 72% 51%;
     --badge-new: 42 75% 31%;
@@ -134,11 +158,11 @@
 
   /* ─── Loiê section label ─── */
   .loi-label {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Sackers Gothic', sans-serif;
     font-weight: 300;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: #000;
   }
 
@@ -151,11 +175,11 @@
     padding: 0.85rem 2.2rem;
     background: var(--loi-dark);
     color: #ffffff;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 300;
+    font-family: 'Sackers Gothic', sans-serif;
+    font-weight: 400;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     text-decoration: none;
     transition: color 0.4s ease;
     z-index: 0;
@@ -184,11 +208,11 @@
     background: transparent;
     color: #000;
     border: 1px solid rgba(0, 0, 0, 0.2);
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 300;
+    font-family: 'Sackers Gothic', sans-serif;
+    font-weight: 400;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     text-decoration: none;
     transition: all 0.4s ease;
   }
@@ -203,11 +227,11 @@
     align-items: center;
     gap: 0.5rem;
     color: rgba(0, 0, 0, 0.5);
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Sackers Gothic', sans-serif;
     font-weight: 300;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     text-decoration: none;
     transition: color 0.3s ease;
   }
@@ -246,12 +270,12 @@
 
   /* ─── Nav link ─── */
   .loi-nav-link {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Sackers Gothic', sans-serif;
     font-weight: 300;
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: #29241f;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     text-decoration: none;
     transition: opacity 0.3s ease;
   }
@@ -397,12 +421,12 @@
 
 /* ── Hero nav links ── */
 .hero-nav-link {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Sackers Gothic', sans-serif;
   font-weight: 300;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: rgba(244, 237, 210, 0.5);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -419,11 +443,11 @@
   padding: 0.85rem 2.2rem;
   background: #f4edd2;
   color: #29241f;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 300;
+  font-family: 'Sackers Gothic', sans-serif;
+  font-weight: 400;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-decoration: none;
   transition: color 0.4s ease;
   z-index: 0;
@@ -446,11 +470,11 @@
   align-items: center;
   gap: 0.5rem;
   color: rgba(244, 237, 210, 0.5);
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Sackers Gothic', sans-serif;
   font-weight: 300;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-decoration: none;
   background: none;
   border: none;
@@ -471,11 +495,11 @@
 @media (max-width: 639px) {
   .hero-btn-primary {
     padding: 0.7rem 1.5rem;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     letter-spacing: 0.22em;
   }
   .hero-btn-ghost {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     letter-spacing: 0.22em;
   }
 }

@@ -187,15 +187,6 @@ const ProductFocusBanner = memo(({
   return (
     <div className={`reveal flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} min-h-[50vh]`}>
       <div className="md:w-1/2 relative md:flex md:items-center md:justify-center" style={{ minHeight: 350, background: dark ? '#f4edd2' : '#f4edd2' }}>
-        {/* desktop-only: absolute overlays that blend the video edges with the cream background */}
-        <div
-          className="hidden md:block absolute inset-x-0 top-0 pointer-events-none"
-          style={{ height: '35%', background: 'linear-gradient(to bottom, #f4edd2 0%, transparent 100%)', zIndex: 20 }}
-        />
-        <div
-          className="hidden md:block absolute inset-x-0 bottom-0 pointer-events-none"
-          style={{ height: '35%', background: 'linear-gradient(to top, #f4edd2 0%, transparent 100%)', zIndex: 20 }}
-        />
         {/* mobile-only: gradient strip above the video, outside/adjacent (not a mask) */}
         <div
           className="md:hidden w-full pointer-events-none"
@@ -221,26 +212,6 @@ const ProductFocusBanner = memo(({
               decoding="async"
             />
           )}
-          {/* overlay atmosférico — mesmo estilo da hero */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              zIndex: 9,
-              background: `
-                radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.45) 100%),
-                linear-gradient(to bottom, rgba(41,36,31,0.45) 0%, rgba(41,36,31,0.00) 30%, rgba(41,36,31,0.00) 70%, rgba(41,36,31,0.55) 100%)
-              `,
-            }}
-          />
-          {/* vignette cream — funde bordas com o fundo #f4edd2 */}
-          <div
-            className="absolute inset-0 pointer-events-none z-10"
-            style={{
-              background: `
-                linear-gradient(to right, #f4edd2 0%, transparent 18%, transparent 82%, #f4edd2 100%)
-              `,
-            }}
-          />
         </div>
         {/* mobile-only: gradient strip below the video, outside/adjacent (not a mask) */}
         <div
@@ -271,7 +242,7 @@ const ProductFocusBanner = memo(({
           >
             {product.description}
           </p>
-          <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.85rem', color: '#29241f', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.85rem', color: '#29241f', marginBottom: '1.5rem' }}>
             R$ {product.price.toFixed(2)}
           </p>
           <Link to={`/product/${product.slug}`} className="loi-btn-outline">
