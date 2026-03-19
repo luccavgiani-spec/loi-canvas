@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         heading: ['Cormorant Garamond', 'serif'],
         body: ['DM Sans', 'sans-serif'],
+        'sackers': ['"Sackers Gothic"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
