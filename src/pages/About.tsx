@@ -1,48 +1,16 @@
-import { useRef, useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { VideoPlayer } from '@/components/ui/VideoPlayer';
 import { storageUrl } from '@/lib/storage';
 
 const banner01 = storageUrl('loie_vela_campos_imagem.JPG');
 const heroVideo = storageUrl('Cartao_Postal_Loie.mp4');
-const manifestoVideo = storageUrl('video_sobre (1).mp4');
-
 /* grain SVG (same as home hero) */
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 
-/** Hook: play video when it scrolls into view */
-function useScrollVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const el = videoRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-        if (entry.isIntersecting) {
-          el.play().catch(() => {});
-        } else {
-          el.pause();
-        }
-      },
-      { threshold: 0.25 },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return { videoRef, isVisible };
-}
-
 const About = () => {
   const ref = useReveal();
-  const { videoRef, isVisible } = useScrollVideo();
 
   return (
     <Layout>
@@ -239,37 +207,6 @@ const About = () => {
                 </div>
               </div>
 
-              {/* Video — below manifesto, full-width-ish */}
-              <div
-                className="relative mt-20 mx-auto"
-                style={{
-                  maxWidth: 420,
-                  boxShadow: '0 8px 40px rgba(41,36,31,0.25), 0 2px 12px rgba(41,36,31,0.15)',
-                  borderRadius: '4px',
-                  overflow: 'hidden',
-                }}
-              >
-                <div
-                  className="absolute inset-0 z-10 pointer-events-none"
-                  style={{ boxShadow: 'inset 0 0 30px rgba(41,36,31,0.3)' }}
-                />
-                <div
-                  className="transition-all duration-700"
-                  style={{
-                    opacity: isVisible ? 1 : 0.3,
-                    transform: isVisible ? 'scale(1)' : 'scale(0.97)',
-                    willChange: 'opacity, transform',
-                  }}
-                >
-                  <VideoPlayer
-                    ref={videoRef}
-                    src={manifestoVideo}
-                    poster={banner01}
-                    className="w-full aspect-[9/16] object-cover"
-                    style={{ filter: 'saturate(0.7) brightness(0.85)' }}
-                  />
-                </div>
-              </div>
             </div>
           </div>
         </section>

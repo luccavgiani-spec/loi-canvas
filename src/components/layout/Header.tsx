@@ -228,15 +228,13 @@ const Header = () => {
               </div>
             ))}
 
-            {/* SOBRE — direct link with dash separator */}
+            {/* SOBRE — direct link */}
             <Link
               to="/about"
               className={linkClass}
-              style={{ color: location.pathname === '/about' ? activeLinkColor : undefined, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4em', letterSpacing: '0.18em' }}
+              style={{ color: location.pathname === '/about' ? activeLinkColor : undefined, textDecoration: 'none' }}
             >
-              <span>sobre</span>
-              <span style={{ letterSpacing: '0.05em', opacity: 0.35, fontWeight: 300 }}>————</span>
-              <span style={{ letterSpacing: '0.18em' }}>nossa história</span>
+              sobre
             </Link>
           </nav>
         </div>

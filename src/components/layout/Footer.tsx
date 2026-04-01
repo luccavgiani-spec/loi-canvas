@@ -72,7 +72,7 @@ const Footer = () => {
         className="max-w-[1400px] mx-auto px-6 py-12"
         style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
             <img
@@ -157,22 +157,6 @@ const Footer = () => {
                   </Link>
                 </li>
               ))}
-              <li>
-                <a
-                  href="#mensagem"
-                  style={{
-                    fontFamily: FONT_BODY,
-                    fontWeight: 300,
-                    fontSize: '0.8rem',
-                    color: 'rgba(244,237,210,0.4)',
-                    textDecoration: 'none',
-                    transition: 'color 0.3s ease',
-                  }}
-                  className="hover:!text-[#f4edd2]"
-                >
-                  deixe uma mensagem
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -215,6 +199,11 @@ const Footer = () => {
                 </a>
               </li>
             </ul>
+          </div>
+          {/* Mensagem */}
+          <div id="mensagem">
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>deixe uma mensagem</h4>
+            <MensagemForm dark />
           </div>
         </div>
 
@@ -281,12 +270,6 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* ── Mensagem form anchor ── */}
-      <div id="mensagem" className="max-w-[1400px] mx-auto px-6 pb-20">
-        <div style={{ borderTop: '1px solid rgba(244,237,210,0.08)', paddingTop: '4rem' }}>
-          <MensagemForm dark />
-        </div>
-      </div>
     </footer>
   );
 };
