@@ -486,16 +486,13 @@ const HomeSections = () => {
           </div>
           <div className="reveal space-y-0">
             {[
-              { q: 'Qual o tempo de queima das velas?', a: 'As velas de 250g têm duração aproximada de 50 horas. Para preservar a fragrância e a qualidade da cera, recomendamos sessões de até 4 horas seguidas — tempo suficiente para perfumar o ambiente sem comprometer o desempenho da vela.' },
+              { q: 'Qual o tempo de queima das velas?', a: 'cotidianas 160g ————————— aprox. 20 horas\nsala 200g —————————————— aprox. 45 horas\nrefúgio 300g ——————————— aprox. 55 horas\nbotânicas & florais 400g —— aprox. 65 horas\n\npara queimas saudáveis e seguras, recomendamos sessões de até 4 horas seguidas — tempo suficiente para perfumar o ambiente sem comprometer o desempenho da vela.' },
               { q: 'As velas são veganas e cruelty-free?', a: 'Sim. Utilizamos exclusivamente ceras vegetais de coco, arroz e palma, pavios de algodão e óleos essenciais puros — sem nenhum componente de origem animal. Nenhum produto Loiê é testado em animais.' },
-              { q: 'Como funciona o frete?', a: 'Frete grátis para compras acima de R$ 299. Para pedidos menores, o frete é calculado no checkout com as melhores opções disponíveis para a sua região.' },
               { q: 'Posso trocar ou devolver?', a: 'Aceitamos trocas e devoluções em até 7 dias após o recebimento, desde que o produto esteja sem uso. Para solicitar, basta entrar em contato pelo e-mail ou WhatsApp — resolvemos com agilidade.' },
-              { q: 'Qual a diferença entre as coleções?', a: 'São quatro coleções com perfis distintos: Cotidianas (latinhas 160g, aromas mais leves, perfeitas para presentear), Sala ou Estar (copo 200g, criações autorais com óleos essenciais), Refúgio (copo âmbar 300g, composições exclusivas com assinatura Loiê) e Botânicas e Florais (copo 400g, dois pavios, queimas longas).' },
               { q: 'As velas são seguras para uso com pets ou crianças?', a: 'Nossas velas são feitas com óleos essenciais puros e ceras vegetais sem aditivos sintéticos. Em ambientes com pets ou crianças pequenas, recomendamos ventilação adequada e manter a vela fora do alcance. Óleos como eucalipto e menta exigem atenção especial com gatos — prefira usar com o ambiente bem arejado.' },
-              { q: 'Qual a diferença entre as velas de 200g e as de 300g?', a: 'As velas de 200g têm duração aproximada de 40 horas e são ideais para ambientes menores ou uso diário. As de 300g duram cerca de 50 horas e entregam maior presença aromática — indicadas para salas maiores ou para quem quer que o aroma se prolongue por mais tempo.' },
-              { q: 'Posso usar a vela em ambientes pequenos, como banheiros?', a: 'Sim. Em espaços menores, o aroma se concentra com rapidez. Recomendamos sessões mais curtas — entre 30 minutos e 1 hora — para evitar saturação sensorial. Velas com perfil mais suave, como Campos ou Ícaro, funcionam especialmente bem nesses ambientes.' },
-              { q: 'As velas são veganas?', a: 'Sim. Utilizamos exclusivamente ceras vegetais de coco, arroz e palma, sem qualquer componente de origem animal. Nenhum produto Loiê é testado em animais.' },
-              { q: 'Como armazenar a vela quando não estiver em uso?', a: 'Guarde em local fresco, seco e afastado da luz solar direta. A tampa ajuda a preservar o aroma e a qualidade da cera entre os usos. Evite superfícies que absorvam calor, como peitoris de janela em dias quentes.' },
+              { q: 'Qual a diferença entre as velas de 200g e as de 300g?', a: 'As velas de 200g têm duração aproximada de 45 horas e são ideais para ambientes menores ou uso diário. As de 300g duram cerca de 55 horas e entregam maior presença aromática — indicadas para salas maiores ou para quem quer que o aroma se prolongue por mais tempo.' },
+              { q: 'Posso usar a vela em ambientes pequenos, como banheiros?', a: 'Sim. Em espaços menores, o aroma se concentra com rapidez. Recomendamos sessões mais curtas para evitar saturação sensorial. Velas com perfil mais suave, como Campos ou Ícaro, funcionam especialmente bem nesses ambientes.' },
+              { q: 'Como armazenar a vela quando não estiver em uso?', a: 'Guarde em local fresco, seco e afastado da luz solar direta. Evite superfícies que absorvam calor, como peitoris de janela em dias quentes.' },
             ].map((faq, i) => (
               <details key={i} className="group" style={{ borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
                 <summary
@@ -504,7 +501,7 @@ const HomeSections = () => {
                 >
                   {faq.q}
                 </summary>
-                <p className="pb-5" style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.82rem', color: '#29241f', lineHeight: 1.8, maxWidth: 520 }}>
+                <p className="pb-5 whitespace-pre-line" style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.82rem', color: '#29241f', lineHeight: 1.8, maxWidth: 520 }}>
                   {faq.a}
                 </p>
               </details>
