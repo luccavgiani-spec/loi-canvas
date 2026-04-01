@@ -120,7 +120,7 @@ const About = () => {
                 <div className="loi-divider mb-6" />
                 <p
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Wagon', sans-serif",
                     fontWeight: 300,
                     fontStyle: 'italic',
                     fontSize: '1.05rem',
@@ -162,7 +162,7 @@ const About = () => {
                   </p>
                   <p
                     style={{
-                      fontFamily: "'Montserrat', sans-serif",
+                      fontFamily: "'Sackers Gothic', sans-serif",
                       fontWeight: 300,
                       fontSize: '0.75rem',
                       color: '#000',
@@ -176,67 +176,82 @@ const About = () => {
               ))}
             </div>
 
-            {/* Manifesto — left text + right video */}
-            <div className="reveal grid md:grid-cols-2 gap-12 items-start">
-              {/* Left: text */}
-              <div className="text-left">
-                <span className="loi-label block mb-6">manifesto</span>
-                <h2
-                  className="heading-display mb-8"
-                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#000', lineHeight: 1.2, textAlign: 'left' }}
-                >
-                  A Loiê Sala Aromática é esse gesto poético, mas também é um ateliê real
-                  <em style={{ color: '#000' }}>— feito de tempo, matéria, escolhas e presença</em>
-                </h2>
+            {/* Manifesto — editorial typographic layout */}
+            <div className="reveal">
+              <span className="loi-label block mb-12 text-center">manifesto</span>
+
+              {/* Stanzas */}
+              <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
+                {[
+                  'acendemos uma vela como quem abre uma porta.\numa porta pra dentro. pra memória. pra beleza que mora no silêncio.',
+                  'a loiê nasceu de uma casa antiga, de um ritual secreto, de um saber\nque se aprende com as mãos e os sentidos.',
+                  'cada aroma é uma narrativa, cada frasco é um convite\na ficar mais tempo com o que importa.',
+                  'somos fogo, mas somos calma.\nsomos essência, mas somos presença.\nsomos brasileiros, feitos à mão, com técnica e alma.',
+                ].map((stanza, i) => (
+                  <p
+                    key={i}
+                    style={{
+                      fontFamily: "'Wagon', sans-serif",
+                      fontWeight: 200,
+                      fontStyle: 'italic',
+                      fontSize: 'clamp(1.5rem, 4vw, 3rem)',
+                      color: '#29241f',
+                      lineHeight: 1.35,
+                      letterSpacing: '0.01em',
+                      whiteSpace: 'pre-line',
+                      marginBottom: 'clamp(2rem, 4vh, 3rem)',
+                    }}
+                  >
+                    {stanza}
+                  </p>
+                ))}
+
+                {/* Final stanza — larger for emphasis */}
                 <p
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontWeight: 300,
-                    fontStyle: 'italic',
-                    fontSize: '1.05rem',
-                    color: '#000',
-                    lineHeight: 1.8,
-                    textAlign: 'left',
+                    fontFamily: "'Wagon', sans-serif",
+                    fontWeight: 700,
+                    fontSize: 'clamp(1.8rem, 5vw, 3.6rem)',
+                    color: '#29241f',
+                    lineHeight: 1.2,
+                    letterSpacing: '0.02em',
+                    marginBottom: 'clamp(2rem, 4vh, 3rem)',
                   }}
                 >
-                  A Loiê nasceu em 2015, a partir de pequenos experimentos realizados pelo artista e fundador André Magalhães Liza. Desde o início, o gesto de acender uma vela esteve ligado ao desejo de qualificar o tempo — dentro de casa, no cotidiano, no silêncio entre as tarefas.
-                  {'\n\n'}O ateliê tomou forma com a ocupação de uma casa antiga de família, no interior de São Paulo. Reativar esse espaço foi também um exercício de memória: recuperar valores, ritmos e afetos que atravessam gerações. A casa moldou a Loiê tanto quanto a Loiê passou a habitar a casa.
-                  {'\n\n'}Ao longo de sua trajetória, a marca foi construída em diferentes etapas e parcerias, sempre guiada pela atenção às matérias-primas, ao fazer manual e à experiência sensível do aroma. Trabalhamos com ceras vegetais, óleos essenciais e processos cuidadosos, respeitando o tempo de cada criação.
-                  {'\n\n'}Hoje a Loiê Sala Aromática segue como um ateliê autoral dedicado à criação de atmosferas — objetos que convidam à presença, ao cuidado e a uma relação mais consciente com o espaço e consigo mesmo. Acreditamos que habitar o agora, com atenção e delicadeza, também é uma forma de transformar o mundo.
+                  não vendemos velas.<br />criamos atmosferas.
                 </p>
-                <div className="mt-10">
-                  <Link to="/shop" className="loi-btn">explorar coleção</Link>
+
+                {/* Photo placeholder */}
+                <div
+                  style={{
+                    border: '1px dashed rgba(41,36,31,0.2)',
+                    padding: '4rem 2rem',
+                    textAlign: 'center',
+                    color: 'rgba(41,36,31,0.3)',
+                    fontFamily: "'Sackers Gothic', sans-serif",
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    marginTop: '4rem',
+                  }}
+                >
+                  espaço reservado — foto do ateliê a ser fornecida
                 </div>
               </div>
 
-              {/* Right: scroll-triggered video with depth frame */}
+              {/* Video — below manifesto, full-width-ish */}
               <div
-                className="relative"
+                className="relative mt-20 mx-auto"
                 style={{
-                  /* soft ambient shadow for depth */
+                  maxWidth: 420,
                   boxShadow: '0 8px 40px rgba(41,36,31,0.25), 0 2px 12px rgba(41,36,31,0.15)',
                   borderRadius: '4px',
                   overflow: 'hidden',
-                  transform: 'perspective(800px) rotateY(-2deg)',
                 }}
               >
-                {/* subtle inner border glow */}
                 <div
                   className="absolute inset-0 z-10 pointer-events-none"
-                  style={{
-                    borderRadius: '4px',
-                    boxShadow: 'inset 0 0 30px rgba(41,36,31,0.3), inset 0 0 4px rgba(41,36,31,0.15)',
-                  }}
-                />
-                {/* fade edges so video blends into the page */}
-                <div
-                  className="absolute inset-0 z-10 pointer-events-none"
-                  style={{
-                    background: `
-                      linear-gradient(to right, rgba(244,237,210,0.35) 0%, transparent 8%, transparent 92%, rgba(244,237,210,0.35) 100%),
-                      linear-gradient(to bottom, rgba(244,237,210,0.25) 0%, transparent 6%, transparent 94%, rgba(244,237,210,0.25) 100%)
-                    `,
-                  }}
+                  style={{ boxShadow: 'inset 0 0 30px rgba(41,36,31,0.3)' }}
                 />
                 <div
                   className="transition-all duration-700"

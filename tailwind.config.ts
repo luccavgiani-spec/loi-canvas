@@ -14,9 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['Cormorant Garamond', 'serif'],
-        body: ['DM Sans', 'sans-serif'],
-        'sackers': ['"Sackers Gothic"', 'sans-serif'],
+        heading: ['Wagon', 'sans-serif'],
+        body: ['"Sackers Gothic"', 'sans-serif'],
+        wagon: ['Wagon', 'sans-serif'],
+        sackers: ['"Sackers Gothic"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

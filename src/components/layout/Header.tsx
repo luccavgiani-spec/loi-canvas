@@ -3,24 +3,50 @@ import { ShoppingBag, Menu, X, Search, Truck } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect, useRef } from 'react';
 
-const COLLECTIONS = [
-  { slug: 'cotidianas', label: 'Cotidianas', desc: 'Latinha 160g · dois pavios' },
-  { slug: 'sala-ou-estar', label: 'Sala ou Estar', desc: 'Copo 200g · óleos essenciais puros' },
-  { slug: 'refugio', label: 'Refúgio', desc: 'Copo âmbar 300g · assinatura Loiê' },
-  { slug: 'botanicas-e-florais', label: 'Botânicas e Florais', desc: 'Copo 400g · dois pavios' },
+const NAV_SECTIONS = [
+  {
+    label: 'velas',
+    items: [
+      { num: 'i',   label: 'cotidianas',           desc: 'ritmos naturais',            to: '/shop/cotidianas' },
+      { num: 'ii',  label: 'sala',                 desc: 'atmosfera do espaço',        to: '/shop/sala-ou-estar' },
+      { num: 'iii', label: 'refúgio',              desc: 'densas e envolventes',       to: '/shop/refugio' },
+      { num: 'iv',  label: 'botânicas & florais',  desc: 'expressivas e detalhadas',   to: '/shop/botanicas-e-florais' },
+    ],
+  },
+  {
+    label: 'borrifadores',
+    items: [
+      { num: 'i',  label: 'matéria 150ml',             desc: 'perfumaria pura e autoral',    to: '/shop/materia' },
+      { num: 'ii', label: 'atmosfera 200ml',            desc: 'aromas de projeção imediata', to: '/shop/atmosfera' },
+    ],
+  },
+  {
+    label: 'corpo',
+    items: [
+      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/shop/corpo' },
+      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/shop/corpo' },
+    ],
+  },
+  {
+    label: 'espaço',
+    items: [
+      { num: 'i', label: 'lembranças', desc: 'memória e sofisticação', to: '/shop/lembrancas' },
+    ],
+  },
 ];
 
 const Header = () => {
   const { count, setIsOpen } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [collectionsOpen, setCollectionsOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [mobileSectionOpen, setMobileSectionOpen] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [trackingOpen, setTrackingOpen] = useState(false);
   const [trackingCode, setTrackingCode] = useState('');
   const location = useLocation();
-  const collectionsRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const trackingRef = useRef<HTMLDivElement>(null);
 
@@ -28,26 +54,23 @@ const Header = () => {
 
   useEffect(() => {
     const onScroll = () => {
-      // On homepage, only transition after fully leaving the hero section (100vh)
       const threshold = isHome ? window.innerHeight : 20;
       setScrolled(window.scrollY > threshold);
     };
-    // Run immediately to set correct initial state
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, [isHome]);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
+    setActiveSection(null);
   }, [location.pathname]);
 
-  // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (collectionsRef.current && !collectionsRef.current.contains(e.target as Node)) {
-        setCollectionsOpen(false);
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setActiveSection(null);
       }
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setSearchOpen(false);
@@ -62,11 +85,10 @@ const Header = () => {
 
   const closeAll = () => {
     setSearchOpen(false);
-    setCollectionsOpen(false);
+    setActiveSection(null);
     setTrackingOpen(false);
   };
 
-  // Non-home pages always use dark navbar; home uses dark only after scrolling past hero
   const showDark = !isHome || scrolled;
   const linkClass = showDark ? 'loi-nav-link' : 'hero-nav-link';
   const iconColor = showDark ? '#29241f' : 'rgba(244,237,210,0.5)';
@@ -93,7 +115,7 @@ const Header = () => {
       window.open(
         `https://www.linkcorreios.com.br/?id=${encodeURIComponent(trackingCode.trim())}`,
         '_blank',
-        'noopener,noreferrer'
+        'noopener,noreferrer',
       );
       setTrackingOpen(false);
       setTrackingCode('');
@@ -135,11 +157,11 @@ const Header = () => {
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          {/* Desktop nav links */}
-          <nav className="hidden md:flex items-center gap-6">
+          {/* Desktop nav */}
+          <nav ref={navRef} className="hidden md:flex items-center gap-6">
             {/* Search */}
             <div ref={searchRef} className="relative">
-              <IconBtn onClick={() => { setSearchOpen(!searchOpen); setCollectionsOpen(false); setTrackingOpen(false); }} label="Buscar">
+              <IconBtn onClick={() => { setSearchOpen(!searchOpen); setActiveSection(null); setTrackingOpen(false); }} label="Buscar">
                 <Search size={17} strokeWidth={1.5} />
               </IconBtn>
               {searchOpen && (
@@ -162,56 +184,59 @@ const Header = () => {
               )}
             </div>
 
-            {/* Coleções dropdown */}
-            <div ref={collectionsRef} className="relative">
-              <button
-                onClick={() => { setCollectionsOpen(!collectionsOpen); setSearchOpen(false); setTrackingOpen(false); }}
-                className={linkClass}
-                style={{ color: location.pathname === '/shop' ? activeLinkColor : undefined, cursor: 'pointer', background: 'none', border: 'none' }}
-              >
-                coleções
-              </button>
-              {collectionsOpen && (
-                <div
-                  className="absolute top-full left-0 mt-3"
-                  style={{ background: dropdownBg, backdropFilter: 'blur(16px)', border: `1px solid ${dropdownBorder}`, padding: '16px 20px', minWidth: 260 }}
+            {/* Section dropdowns */}
+            {NAV_SECTIONS.map((section) => (
+              <div key={section.label} className="relative">
+                <button
+                  onClick={() => setActiveSection(activeSection === section.label ? null : section.label)}
+                  className={linkClass}
+                  style={{ cursor: 'pointer', background: 'none', border: 'none', opacity: activeSection && activeSection !== section.label ? 0.45 : 1 }}
                 >
-                  <Link
-                    to="/shop"
-                    onClick={() => setCollectionsOpen(false)}
-                    className="block mb-3 pb-3"
-                    style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.68rem', color: '#f4edd2', textDecoration: 'none', borderBottom: `1px solid ${dropdownBorder}` }}
+                  {section.label}
+                </button>
+                {activeSection === section.label && (
+                  <div
+                    className="absolute top-full left-0 mt-3"
+                    style={{ background: dropdownBg, backdropFilter: 'blur(16px)', border: `1px solid ${dropdownBorder}`, padding: '16px 20px', minWidth: 260, zIndex: 60 }}
                   >
-                    ver todas
-                  </Link>
-                  {COLLECTIONS.map((col) => (
-                    <Link
-                      key={col.slug}
-                      to={`/shop/${col.slug}`}
-                      onClick={() => setCollectionsOpen(false)}
-                      className="block py-2 group/item"
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <span
-                        style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.68rem', color: 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'block' }}
-                        className="group-hover/item:!text-[#565600]"
+                    {section.items.map((item) => (
+                      <Link
+                        key={item.to + item.label}
+                        to={item.to}
+                        onClick={() => setActiveSection(null)}
+                        className="block py-2 group/item"
+                        style={{ textDecoration: 'none' }}
                       >
-                        {col.label}
-                      </span>
-                      <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontStyle: 'italic', fontSize: '0.78rem', color: dropdownMuted, display: 'block', marginTop: 2 }}>
-                        {col.desc}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+                        <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.08em', fontSize: '0.65rem', color: dropdownMuted, marginRight: '0.5rem' }}>
+                          {item.num}
+                        </span>
+                        <span
+                          style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'lowercase', fontSize: '0.68rem', color: 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'inline' }}
+                          className="group-hover/item:!text-[#989857]"
+                        >
+                          {item.label}
+                        </span>
+                        {item.desc && (
+                          <span style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 200, fontStyle: 'italic', fontSize: '0.75rem', color: dropdownMuted, display: 'block', marginTop: 2, paddingLeft: '1.2rem' }}>
+                            {item.desc}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
 
-            <Link to="/about" className={linkClass} style={{ color: location.pathname === '/about' ? activeLinkColor : undefined }}>
-              sobre
-            </Link>
-            <Link to="/collabs" className={linkClass} style={{ color: location.pathname === '/collabs' ? activeLinkColor : undefined }}>
-              collabs
+            {/* SOBRE — direct link with dash separator */}
+            <Link
+              to="/about"
+              className={linkClass}
+              style={{ color: location.pathname === '/about' ? activeLinkColor : undefined, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4em', letterSpacing: '0.18em' }}
+            >
+              <span>sobre</span>
+              <span style={{ letterSpacing: '0.05em', opacity: 0.35, fontWeight: 300 }}>————</span>
+              <span style={{ letterSpacing: '0.18em' }}>nossa história</span>
             </Link>
           </nav>
         </div>
@@ -233,10 +258,10 @@ const Header = () => {
           />
         </Link>
 
-        {/* ── Right: utility icons (always visible, including mobile) ── */}
+        {/* ── Right: utility icons ── */}
         <div className="flex items-center gap-5">
-          {/* Search (mobile only — desktop has it in left nav) */}
-          <div ref={undefined} className="relative md:hidden">
+          {/* Search (mobile only) */}
+          <div className="relative md:hidden">
             <IconBtn onClick={() => { setSearchOpen(!searchOpen); setTrackingOpen(false); }} label="Buscar">
               <Search size={17} strokeWidth={1.5} />
             </IconBtn>
@@ -244,7 +269,7 @@ const Header = () => {
 
           {/* Tracking */}
           <div ref={trackingRef} className="relative">
-            <IconBtn onClick={() => { setTrackingOpen(!trackingOpen); setSearchOpen(false); setCollectionsOpen(false); }} label="Rastrear pedido">
+            <IconBtn onClick={() => { setTrackingOpen(!trackingOpen); setSearchOpen(false); setActiveSection(null); }} label="Rastrear pedido">
               <Truck size={18} strokeWidth={1.5} />
             </IconBtn>
             {trackingOpen && (
@@ -297,7 +322,7 @@ const Header = () => {
         </div>
       </div>
 
-      {/* ── Mobile search dropdown (appears below header bar) ── */}
+      {/* ── Mobile search ── */}
       {searchOpen && (
         <div
           className="md:hidden px-6 py-3"
@@ -317,7 +342,7 @@ const Header = () => {
         </div>
       )}
 
-      {/* ── Mobile nav: clean dropdown list ── */}
+      {/* ── Mobile nav ── */}
       {mobileOpen && (
         <nav
           className="md:hidden px-6 py-5"
@@ -325,32 +350,38 @@ const Header = () => {
             background: 'rgba(41,36,31,0.97)',
             borderTop: '1px solid rgba(244,237,210,0.08)',
             backdropFilter: 'blur(12px)',
+            maxHeight: '80vh',
+            overflowY: 'auto',
           }}
         >
-          <ul className="space-y-1" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            {/* Main nav links */}
-            <li>
-              <Link
-                to="/shop"
-                onClick={() => setMobileOpen(false)}
-                className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
-              >
-                Coleções
-              </Link>
-            </li>
-
-            {/* Collection sub-items */}
-            {COLLECTIONS.map((col) => (
-              <li key={col.slug}>
-                <Link
-                  to={`/shop/${col.slug}`}
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-2 pl-4"
-                  style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.1em', fontSize: '0.7rem', color: 'rgba(244,237,210,0.6)', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.04)' }}
+          <ul className="space-y-0" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            {NAV_SECTIONS.map((section) => (
+              <li key={section.label}>
+                <button
+                  onClick={() => setMobileSectionOpen(mobileSectionOpen === section.label ? null : section.label)}
+                  className="w-full text-left block py-2.5"
+                  style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', background: 'none', border: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)', cursor: 'pointer' }}
                 >
-                  {col.label}
-                </Link>
+                  {section.label}
+                  <span style={{ float: 'right', opacity: 0.4, fontWeight: 300 }}>{mobileSectionOpen === section.label ? '−' : '+'}</span>
+                </button>
+                {mobileSectionOpen === section.label && (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {section.items.map((item) => (
+                      <li key={item.to + item.label}>
+                        <Link
+                          to={item.to}
+                          onClick={() => setMobileOpen(false)}
+                          className="block py-2 pl-4"
+                          style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.1em', fontSize: '0.7rem', color: 'rgba(244,237,210,0.6)', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.04)' }}
+                        >
+                          <span style={{ opacity: 0.4, marginRight: '0.4em', fontSize: '0.6rem' }}>{item.num}</span>
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
 
@@ -361,18 +392,7 @@ const Header = () => {
                 className="block py-2.5"
                 style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
               >
-                Sobre
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                to="/collabs"
-                onClick={() => setMobileOpen(false)}
-                className="block py-2.5"
-                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
-              >
-                Collabs
+                sobre <span style={{ opacity: 0.3, letterSpacing: '0.05em' }}>——</span> nossa história
               </Link>
             </li>
 
@@ -383,12 +403,12 @@ const Header = () => {
                 className="block py-2.5"
                 style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none' }}
               >
-                Contato
+                contato
               </Link>
             </li>
           </ul>
 
-          {/* Tracking inline form */}
+          {/* Tracking inline */}
           <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}>
             <form onSubmit={handleTracking} className="flex items-center gap-2">
               <Truck size={14} style={{ color: '#fcf5e0', flexShrink: 0 }} />

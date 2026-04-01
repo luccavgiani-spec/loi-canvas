@@ -20,7 +20,7 @@ function buildThumbUrl(assetFolder: string | null | undefined): string {
 }
 
 const LABEL: React.CSSProperties = {
-  fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+  fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
   fontSize: '0.6rem',
   letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
@@ -124,7 +124,7 @@ const OrderConfirmation = () => {
             <span style={{ ...LABEL, display: 'block', marginBottom: 14 }}>pedido confirmado</span>
 
             <h1 style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Wagon', sans-serif",
               fontSize: 'clamp(2rem,5vw,3rem)',
               fontWeight: 300,
               color: CHAR,
@@ -137,7 +137,7 @@ const OrderConfirmation = () => {
             <div style={{ width: 40, height: 1, background: `${OLIVA}55`, margin: '0 auto 20px' }} />
 
             <p style={{
-              fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+              fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
               fontSize: '0.7rem',
               letterSpacing: '0.12em',
               color: CHAR,
@@ -147,7 +147,7 @@ const OrderConfirmation = () => {
             </p>
 
             <p style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Wagon', sans-serif",
               fontStyle: 'italic',
               fontSize: '0.95rem',
               color: `${CHAR}77`,
@@ -185,7 +185,7 @@ const OrderConfirmation = () => {
                     )}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Wagon', sans-serif",
                         fontSize: '1rem',
                         color: CHAR,
                         margin: 0,
@@ -196,7 +196,7 @@ const OrderConfirmation = () => {
                         {product?.name || 'Produto'}
                       </p>
                       <p style={{
-                        fontFamily: "'Montserrat', sans-serif",
+                        fontFamily: "'Sackers Gothic', sans-serif",
                         fontWeight: 300,
                         fontSize: '0.7rem',
                         color: `${CHAR}55`,
@@ -206,7 +206,7 @@ const OrderConfirmation = () => {
                       </p>
                     </div>
                     <span style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Wagon', sans-serif",
                       fontSize: '0.95rem',
                       color: CHAR,
                       whiteSpace: 'nowrap',
@@ -220,14 +220,14 @@ const OrderConfirmation = () => {
 
             <div style={{ borderTop: `1px solid ${CHAR}14`, marginTop: 20, paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Wagon', sans-serif",
                 fontSize: '1.05rem',
                 color: CHAR,
               }}>
                 Total
               </span>
               <span style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Wagon', sans-serif",
                 fontSize: '1.2rem',
                 fontWeight: 500,
                 color: CHAR,
@@ -249,7 +249,7 @@ const OrderConfirmation = () => {
               <Package size={20} style={{ color: OLIVA, flexShrink: 0, marginTop: 2 }} />
               <div>
                 <p style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Wagon', sans-serif",
                   fontSize: '1rem',
                   color: CHAR,
                   margin: '0 0 8px',
@@ -258,7 +258,7 @@ const OrderConfirmation = () => {
                   <strong>5 a 10 dias úteis</strong> após a confirmação do pagamento
                 </p>
                 <p style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Wagon', sans-serif",
                   fontStyle: 'italic',
                   fontSize: '0.9rem',
                   color: `${CHAR}77`,
@@ -272,7 +272,7 @@ const OrderConfirmation = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Wagon', sans-serif",
                     fontSize: '0.85rem',
                     color: OLIVA,
                     textDecoration: 'underline',
@@ -282,7 +282,7 @@ const OrderConfirmation = () => {
                   Acompanhe pelo site oficial dos Correios
                 </a>
                 <p style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Wagon', sans-serif",
                   fontSize: '0.8rem',
                   color: `${CHAR}55`,
                   margin: '8px 0 0',
@@ -300,7 +300,7 @@ const OrderConfirmation = () => {
               <div style={{ textAlign: 'center', marginBottom: 28 }}>
                 <span style={{ ...LABEL, display: 'block', marginBottom: 10 }}>você também pode gostar</span>
                 <h2 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Wagon', sans-serif",
                   fontSize: 'clamp(1.4rem,3vw,2rem)',
                   fontWeight: 300,
                   color: CHAR,
@@ -331,7 +331,7 @@ const OrderConfirmation = () => {
                     </Link>
                     <Link to={`/product/${product.slug}`} style={{ textDecoration: 'none' }}>
                       <p style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Wagon', sans-serif",
                         fontSize: '0.95rem',
                         color: CHAR,
                         margin: 0,
@@ -343,7 +343,7 @@ const OrderConfirmation = () => {
                       </p>
                     </Link>
                     <span style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Wagon', sans-serif",
                       fontSize: '0.9rem',
                       color: `${CHAR}88`,
                     }}>
@@ -356,7 +356,7 @@ const OrderConfirmation = () => {
                         background: 'transparent',
                         border: `1px solid ${CHAR}33`,
                         color: CHAR,
-                        fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+                        fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
                         fontSize: '0.5rem',
                         letterSpacing: '0.16em',
                         textTransform: 'uppercase',
@@ -383,7 +383,7 @@ const OrderConfirmation = () => {
                 background: CHAR,
                 color: CREME,
                 border: 'none',
-                fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+                fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
                 fontSize: '0.6rem',
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
@@ -397,7 +397,7 @@ const OrderConfirmation = () => {
               voltar à loja
             </button>
             <p style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Wagon', sans-serif",
               fontStyle: 'italic',
               fontSize: '0.85rem',
               color: `${CHAR}55`,

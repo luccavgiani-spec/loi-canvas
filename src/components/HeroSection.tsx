@@ -50,7 +50,7 @@ const HeroSection = () => {
         <div className="flex flex-col items-center text-center" style={{ maxWidth: 1000 }}>
           <h1
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
               fontSize: 'clamp(5rem, 12.5vw, 11rem)',
               lineHeight: 0.88,
@@ -85,7 +85,7 @@ const HeroSection = () => {
           <p
             className="hero-fadeUp mt-8"
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',

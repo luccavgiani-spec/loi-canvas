@@ -34,7 +34,7 @@ const Contact = () => {
                     <Icon size={16} style={{ color: '#000' }} />
                     <span
                       style={{
-                        fontFamily: "'Montserrat', sans-serif",
+                        fontFamily: "'Sackers Gothic', sans-serif",
                         fontWeight: 300,
                         fontSize: '0.85rem',
                         color: '#000',
@@ -47,7 +47,7 @@ const Contact = () => {
               </div>
               <p
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
                   fontStyle: 'italic',
                   fontSize: '1rem',
@@ -73,7 +73,7 @@ const Contact = () => {
                     style={{
                       border: '1px solid rgba(86,86,0,0.2)',
                       color: '#000',
-                      fontFamily: "'Montserrat', sans-serif",
+                      fontFamily: "'Sackers Gothic', sans-serif",
                       fontWeight: 300,
                       outline: 'none',
                     }}
@@ -88,7 +88,7 @@ const Contact = () => {
                   style={{
                     border: '1px solid rgba(86,86,0,0.2)',
                     color: '#000',
-                    fontFamily: "'Montserrat', sans-serif",
+                    fontFamily: "'Sackers Gothic', sans-serif",
                     fontWeight: 300,
                     outline: 'none',
                   }}

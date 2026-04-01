@@ -73,7 +73,7 @@ const CollectionPage = () => {
   if (loading || !collection) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">
-        <p style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
+        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
           Carregando...
         </p>
       </div>
@@ -122,7 +122,7 @@ const CollectionPage = () => {
               <span
                 className="reveal-fade block mb-4"
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
                   fontStyle: 'italic',
                   fontSize: '1.1rem',
@@ -144,7 +144,7 @@ const CollectionPage = () => {
               <p
                 className="reveal-fade mb-6"
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
                   fontStyle: 'italic',
                   fontSize: 'clamp(1rem, 2vw, 1.15rem)',
@@ -212,7 +212,7 @@ const CollectionPage = () => {
             {/* Grid */}
             {sorted.length === 0 ? (
               <div className="min-h-[40vh] flex items-center justify-center">
-                <p style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
+                <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
                   Nenhum produto nesta coleção ainda.
                 </p>
               </div>
@@ -270,12 +270,12 @@ const CollectionPage = () => {
                       </button>
                     </Link>
                     <Link to={`/product/${product.slug}`} className="block">
-                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
+                      <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
                         {product.name}
                       </h3>
                       <p
                         style={{
-                          fontFamily: "'Cormorant Garamond', serif",
+                          fontFamily: "'Wagon', sans-serif",
                           fontWeight: 300,
                           fontStyle: 'italic',
                           fontSize: '0.82rem',
@@ -361,7 +361,7 @@ const CollectionPage = () => {
                       <div className="relative z-10 h-full flex flex-col justify-end p-6 md:p-8">
                         <span
                           style={{
-                            fontFamily: "'Cormorant Garamond', serif",
+                            fontFamily: "'Wagon', sans-serif",
                             fontWeight: 300,
                             fontStyle: 'italic',
                             fontSize: '0.85rem',

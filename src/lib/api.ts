@@ -522,3 +522,13 @@ export const getAdminNewsletterEmails = async (): Promise<string[]> => {
   if (error) throw error;
   return (data ?? []).map((row: { email: string }) => row.email);
 };
+
+// Admin — get internal messages (mensagens)
+export const getAdminMensagens = async (): Promise<{ id: string; nome: string; assunto: string | null; mensagem: string; created_at: string }[]> => {
+  const { data, error } = await supabase
+    .from('mensagens')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+};

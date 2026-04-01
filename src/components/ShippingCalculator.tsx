@@ -5,7 +5,7 @@ const CHAR  = '#29241f';
 const OLIVA = '#565600';
 
 const LABEL: React.CSSProperties = {
-  fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+  fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
   fontSize: '0.6rem',
   letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
@@ -19,7 +19,7 @@ const INPUT: React.CSSProperties = {
   border: `1px solid ${CHAR}22`,
   borderRadius: 0,
   color: CHAR,
-  fontFamily: "'Cormorant Garamond', serif",
+  fontFamily: "'Wagon', sans-serif",
   fontSize: '1rem',
   outline: 'none',
   boxSizing: 'border-box' as const,
@@ -97,7 +97,7 @@ const ShippingCalculator = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Loader2 size={13} className="animate-spin" style={{ color: `${CHAR}66`, flexShrink: 0 }} />
           <span style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Wagon', sans-serif",
             fontStyle: 'italic',
             fontSize: '0.82rem',
             color: `${CHAR}77`,
@@ -111,7 +111,7 @@ const ShippingCalculator = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <CheckCircle size={13} style={{ color: OLIVA, flexShrink: 0 }} />
           <span style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Wagon', sans-serif",
             fontSize: '0.88rem',
             color: CHAR,
           }}>
@@ -124,7 +124,7 @@ const ShippingCalculator = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <AlertCircle size={13} style={{ color: '#c44', flexShrink: 0 }} />
           <span style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Wagon', sans-serif",
             fontSize: '0.82rem',
             color: '#c44',
           }}>

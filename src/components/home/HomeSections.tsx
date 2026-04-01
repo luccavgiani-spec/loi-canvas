@@ -141,7 +141,7 @@ const ProductCarousel = memo(({
               </button>
             </Link>
             <Link to={`/product/${product.slug}`} className="block">
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: dark ? '#f4edd2' : '#000', marginBottom: 4 }}>
+              <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: dark ? '#f4edd2' : '#000', marginBottom: 4 }}>
                 {product.name}
               </h3>
               <div className="flex items-center gap-3">
@@ -231,7 +231,7 @@ const ProductFocusBanner = memo(({
           <div className="loi-divider mb-6" />
           <p
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: '1.05rem',
@@ -313,7 +313,7 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)' }}
           />
         </div>
-        <p style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 2 }}>
+        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 2 }}>
           {collab.name}
         </p>
         <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.72rem', color: '#000', marginBottom: 8 }}>
@@ -321,7 +321,7 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
         </p>
       </Link>
       <Link to={`/collabs?collab=${collab.slug}`} className="loi-ghost group/link" style={{ fontSize: '0.65rem' }}>
-        <span>ver collab</span>
+        <span>ver colaboração</span>
         <span className="loi-ghost-dash" />
         <span className="transition-transform duration-300 group-hover/link:translate-x-1">→</span>
       </Link>
@@ -373,9 +373,9 @@ const HomeSections = () => {
       <section className="py-16 px-6 md:py-0 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4">mais amados</span>
+            <span className="reveal loi-label block mb-4">mais pedidas</span>
             <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
-              Bestsellers
+              mais pedidas
             </h2>
           </div>
           <div className="reveal">
@@ -457,7 +457,7 @@ const HomeSections = () => {
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
             <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
-              Collabs
+              Colaborações
             </h2>
           </div>
           <div className="reveal-stagger grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
@@ -467,7 +467,7 @@ const HomeSections = () => {
           </div>
           <div className="reveal text-center mt-10">
             <Link to="/collabs" className="loi-ghost group">
-              <span>ver todas as collabs</span>
+              <span>ver todas as colaborações</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </Link>
@@ -500,7 +500,7 @@ const HomeSections = () => {
               <details key={i} className="group" style={{ borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
                 <summary
                   className="flex items-center py-5 cursor-pointer list-none"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#29241f' }}
+                  style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#29241f' }}
                 >
                   {faq.q}
                 </summary>
@@ -527,7 +527,7 @@ const HomeSections = () => {
           <p
             className="reveal mb-10"
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: '1.05rem',

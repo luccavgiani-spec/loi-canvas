@@ -18,7 +18,7 @@ const HomeFooter = () => {
             
             <p
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Wagon', sans-serif",
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: '0.95rem',
@@ -47,7 +47,7 @@ const HomeFooter = () => {
                   <Link
                   to={link.to}
                   style={{
-                    fontFamily: "'Montserrat', sans-serif",
+                    fontFamily: "'Sackers Gothic', sans-serif",
                     fontWeight: 300,
                     fontSize: '0.8rem',
                     color: 'rgba(244,237,210,0.4)',
@@ -77,7 +77,7 @@ const HomeFooter = () => {
                   <Link
                   to={link.to}
                   style={{
-                    fontFamily: "'Montserrat', sans-serif",
+                    fontFamily: "'Sackers Gothic', sans-serif",
                     fontWeight: 300,
                     fontSize: '0.8rem',
                     color: 'rgba(244,237,210,0.4)',
@@ -97,20 +97,20 @@ const HomeFooter = () => {
           <div>
             <h4 className="loi-label mb-6" style={{ color: 'rgba(244,237,210,0.5)' }}>contato</h4>
             <ul className="space-y-3">
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 loie.aromatica@gmail.com
               </li>
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 (11) 99649-7672
               </li>
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 Rua Cel. João Leme, 688
               </li>
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 Bragança Paulista, SP 12900-161
               </li>
               <li className="pt-2">
-                <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.7rem', color: 'rgba(244,237,210,0.5)' }}>@loie.velas</span>
+                <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.7rem', color: 'rgba(244,237,210,0.5)' }}>@loie.velas</span>
               </li>
             </ul>
           </div>
@@ -120,7 +120,7 @@ const HomeFooter = () => {
           className="mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
           style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}>
           
-          <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', letterSpacing: '0.05em' }}>
+          <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', letterSpacing: '0.05em' }}>
             © {new Date().getFullYear()} Loiê. Todos os direitos reservados.
           </p>
           <div className="flex gap-8">
@@ -128,7 +128,7 @@ const HomeFooter = () => {
             <Link
               key={label}
               to="/policies"
-              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
+              style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
               className="hover:!text-[rgba(244,237,210,0.5)]">
               
                 {label}

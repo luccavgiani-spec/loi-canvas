@@ -29,7 +29,7 @@ const CartDrawer = () => {
         <SheetHeader>
           <SheetTitle
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
               fontSize: '1.4rem',
               color: '#29241f',
@@ -44,7 +44,7 @@ const CartDrawer = () => {
           <div className="flex-1 flex items-center justify-center">
             <p
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Wagon', sans-serif",
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: '1rem',
@@ -67,7 +67,7 @@ const CartDrawer = () => {
               <p
                 className="mt-2"
                 style={{
-                  fontFamily: "'Montserrat', sans-serif",
+                  fontFamily: "'Sackers Gothic', sans-serif",
                   fontWeight: 300,
                   fontSize: '0.7rem',
                   color: 'rgba(41,36,31,0.4)',
@@ -92,7 +92,7 @@ const CartDrawer = () => {
                     <h4
                       className="truncate"
                       style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Wagon', sans-serif",
                         fontWeight: 400,
                         fontSize: '0.95rem',
                         color: '#29241f',
@@ -100,7 +100,7 @@ const CartDrawer = () => {
                     >
                       {item.product.name}
                     </h4>
-                    <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#565600' }}>
+                    <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#565600' }}>
                       R$ {item.product.price.toFixed(2)}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
@@ -111,7 +111,7 @@ const CartDrawer = () => {
                       >
                         <Minus size={12} />
                       </button>
-                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.75rem', color: '#29241f', width: 24, textAlign: 'center', display: 'inline-block' }}>
+                      <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.75rem', color: '#29241f', width: 24, textAlign: 'center', display: 'inline-block' }}>
                         {item.quantity}
                       </span>
                       <button
@@ -151,10 +151,10 @@ const CartDrawer = () => {
             {/* Subtotal + CTA */}
             <div className="pt-4 space-y-3" style={{ borderTop: '1px solid rgba(86,86,0,0.1)' }}>
               <div className="flex justify-between">
-                <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(41,36,31,0.4)' }}>
+                <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(41,36,31,0.4)' }}>
                   Subtotal
                 </span>
-                <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.9rem', color: '#29241f' }}>
+                <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.9rem', color: '#29241f' }}>
                   R$ {subtotal.toFixed(2)}
                 </span>
               </div>
@@ -181,17 +181,17 @@ function UpsellCard({ product }: { product: import('@/types').Product }) {
         alt={product.name}
         className="w-full h-16 object-cover mb-1"
       />
-      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '0.8rem', color: '#29241f' }} className="truncate">
+      <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '0.8rem', color: '#29241f' }} className="truncate">
         {product.name}
       </p>
       <div className="flex items-center justify-between mt-1">
-        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: '#565600' }}>
+        <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: '#565600' }}>
           R$ {product.price}
         </span>
         <button
           onClick={() => addItem(product)}
           style={{
-            fontFamily: "'Montserrat', sans-serif",
+            fontFamily: "'Sackers Gothic', sans-serif",
             fontWeight: 300,
             fontSize: '0.6rem',
             color: 'rgba(41,36,31,0.4)',

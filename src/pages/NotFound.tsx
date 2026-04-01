@@ -23,7 +23,7 @@ const NotFound = () => {
         <p
           className="mb-8"
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Wagon', sans-serif",
             fontWeight: 300,
             fontStyle: 'italic',
             fontSize: '1.2rem',

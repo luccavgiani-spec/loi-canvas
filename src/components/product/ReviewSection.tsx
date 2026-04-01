@@ -11,7 +11,7 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   border: '1px solid rgba(41,36,31,0.22)',
   padding: '10px 14px',
-  fontFamily: "'Montserrat', sans-serif",
+  fontFamily: "'Sackers Gothic', sans-serif",
   fontWeight: 300,
   fontSize: '0.82rem',
   color: '#29241f',
@@ -20,7 +20,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "'Montserrat', sans-serif",
+  fontFamily: "'Sackers Gothic', sans-serif",
   fontWeight: 300,
   letterSpacing: '0.15em',
   textTransform: 'uppercase' as const,
@@ -130,7 +130,7 @@ const ReviewSection = ({ productId }: ReviewSectionProps) => {
                 />
               ))}
             </div>
-            <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#29241f' }}>
+            <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#29241f' }}>
               {roundedAvg} de 5 · {reviews.length} avaliações
             </span>
           </div>
@@ -139,11 +139,11 @@ const ReviewSection = ({ productId }: ReviewSectionProps) => {
 
       {/* Review list */}
       {loading ? (
-        <p style={{ textAlign: 'center', fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: 'rgba(41,36,31,0.4)' }}>
+        <p style={{ textAlign: 'center', fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.78rem', color: 'rgba(41,36,31,0.4)' }}>
           Carregando avaliações...
         </p>
       ) : reviews.length === 0 ? (
-        <p style={{ textAlign: 'center', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1rem', color: 'rgba(41,36,31,0.5)' }}>
+        <p style={{ textAlign: 'center', fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1rem', color: 'rgba(41,36,31,0.5)' }}>
           Seja o primeiro a avaliar este produto.
         </p>
       ) : (
@@ -170,17 +170,17 @@ const ReviewSection = ({ productId }: ReviewSectionProps) => {
                     />
                   ))}
                 </div>
-                <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 400, fontSize: '0.72rem', color: '#29241f' }}>
+                <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 400, fontSize: '0.72rem', color: '#29241f' }}>
                   {r.author_name}
                 </span>
                 {r.created_at && (
-                  <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.68rem', color: 'rgba(41,36,31,0.38)' }}>
+                  <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.68rem', color: 'rgba(41,36,31,0.38)' }}>
                     · {new Date(r.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
                   </span>
                 )}
               </div>
               {r.body && (
-                <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#29241f', lineHeight: 1.75 }}>
+                <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#29241f', lineHeight: 1.75 }}>
                   {r.body}
                 </p>
               )}
@@ -196,7 +196,7 @@ const ReviewSection = ({ productId }: ReviewSectionProps) => {
         </h3>
 
         {submitted ? (
-          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.1rem', color: '#29241f' }}>
+          <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1.1rem', color: '#29241f' }}>
             Avaliação recebida. Publicaremos em breve.
           </p>
         ) : (
@@ -266,7 +266,7 @@ const ReviewSection = ({ productId }: ReviewSectionProps) => {
                   cursor: 'pointer',
                   border: '1px dashed rgba(41,36,31,0.3)',
                   padding: '10px 16px',
-                  fontFamily: "'Montserrat', sans-serif",
+                  fontFamily: "'Sackers Gothic', sans-serif",
                   fontWeight: 300,
                   fontSize: '0.75rem',
                   color: 'rgba(41,36,31,0.6)',
@@ -314,7 +314,7 @@ const ReviewSection = ({ productId }: ReviewSectionProps) => {
 
             {/* Error message */}
             {submitError && (
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.75rem', color: '#b91c1c' }}>
+              <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.75rem', color: '#b91c1c' }}>
                 {submitError}
               </p>
             )}

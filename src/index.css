@@ -1,7 +1,28 @@
-/* Fonts loaded via index.html <link> for better LCP — only used weights:
-   Cormorant Garamond: 300, 400, 300i
-   Montserrat: 200, 300, 400
-   DM Sans removed (unused) */
+/* Fonts: Wagon (local) + Sackers Gothic (local) — Cormorant Garamond and Montserrat removed */
+
+@font-face {
+  font-family: 'Wagon';
+  src: url('/Wagon-ExtraLight.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Wagon';
+  src: url('/Wagon-ExtraLightItalic.woff2') format('woff2');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Wagon';
+  src: url('/Wagon-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: 'Sackers Gothic';
@@ -108,7 +129,8 @@
     --sidebar-border: 30 15% 88%;
     --sidebar-ring: 42 75% 31%;
 
-    --font-heading: 'Wagon', 'Cormorant Garamond', serif;
+    --font-heading: 'Wagon', sans-serif;
+    --font-wagon: 'Wagon', sans-serif;
     --font-body: 'Sackers Gothic', sans-serif;
 
     --badge-sale: 0 72% 51%;

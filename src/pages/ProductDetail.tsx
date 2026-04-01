@@ -119,7 +119,7 @@ const ProductDetail = () => {
                 <span
                   className="inline-block mb-3"
                   style={{
-                    fontFamily: "'Montserrat', sans-serif",
+                    fontFamily: "'Sackers Gothic', sans-serif",
                     fontWeight: 300,
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
@@ -154,7 +154,7 @@ const ProductDetail = () => {
                 </div>
                 <span
                   style={{
-                    fontFamily: "'Montserrat', sans-serif",
+                    fontFamily: "'Sackers Gothic', sans-serif",
                     fontWeight: 300,
                     fontSize: '0.75rem',
                     color: '#000',
@@ -175,7 +175,7 @@ const ProductDetail = () => {
                 {product.compare_at_price && (
                   <span
                     style={{
-                      fontFamily: "'Montserrat', sans-serif",
+                      fontFamily: "'Sackers Gothic', sans-serif",
                       fontWeight: 300,
                       fontSize: '1rem',
                       color: '#000',
@@ -193,7 +193,7 @@ const ProductDetail = () => {
                 <p
                   className="mb-2 break-words"
                   style={{
-                    fontFamily: "'Sackers Gothic', 'Montserrat', sans-serif",
+                    fontFamily: "'Sackers Gothic', 'Sackers Gothic', sans-serif",
                     fontWeight: 300,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
@@ -208,7 +208,7 @@ const ProductDetail = () => {
                 <p
                   className="mb-5 break-words"
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Wagon', sans-serif",
                     fontWeight: 400,
                     fontSize: '0.9rem',
                     color: 'rgba(0,0,0,0.55)',
@@ -222,7 +222,7 @@ const ProductDetail = () => {
               <p
                 className="mb-8 break-words"
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
                   fontStyle: 'italic',
                   fontSize: '1.05rem',
@@ -245,7 +245,7 @@ const ProductDetail = () => {
                     <b.icon size={14} style={{ color: '#000', flexShrink: 0 }} />
                     <span
                       style={{
-                        fontFamily: "'Montserrat', sans-serif",
+                        fontFamily: "'Sackers Gothic', sans-serif",
                         fontWeight: 300,
                         fontSize: '0.72rem',
                         color: '#000',
@@ -292,7 +292,7 @@ const ProductDetail = () => {
                       <summary
                         className="flex items-center justify-between py-4 cursor-pointer list-none"
                         style={{
-                          fontFamily: "'Cormorant Garamond', serif",
+                          fontFamily: "'Wagon', sans-serif",
                           fontWeight: 400,
                           fontSize: '1rem',
                           color: '#000',
@@ -304,7 +304,7 @@ const ProductDetail = () => {
                       <p
                         className="pb-4 break-words"
                         style={{
-                          fontFamily: "'Montserrat', sans-serif",
+                          fontFamily: "'Sackers Gothic', sans-serif",
                           fontWeight: 300,
                           fontSize: '0.82rem',
                           color: '#000',
@@ -353,10 +353,10 @@ const ProductDetail = () => {
                       )}
                     </Link>
                     <Link to={`/product/${p.slug}`}>
-                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1rem', color: '#000', marginBottom: 4 }}>
+                      <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1rem', color: '#000', marginBottom: 4 }}>
                         {p.name}
                       </h3>
-                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
+                      <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
                         R$ {p.price.toFixed(2)}
                       </span>
                     </Link>

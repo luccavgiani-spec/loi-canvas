@@ -45,7 +45,7 @@ const Policies = () => {
                 <div className="loi-divider mb-4" />
                 <p
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Wagon', sans-serif",
                     fontWeight: 300,
                     fontStyle: 'italic',
                     fontSize: '1rem',
