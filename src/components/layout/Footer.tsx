@@ -243,11 +243,20 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-          {/* Mensagem */}
-          <div id="mensagem">
+          {/* Mensagem — desktop only (grid column) */}
+          <div id="mensagem" className="hidden md:block">
             <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>deixe uma mensagem</h4>
             <MensagemForm dark />
           </div>
+        </div>
+
+        {/* Mensagem — mobile only (standalone section) */}
+        <div
+          className="block md:hidden pt-8"
+          style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}
+        >
+          <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>deixe uma mensagem</h4>
+          <MensagemForm dark />
         </div>
 
         {/* ── Bottom bar ── */}

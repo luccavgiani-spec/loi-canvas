@@ -321,7 +321,8 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
         </p>
       </Link>
       <Link to={`/collabs?collab=${collab.slug}`} className="loi-ghost group/link" style={{ fontSize: '0.65rem' }}>
-        <span>ver colaboração</span>
+        <span className="md:hidden">ver</span>
+        <span className="hidden md:inline">ver colaboração</span>
         <span className="loi-ghost-dash" />
         <span className="transition-transform duration-300 group-hover/link:translate-x-1">→</span>
       </Link>
