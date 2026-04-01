@@ -115,8 +115,21 @@ const HeroSection = () => {
       <div
         className="absolute z-[3] bottom-0 left-0 right-0 flex flex-col items-center gap-6 pb-[2rem] md:flex-row md:items-end md:justify-between md:px-[5rem] md:pb-[2.5rem]"
       >
-        {/* spacer for left alignment (desktop only) */}
-        <div className="hidden md:block" />
+        {/* brand micro-line — bottom left, desktop */}
+        <p
+          className="hidden md:block hero-fadeUp"
+          style={{
+            fontFamily: "'Sackers Gothic', sans-serif",
+            fontWeight: 300,
+            fontSize: '0.58rem',
+            letterSpacing: '0.22em',
+            textTransform: 'lowercase',
+            color: 'rgba(244,237,210,0.28)',
+            animationDelay: '1.5s',
+          }}
+        >
+          natural com presença estética
+        </p>
 
         {/* scroll indicator */}
         <div

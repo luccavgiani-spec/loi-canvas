@@ -209,6 +209,25 @@ const About = () => {
 
             </div>
           </div>
+
+          {/* Brand philosophy — subtle, for SEO and the curious reader */}
+          <div className="reveal mt-16 pt-12" style={{ borderTop: '1px solid rgba(41,36,31,0.06)', maxWidth: '520px', margin: '4rem auto 0' }}>
+            <p
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.7rem',
+                letterSpacing: '0.08em',
+                color: 'rgba(41,36,31,0.28)',
+                lineHeight: 2,
+                textAlign: 'center',
+              }}
+            >
+              Profundo conhecimento em construção olfativa, com foco em óleos essenciais,
+              mas abertura para fragrâncias que elevem a experiência sem comprometer a
+              identidade e segurança da marca.
+            </p>
+          </div>
         </section>
       </div>
     </Layout>
