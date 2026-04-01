@@ -59,25 +59,17 @@ const HeroSection = () => {
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
-                style={{ color: '#f4edd2', animationDelay: '0.3s' }}
+                style={{ color: '#565600', fontStyle: 'italic', animationDelay: '0.3s' }}
               >
-                atmosferas
+                o aroma é
               </span>
             </span>
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
-                style={{ color: '#565600', fontStyle: 'italic', animationDelay: '0.45s' }}
+                style={{ color: '#f4edd2', animationDelay: '0.45s' }}
               >
-                que
-              </span>
-            </span>
-            <span className="block overflow-hidden">
-              <span
-                className="inline-block hero-wordReveal"
-                style={{ color: '#f4edd2', animationDelay: '0.6s' }}
-              >
-                ficam.
+                uma linguagem.
               </span>
             </span>
           </h1>
@@ -94,9 +86,7 @@ const HeroSection = () => {
               animationDelay: '0.85s',
             }}
           >
-            Cada vela é uma narrativa. Cada aroma, uma porta.
-            <br />
-            Feitas à mão, com essência e intenção.
+            Acendemos uma vela como quem abre uma porta.
           </p>
 
           <div className="flex items-center gap-4 sm:gap-8 mt-10 px-6 sm:px-0">

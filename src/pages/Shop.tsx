@@ -281,7 +281,7 @@ const Shop = () => {
           return (
             <section
               key={col.id}
-              className="reveal md:py-40 px-6 py-0"
+              className="reveal md:py-40 px-6 py-14"
               style={{
                 background: isEven ? '#fcf5e0' : '#f5ecd0'
               }}>
