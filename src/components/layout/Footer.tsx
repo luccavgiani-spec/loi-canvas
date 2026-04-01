@@ -1,10 +1,77 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Facebook } from 'lucide-react';
+import { useState } from 'react';
+import MensagemForm from '@/components/MensagemForm';
+
+/* ── Olfactory families data ── */
+const FAMILIES = [
+  { label: 'cítricos e frescos',   products: ['Campos', 'Citronela', 'Pomar'] },
+  { label: 'verdes e verbais',     products: ['Bosque', 'Gin', 'Tabaco'] },
+  { label: 'florais',              products: ['Estela', 'Gardênia', 'Margarida', 'Ícaro', 'Dulce'] },
+  { label: 'amadeirados',          products: ['Pomar', 'Ritual', 'Toca'] },
+  { label: 'especiados e quentes', products: ['Gin', 'Gabriela', 'Ícaro', 'Ame', 'Bosque', 'Ritual'] },
+  { label: 'gourmand e conforto',  products: ['Dulce', 'Caramelo', 'Gin', 'Tabaco', 'Oceano'] },
+];
+
+const FONT_BODY = "'Sackers Gothic', sans-serif";
 
 const Footer = () => {
+  const [activeFamily, setActiveFamily] = useState<string | null>(null);
+
   return (
     <footer style={{ background: '#29241f' }}>
-      <div className="max-w-[1400px] mx-auto px-6 py-20">
+      {/* ── Olfactory family filter ── */}
+      <div className="max-w-[1400px] mx-auto px-6 pt-16 pb-10">
+        <span className="loi-label block mb-6" style={{ color: 'rgba(244,237,210,0.4)' }}>família aromática</span>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {FAMILIES.map((fam) => {
+            const isActive = activeFamily === fam.label;
+            return (
+              <button
+                key={fam.label}
+                onClick={() => setActiveFamily(isActive ? null : fam.label)}
+                style={{
+                  fontFamily: FONT_BODY,
+                  fontWeight: 300,
+                  fontSize: '0.6rem',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
+                  background: 'transparent',
+                  border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
+                  padding: '5px 14px',
+                  cursor: 'pointer',
+                  transition: 'color 0.3s ease, border-color 0.3s ease',
+                }}
+              >
+                {fam.label}
+              </button>
+            );
+          })}
+        </div>
+        {activeFamily && (
+          <div style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.12em', color: 'rgba(244,237,210,0.55)' }}>
+            {FAMILIES.find((f) => f.label === activeFamily)?.products.map((product, i, arr) => (
+              <span key={product}>
+                <Link
+                  to={`/shop?q=${encodeURIComponent(product.toLowerCase())}`}
+                  style={{ color: 'rgba(244,237,210,0.55)', textDecoration: 'none', transition: 'color 0.3s ease' }}
+                  className="hover:!text-[#f4edd2]"
+                >
+                  {product}
+                </Link>
+                {i < arr.length - 1 && <span style={{ opacity: 0.3, margin: '0 0.4em' }}>·</span>}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Main 4-column grid ── */}
+      <div
+        className="max-w-[1400px] mx-auto px-6 py-12"
+        style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}
+      >
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
@@ -19,8 +86,8 @@ const Footer = () => {
             />
             <p
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 300,
+                fontFamily: "'Wagon', sans-serif",
+                fontWeight: 200,
                 fontStyle: 'italic',
                 fontSize: '0.95rem',
                 color: 'rgba(244,237,210,0.4)',
@@ -34,12 +101,12 @@ const Footer = () => {
 
           {/* Shop */}
           <div>
-            <h4 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>coleção</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>coleção</h4>
             <ul className="space-y-3">
               {[
                 { to: '/shop', label: 'Todas as Coleções' },
                 { to: '/shop/cotidianas', label: 'Cotidianas' },
-                { to: '/shop/sala-ou-estar', label: 'Sala ou Estar' },
+                { to: '/shop/sala-ou-estar', label: 'Sala' },
                 { to: '/shop/refugio', label: 'Refúgio' },
                 { to: '/shop/botanicas-e-florais', label: 'Botânicas e Florais' },
               ].map((link) => (
@@ -47,7 +114,7 @@ const Footer = () => {
                   <Link
                     to={link.to}
                     style={{
-                      fontFamily: "'Montserrat', sans-serif",
+                      fontFamily: FONT_BODY,
                       fontWeight: 300,
                       fontSize: '0.8rem',
                       color: 'rgba(244,237,210,0.4)',
@@ -65,11 +132,11 @@ const Footer = () => {
 
           {/* About */}
           <div>
-            <h4 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>sobre</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>sobre</h4>
             <ul className="space-y-3">
               {[
                 { to: '/about', label: 'Nossa História' },
-                { to: '/collabs', label: 'Collabs' },
+                { to: '/collabs', label: 'Colaborações' },
                 { to: '/contact', label: 'Contato' },
                 { to: '/policies', label: 'Políticas' },
               ].map((link) => (
@@ -77,7 +144,7 @@ const Footer = () => {
                   <Link
                     to={link.to}
                     style={{
-                      fontFamily: "'Montserrat', sans-serif",
+                      fontFamily: FONT_BODY,
                       fontWeight: 300,
                       fontSize: '0.8rem',
                       color: 'rgba(244,237,210,0.4)',
@@ -90,23 +157,39 @@ const Footer = () => {
                   </Link>
                 </li>
               ))}
+              <li>
+                <a
+                  href="#mensagem"
+                  style={{
+                    fontFamily: FONT_BODY,
+                    fontWeight: 300,
+                    fontSize: '0.8rem',
+                    color: 'rgba(244,237,210,0.4)',
+                    textDecoration: 'none',
+                    transition: 'color 0.3s ease',
+                  }}
+                  className="hover:!text-[#f4edd2]"
+                >
+                  deixe uma mensagem
+                </a>
+              </li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h4 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>contato</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>contato</h4>
             <ul className="space-y-3">
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 loie.aromatica@gmail.com
               </li>
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 (11) 99649-7672
               </li>
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 Rua Cel. João Leme, 688
               </li>
-              <li style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
+              <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 Bragança Paulista, SP 12900-161
               </li>
               <li className="pt-3 flex items-center gap-4">
@@ -135,11 +218,12 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* ── Bottom bar ── */}
         <div
           className="mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
           style={{ borderTop: '1px solid rgba(244,237,210,0.08)' }}
         >
-          <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', letterSpacing: '0.05em' }}>
+          <p style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', letterSpacing: '0.05em' }}>
             © {new Date().getFullYear()} Loiê. Todos os direitos reservados.
           </p>
           <div className="flex gap-8">
@@ -147,7 +231,7 @@ const Footer = () => {
               <Link
                 key={label}
                 to="/policies"
-                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
+                style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
                 className="hover:!text-[rgba(244,237,210,0.5)]"
               >
                 {label}
@@ -155,9 +239,17 @@ const Footer = () => {
             ))}
           </div>
         </div>
+
+        {/* ── Brand signature ── */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', marginTop: '1.2rem' }}>
+          <img src="/hero/SIMBOLO_t.png" alt="" width={18} height={18} loading="lazy" style={{ opacity: 0.15 }} />
+          <span style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(244,237,210,0.2)', textTransform: 'lowercase' }}>
+            somos brasileiros, feitos à mão, com técnica e com alma
+          </span>
+        </div>
       </div>
 
-      {/* Brand symbol bottom */}
+      {/* ── Brand symbol hover ── */}
       <div className="flex justify-center pb-10">
         <div className="relative group" style={{ width: 40, height: 40 }}>
           <div
@@ -186,6 +278,13 @@ const Footer = () => {
               if (imgs[1]) { imgs[1].style.opacity = '0'; imgs[1].style.transform = ''; imgs[1].style.filter = ''; }
             }}
           />
+        </div>
+      </div>
+
+      {/* ── Mensagem form anchor ── */}
+      <div id="mensagem" className="max-w-[1400px] mx-auto px-6 pb-20">
+        <div style={{ borderTop: '1px solid rgba(244,237,210,0.08)', paddingTop: '4rem' }}>
+          <MensagemForm dark />
         </div>
       </div>
     </footer>

@@ -141,12 +141,12 @@ const ProductCarousel = ({
               </button>
             </Link>
             <Link to={`/product/${product.slug}`} className="block">
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
+              <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
                 {product.name}
               </h3>
               <p
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Wagon', sans-serif",
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: '0.82rem',
@@ -259,7 +259,7 @@ const Shop = () => {
             <p
               className="reveal-fade max-w-xl mx-auto"
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Wagon', sans-serif",
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: 'clamp(1rem, 2vw, 1.2rem)',
@@ -292,7 +292,7 @@ const Shop = () => {
                   <div>
                     <span
                       style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Wagon', sans-serif",
                         fontWeight: 300,
                         fontStyle: 'italic',
                         fontSize: '1rem',
@@ -315,7 +315,7 @@ const Shop = () => {
                     </h2>
                     <p
                       style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Wagon', sans-serif",
                         fontWeight: 300,
                         fontStyle: 'italic',
                         fontSize: '1rem',

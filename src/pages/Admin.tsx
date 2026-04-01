@@ -9,6 +9,7 @@ import {
   createAdminCollab, updateAdminCollab, deleteAdminCollab,
   createAdminCoupon, updateAdminCoupon, deleteAdminCoupon,
   sendTrackingEmail, sendCampaign, shipOrder, sendCampaignEmail, getAdminNewsletterEmails,
+  getAdminMensagens,
 } from '@/lib/api';
 import { mockProducts } from '@/lib/mocks';
 import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Product, Collection, Collab } from '@/types';
@@ -181,6 +182,7 @@ const Admin = () => {
             <TabsTrigger value="coupons">Cupons</TabsTrigger>
             <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
             <TabsTrigger value="campanhas">Campanhas</TabsTrigger>
+            <TabsTrigger value="mensagens">Mensagens</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview"><OverviewTab /></TabsContent>
@@ -192,6 +194,7 @@ const Admin = () => {
           <TabsContent value="coupons"><CouponsTab /></TabsContent>
           <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
           <TabsContent value="campanhas"><CampaignsTab /></TabsContent>
+          <TabsContent value="mensagens"><MensagensTab /></TabsContent>
         </Tabs>
       </div>
     </Layout>
@@ -1325,7 +1328,7 @@ function CampaignTab() {
             <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Pré-visualização</label>
             <div
               className="border border-border rounded-md p-4 bg-[#fcf5e0] text-[#29241f] text-sm"
-              style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
+              style={{ fontFamily: "'Wagon', sans-serif" }}
             >
               <div className="text-center mb-4 pb-3 border-b border-[#e8dfc8]">
                 <p className="text-base font-normal tracking-[0.3em] uppercase">LOIÊ</p>
@@ -1340,6 +1343,54 @@ function CampaignTab() {
           <Send size={14} /> {sending ? 'Enviando...' : 'Enviar para todos os assinantes'}
         </Button>
       </div>
+    </div>
+  );
+}
+
+function MensagensTab() {
+  const [mensagens, setMensagens] = useState<{ id: string; nome: string; assunto: string | null; mensagem: string; created_at: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getAdminMensagens()
+      .then(setMensagens)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-sm font-medium mb-4">Mensagens recebidas ({mensagens.length})</h3>
+      {loading ? (
+        <p className="text-xs text-muted-foreground">Carregando...</p>
+      ) : mensagens.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Nenhuma mensagem ainda.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left py-2 pr-4 text-xs font-medium text-muted-foreground w-36">data</th>
+                <th className="text-left py-2 pr-4 text-xs font-medium text-muted-foreground w-32">nome</th>
+                <th className="text-left py-2 pr-4 text-xs font-medium text-muted-foreground w-24">assunto</th>
+                <th className="text-left py-2 text-xs font-medium text-muted-foreground">mensagem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mensagens.map((m) => (
+                <tr key={m.id} className="border-b border-border/50 align-top">
+                  <td className="py-3 pr-4 text-xs text-muted-foreground whitespace-nowrap">
+                    {new Date(m.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  </td>
+                  <td className="py-3 pr-4 text-xs">{m.nome}</td>
+                  <td className="py-3 pr-4 text-xs text-muted-foreground">{m.assunto ?? '—'}</td>
+                  <td className="py-3 text-xs leading-relaxed" style={{ maxWidth: 480 }}>{m.mensagem}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

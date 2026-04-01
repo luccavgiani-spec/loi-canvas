@@ -65,7 +65,7 @@ const CollabDetailCard = ({ collab }: { collab: Collab }) => {
         <div className="loi-divider mb-6" />
         <p
           style={{
-            fontFamily: "'Montserrat', sans-serif",
+            fontFamily: "'Sackers Gothic', sans-serif",
             fontWeight: 300,
             fontSize: '0.72rem',
             color: '#000',
@@ -78,7 +78,7 @@ const CollabDetailCard = ({ collab }: { collab: Collab }) => {
         </p>
         <p
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Wagon', sans-serif",
             fontWeight: 300,
             fontStyle: 'italic',
             fontSize: '1.05rem',
@@ -120,7 +120,7 @@ const Collabs = () => {
             <p
               className="reveal mt-4"
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Wagon', sans-serif",
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: '1.1rem',

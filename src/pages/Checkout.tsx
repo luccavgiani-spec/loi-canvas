@@ -37,7 +37,7 @@ const OLIVA = '#565600';
 const CREME = '#f4edd2';
 
 const LABEL: React.CSSProperties = {
-  fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+  fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
   fontSize: '0.9rem',
   letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
@@ -51,7 +51,7 @@ const INPUT: React.CSSProperties = {
   border: `1px solid ${CHAR}22`,
   borderRadius: 0,
   color: '#000000',
-  fontFamily: "'Cormorant Garamond', serif",
+  fontFamily: "'Wagon', sans-serif",
   fontSize: '1.5rem',
   outline: 'none',
   boxSizing: 'border-box' as const,
@@ -76,7 +76,7 @@ const MP_IFRAME_CSS = `
     height: 46px !important;
     border: none !important;
     padding: 0 14px !important;
-    font-family: 'Cormorant Garamond', serif !important;
+    font-family: 'Wagon', sans-serif !important;
     font-size: 1.5rem !important;
     color: #000000 !important;
     background: transparent !important;
@@ -129,7 +129,7 @@ const PixForm = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.05rem', color: '#000000', lineHeight: 1.6 }}>
+      <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1.05rem', color: '#000000', lineHeight: 1.6 }}>
         Clique no botão abaixo para gerar o QR Code PIX. O pagamento é confirmado instantaneamente.
       </p>
       <button
@@ -139,7 +139,7 @@ const PixForm = ({
           padding: '14px 24px',
           background: loading ? `${OLIVA}55` : OLIVA,
           color: '#ffffff', border: 'none',
-          fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+          fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
           fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase',
           cursor: loading ? 'not-allowed' : 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -169,14 +169,14 @@ const PixQRCode = ({ qrCode, qrCodeBase64, amount }: { qrCode: string; qrCodeBas
         onClick={() => navigator.clipboard.writeText(qrCode)}
         style={{
           padding: '10px 20px', background: 'transparent', border: `1px solid ${CHAR}33`, color: '#000000',
-          fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+          fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
           fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase', cursor: 'pointer',
         }}
       >
         copiar código
       </button>
     </div>
-    <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000', textAlign: 'center' }}>
+    <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000', textAlign: 'center' }}>
       R$ {amount.toFixed(2)} — você receberá a confirmação por e-mail assim que o pagamento for processado.
     </p>
   </div>
@@ -428,7 +428,7 @@ const CardForm = ({
             marginTop: 8, padding: '16px 24px',
             background: mpReady && !isSubmitting ? '#2d7a3a' : '#2d7a3a99',
             color: '#ffffff', border: 'none',
-            fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+            fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
             fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase',
             cursor: mpReady && !isSubmitting ? 'pointer' : 'not-allowed',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -442,7 +442,7 @@ const CardForm = ({
           {!mpReady ? 'carregando...' : isSubmitting ? 'processando...' : 'finalizar compra'}
         </button>
 
-        <p style={{ textAlign: 'center', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.9rem', color: '#000000' }}>
+        <p style={{ textAlign: 'center', fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '0.9rem', color: '#000000' }}>
           pagamento seguro via Mercado Pago
         </p>
       </div>
@@ -620,7 +620,7 @@ const Checkout = () => {
     return (
       <Layout>
         <div style={{ maxWidth: 640, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', color: '#000000' }}>
+          <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', color: '#000000' }}>
             Seu carrinho está vazio.
           </p>
         </div>
@@ -678,14 +678,14 @@ const Checkout = () => {
                 style={{ width: 44, height: 44, objectFit: 'cover', filter: 'saturate(0.6)', flexShrink: 0 }} />
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <p style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {item.product.name}
               </p>
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000000', margin: 0 }}>
+              <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000000', margin: 0 }}>
                 Qtd: {item.quantity}
               </p>
             </div>
-            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000', whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000', whiteSpace: 'nowrap' }}>
               R$ {(item.product.price * item.quantity).toFixed(2)}
             </span>
           </div>
@@ -693,18 +693,18 @@ const Checkout = () => {
       </div>
       <div style={{ borderTop: `1px solid ${CHAR}14`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000' }}>Subtotal</span>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000' }}>R$ {subtotal.toFixed(2)}</span>
+          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>Subtotal</span>
+          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>R$ {subtotal.toFixed(2)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000' }}>Frete</span>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', color: '#000000' }}>
+          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>Frete</span>
+          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>
             {shipping === 0 ? 'Grátis' : `R$ ${shipping.toFixed(2)}`}
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, borderTop: `1px solid ${CHAR}14` }}>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.15rem', color: '#000000' }}>Total</span>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', fontWeight: 500, color: '#000000' }}>
+          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1.15rem', color: '#000000' }}>Total</span>
+          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1.25rem', fontWeight: 500, color: '#000000' }}>
             R$ {total.toFixed(2)}
           </span>
         </div>
@@ -718,7 +718,7 @@ const Checkout = () => {
 
         <div style={{ textAlign: 'center', marginBottom: 56 }}>
           <span style={{ ...LABEL, display: 'block', marginBottom: 12 }}>finalizar compra</span>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2.4rem,6vw,4.8rem)', fontWeight: 300, color: '#000000', margin: 0, letterSpacing: '0.04em' }}>
+          <h1 style={{ fontFamily: "'Wagon', sans-serif", fontSize: 'clamp(2.4rem,6vw,4.8rem)', fontWeight: 300, color: '#000000', margin: 0, letterSpacing: '0.04em' }}>
             Checkout
           </h1>
           <div style={{ width: 40, height: 1, background: `${OLIVA}55`, margin: '20px auto 0' }} />
@@ -727,10 +727,10 @@ const Checkout = () => {
         {step === 'success' ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <CheckCircle size={40} style={{ color: OLIVA, marginBottom: 20 }} />
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.5rem', fontWeight: 300, color: '#000000', marginBottom: 12 }}>
+            <h2 style={{ fontFamily: "'Wagon', sans-serif", fontSize: '2.5rem', fontWeight: 300, color: '#000000', marginBottom: 12 }}>
               Pedido confirmado
             </h2>
-            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', color: '#000000' }}>
+            <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', color: '#000000' }}>
               Você receberá um e-mail de confirmação em breve.
             </p>
           </div>
@@ -794,7 +794,7 @@ const Checkout = () => {
                     {shippingStatus === 'loading' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                         <Loader2 size={13} className="animate-spin" style={{ color: `${CHAR}66`, flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.95rem', color: '#000000' }}>
+                        <span style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '0.95rem', color: '#000000' }}>
                           Calculando prazo e custo de envio...
                         </span>
                       </div>
@@ -802,7 +802,7 @@ const Checkout = () => {
                     {shippingStatus === 'ready' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                         <CheckCircle size={13} style={{ color: OLIVA, flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.95rem', color: '#000000' }}>
+                        <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '0.95rem', color: '#000000' }}>
                           {shippingMessage}
                         </span>
                       </div>
@@ -810,7 +810,7 @@ const Checkout = () => {
                     {shippingStatus === 'error' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                         <AlertCircle size={13} style={{ color: '#c44', flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.95rem', color: '#c44' }}>
+                        <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '0.95rem', color: '#c44' }}>
                           CEP não encontrado.
                         </span>
                       </div>
@@ -842,7 +842,7 @@ const Checkout = () => {
                 {step === 'form' && (
                   <>
                     {!isFormComplete && (
-                      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000', marginBottom: 24 }}>
+                      <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000', marginBottom: 24 }}>
                         Preencha todos os dados acima para continuar.
                       </p>
                     )}
@@ -853,7 +853,7 @@ const Checkout = () => {
                         width: '100%', padding: '14px 24px',
                         background: isFormComplete ? CHAR : `${CHAR}44`,
                         color: '#ffffff', border: 'none',
-                        fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+                        fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
                         fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase',
                         cursor: isFormComplete ? 'pointer' : 'not-allowed',
                         transition: 'background 0.2s',
@@ -886,7 +886,7 @@ const Checkout = () => {
                                 background: paymentMethod === method ? CHAR : 'transparent',
                                 color: paymentMethod === method ? '#ffffff' : '#000000',
                                 border: 'none', cursor: 'pointer',
-                                fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+                                fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
                                 fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase',
                                 transition: 'all 0.2s',
                               }}
@@ -937,7 +937,7 @@ const Checkout = () => {
                 {step === 'processing' && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '32px 0' }}>
                     <Loader2 size={18} className="animate-spin" style={{ color: CHAR }} />
-                    <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000' }}>
+                    <span style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000' }}>
                       processando...
                     </span>
                   </div>
@@ -947,7 +947,7 @@ const Checkout = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                       <AlertCircle size={16} style={{ color: '#c44', flexShrink: 0, marginTop: 2 }} />
-                      <p style={{ color: '#c44', fontSize: '1rem', fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.5 }}>
+                      <p style={{ color: '#c44', fontSize: '1rem', fontFamily: "'Wagon', sans-serif", lineHeight: 1.5 }}>
                         {errorMessage || 'Erro ao processar pagamento. Tente novamente.'}
                       </p>
                     </div>
@@ -955,7 +955,7 @@ const Checkout = () => {
                       onClick={() => { setStep('form'); setErrorMessage(''); setPixData(null); }}
                       style={{
                         padding: '12px 24px', background: 'transparent', border: `1px solid ${CHAR}33`, color: '#000000',
-                        fontFamily: "'Sackers Gothic', 'Cormorant Garamond', serif",
+                        fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
                         fontSize: '0.9rem', letterSpacing: '0.18em', textTransform: 'uppercase', cursor: 'pointer',
                       }}
                     >
