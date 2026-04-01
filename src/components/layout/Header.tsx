@@ -27,12 +27,6 @@ const NAV_SECTIONS = [
       { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/shop/corpo' },
     ],
   },
-  {
-    label: 'espaço',
-    items: [
-      { num: 'i', label: 'lembranças', desc: 'memória e sofisticação', to: '/shop/lembrancas' },
-    ],
-  },
 ];
 
 const Header = () => {
@@ -228,14 +222,6 @@ const Header = () => {
               </div>
             ))}
 
-            {/* SOBRE — direct link */}
-            <Link
-              to="/about"
-              className={linkClass}
-              style={{ color: location.pathname === '/about' ? activeLinkColor : undefined, textDecoration: 'none' }}
-            >
-              sobre
-            </Link>
           </nav>
         </div>
 
@@ -258,6 +244,22 @@ const Header = () => {
 
         {/* ── Right: utility icons ── */}
         <div className="flex items-center gap-5">
+          {/* Espaço + Sobre — right of logo, desktop only */}
+          <Link
+            to="/shop/lembrancas"
+            className={`hidden md:inline ${linkClass}`}
+            style={{ textDecoration: 'none' }}
+          >
+            espaço
+          </Link>
+          <Link
+            to="/about"
+            className={`hidden md:inline ${linkClass}`}
+            style={{ color: location.pathname === '/about' ? activeLinkColor : undefined, textDecoration: 'none' }}
+          >
+            sobre
+          </Link>
+
           {/* Search (mobile only) */}
           <div className="relative md:hidden">
             <IconBtn onClick={() => { setSearchOpen(!searchOpen); setTrackingOpen(false); }} label="Buscar">
@@ -383,6 +385,16 @@ const Header = () => {
               </li>
             ))}
 
+            <li>
+              <Link
+                to="/shop/lembrancas"
+                onClick={() => setMobileOpen(false)}
+                className="block py-2.5"
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
+              >
+                espaço
+              </Link>
+            </li>
             <li>
               <Link
                 to="/about"

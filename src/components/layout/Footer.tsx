@@ -5,12 +5,43 @@ import MensagemForm from '@/components/MensagemForm';
 
 /* ── Olfactory families data ── */
 const FAMILIES = [
-  { label: 'cítricos e frescos',   products: ['Campos', 'Citronela', 'Pomar'] },
-  { label: 'verdes e verbais',     products: ['Bosque', 'Gin', 'Tabaco'] },
-  { label: 'florais',              products: ['Estela', 'Gardênia', 'Margarida', 'Ícaro', 'Dulce'] },
-  { label: 'amadeirados',          products: ['Pomar', 'Ritual', 'Toca'] },
-  { label: 'especiados e quentes', products: ['Gin', 'Gabriela', 'Ícaro', 'Ame', 'Bosque', 'Ritual'] },
-  { label: 'gourmand e conforto',  products: ['Dulce', 'Caramelo', 'Gin', 'Tabaco', 'Oceano'] },
+  { label: 'cítricos e frescos', products: [
+    { name: 'Campos', slug: 'campos' },
+    { name: 'Citronela', slug: 'citronela-refugio' },
+    { name: 'Pomar', slug: 'pomar' },
+  ]},
+  { label: 'verdes e verbais', products: [
+    { name: 'Bosque', slug: 'bosque' },
+    { name: 'Gin', slug: 'gin' },
+    { name: 'Tabaco', slug: 'tabaco' },
+  ]},
+  { label: 'florais', products: [
+    { name: 'Estela', slug: 'estela' },
+    { name: 'Gardênia', slug: 'gardenia' },
+    { name: 'Margarida', slug: 'margarida' },
+    { name: 'Ícaro', slug: 'icaro' },
+    { name: 'Dulce', slug: 'dulce' },
+  ]},
+  { label: 'amadeirados', products: [
+    { name: 'Pomar', slug: 'pomar' },
+    { name: 'Ritual', slug: 'ritual' },
+    { name: 'Toca', slug: 'toca' },
+  ]},
+  { label: 'especiados e quentes', products: [
+    { name: 'Gin', slug: 'gin' },
+    { name: 'Gabriela', slug: 'gabriela' },
+    { name: 'Ícaro', slug: 'icaro' },
+    { name: 'Ame', slug: 'ame' },
+    { name: 'Bosque', slug: 'bosque' },
+    { name: 'Ritual', slug: 'ritual' },
+  ]},
+  { label: 'gourmand e conforto', products: [
+    { name: 'Dulce', slug: 'dulce' },
+    { name: 'Caramelo', slug: 'caramelo' },
+    { name: 'Gin', slug: 'gin' },
+    { name: 'Tabaco', slug: 'tabaco' },
+    { name: 'Oceano', slug: 'oceano' },
+  ]},
 ];
 
 const FONT_BODY = "'Sackers Gothic', sans-serif";
@@ -52,13 +83,13 @@ const Footer = () => {
         {activeFamily && (
           <div style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.12em', color: 'rgba(244,237,210,0.55)' }}>
             {FAMILIES.find((f) => f.label === activeFamily)?.products.map((product, i, arr) => (
-              <span key={product}>
+              <span key={product.slug}>
                 <Link
-                  to={`/shop?q=${encodeURIComponent(product.toLowerCase())}`}
+                  to={`/product/${product.slug}`}
                   style={{ color: 'rgba(244,237,210,0.55)', textDecoration: 'none', transition: 'color 0.3s ease' }}
                   className="hover:!text-[#f4edd2]"
                 >
-                  {product}
+                  {product.name}
                 </Link>
                 {i < arr.length - 1 && <span style={{ opacity: 0.3, margin: '0 0.4em' }}>·</span>}
               </span>
@@ -94,8 +125,20 @@ const Footer = () => {
                 lineHeight: 1.7,
               }}
             >
-              Atmosferas que ficam. Velas artesanais feitas à mão com cera de soja
-              100% natural e fragrâncias exclusivas.
+              A loiê é uma marca brasileira de velas aromáticas feita com óleos essenciais e estética autoral.
+            </p>
+            <p
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.58rem',
+                letterSpacing: '0.2em',
+                textTransform: 'lowercase',
+                color: 'rgba(244,237,210,0.2)',
+                marginTop: '0.75rem',
+              }}
+            >
+              amantes de rituais discretos
             </p>
           </div>
 

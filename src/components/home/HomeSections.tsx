@@ -391,6 +391,23 @@ const HomeSections = () => {
         </div>
       </section>
 
+      {/* ── Frase de marca ── */}
+      <div className="reveal text-center py-10 px-6" style={{ background: '#fcf5e0' }}>
+        <p
+          style={{
+            fontFamily: "'Wagon', sans-serif",
+            fontWeight: 300,
+            fontStyle: 'italic',
+            fontSize: 'clamp(1.1rem, 2.2vw, 1.5rem)',
+            color: 'rgba(41,36,31,0.35)',
+            letterSpacing: '0.02em',
+            lineHeight: 1.6,
+          }}
+        >
+          cada aroma é uma narrativa
+        </p>
+      </div>
+
       {/* ── Separador cream → cream (sutil) ── */}
       <div style={{ height: 'clamp(40px, 6vw, 80px)', background: '#f4edd2' }} />
 
@@ -427,6 +444,22 @@ const HomeSections = () => {
           </>
         )}
       </section>
+
+      {/* ── Frase de marca ── */}
+      <div className="reveal text-center py-10 px-6" style={{ background: '#f4edd2' }}>
+        <span
+          style={{
+            fontFamily: "'Sackers Gothic', sans-serif",
+            fontWeight: 300,
+            fontSize: '0.6rem',
+            letterSpacing: '0.28em',
+            textTransform: 'lowercase',
+            color: 'rgba(41,36,31,0.3)',
+          }}
+        >
+          a loiê ocupa o espaço entre o design e o ritual
+        </span>
+      </div>
 
       {/* ── Separador cream → cream (sutil) ── */}
       <div style={{ height: 'clamp(40px, 6vw, 80px)', background: '#f4edd2' }} />
