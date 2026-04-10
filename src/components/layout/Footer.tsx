@@ -66,7 +66,6 @@ const Footer = () => {
                   fontWeight: 300,
                   fontSize: '0.6rem',
                   letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
                   color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
                   background: 'transparent',
                   border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
