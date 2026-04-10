@@ -18,6 +18,7 @@ const Collabs = lazy(() => import("./pages/Collabs"));
 const Policies = lazy(() => import("./pages/Policies"));
 const Admin = lazy(() => import("./pages/Admin"));
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const Lembrancas = lazy(() => import("./pages/Lembrancas"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -52,6 +53,7 @@ const App = () => (
                 <Route path="/collabs" element={<Collabs />} />
                 <Route path="/policies" element={<Policies />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/lembrancas" element={<Lembrancas />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
