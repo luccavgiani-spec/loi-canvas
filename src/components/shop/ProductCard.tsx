@@ -39,7 +39,7 @@ const ProductCard = ({ product }: Props) => {
         </button>
       </Link>
       <Link to={`/product/${product.slug}`}>
-        <h3 className="text-base font-medium mb-1">{product.name}</h3>
+        <h3 className="text-base font-medium mb-1" style={{ fontFamily: "'Wagon', sans-serif" }}>{product.name}</h3>
         <div className="flex items-center gap-2">
           <span className="text-base text-accent font-medium">R$ {product.price.toFixed(2)}</span>
           {product.compare_at_price && (
