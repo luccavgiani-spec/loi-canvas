@@ -7,7 +7,7 @@ import Header from '@/components/layout/Header';
    defers hydration of carousels, videos, FAQ, newsletter, and footer
    until the user approaches that content. */
 const HomeSections = lazy(() => import('@/components/home/HomeSections'));
-const HomeFooter = lazy(() => import('@/components/home/HomeFooter'));
+const Footer = lazy(() => import('@/components/layout/Footer'));
 
 const BelowFoldFallback = () => (
   <div style={{ background: '#fcf5e0', minHeight: '50vh' }} />
@@ -21,7 +21,7 @@ const Index = () => {
       <HeroSection />
       <Suspense fallback={<BelowFoldFallback />}>
         <HomeSections />
-        <HomeFooter />
+        <Footer />
       </Suspense>
     </>
   );

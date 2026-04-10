@@ -10,6 +10,7 @@ const FONT_BODY = "'Sackers Gothic', sans-serif";
 
 const MensagemForm = ({ dark = false }: MensagemFormProps) => {
   const [nome, setNome] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [assunto, setAssunto] = useState('');
   const [mensagem, setMensagem] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -43,6 +44,7 @@ const MensagemForm = ({ dark = false }: MensagemFormProps) => {
     try {
       const { error } = await supabase.from('mensagens').insert({
         nome: nome.trim(),
+        telefone: telefone.trim() || null,
         assunto: assunto || null,
         mensagem: mensagem.trim(),
       });
@@ -79,6 +81,14 @@ const MensagemForm = ({ dark = false }: MensagemFormProps) => {
           onChange={(e) => setNome(e.target.value)}
           placeholder="seu nome"
           required
+          style={inputStyle}
+        />
+
+        <input
+          type="tel"
+          value={telefone}
+          onChange={(e) => setTelefone(e.target.value)}
+          placeholder="seu telefone (opcional)"
           style={inputStyle}
         />
 
