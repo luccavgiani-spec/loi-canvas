@@ -1,23 +1,45 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-
 const Manifesto = () => {
   return (
-    <section className="py-20 md:py-28 bg-background">
-      <div className="container max-w-3xl text-center">
-        <span className="text-sm uppercase tracking-[0.3em] text-accent mb-6 block">Nosso Ateliê</span>
-        <h2 className="heading-display text-3xl md:text-4xl lg:text-5xl mb-6">
-          Cada vela é uma história, cada aroma é uma memória
-        </h2>
-        <p className="text-muted-foreground leading-relaxed mb-8">
-          Na Loiê, acreditamos que os aromas têm o poder de transformar ambientes e evocar sentimentos.
-          Nossas velas são produzidas em pequenos lotes, com cera de soja 100% vegetal e fragrâncias
-          cuidadosamente selecionadas por perfumistas brasileiros. Do derretimento ao rótulo,
-          cada detalhe é feito à mão no nosso ateliê em São Paulo.
-        </p>
-        <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 text-base uppercase tracking-wider">
-          <Link to="/about">Conheça nossa história</Link>
-        </Button>
+    <section className="py-20 md:py-28" style={{ background: '#fcf5e0' }}>
+      <div className="container max-w-5xl">
+        <span className="loi-label block mb-10">manifesto</span>
+        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
+
+          {/* Placeholder de foto */}
+          <div
+            className="aspect-[3/4] border border-dashed border-[#29241f]/30 bg-[#f4edd2] flex items-center justify-center"
+            aria-label="Foto em breve"
+          >
+            <span className="loi-label opacity-40">foto em breve</span>
+          </div>
+
+          {/* Texto do manifesto */}
+          <div
+            className="text-body text-justify text-[#29241f] font-light leading-[1.9]"
+            style={{ fontSize: 'clamp(1rem, 1.5vw, 1.2rem)' }}
+          >
+            <p className="mb-5">acendemos uma vela como quem abre uma porta.</p>
+            <p className="mb-5">uma porta pra dentro. pra memória. pra beleza que mora no silêncio.</p>
+            <p className="mb-5">
+              a loiê nasceu de uma casa antiga, de um ritual secreto, de um
+              saber que se aprende com as mãos e os sentidos.
+            </p>
+            <p className="mb-5">
+              cada aroma é uma narrativa, cada frasco é um convite a ficar
+              mais tempo com o que importa.
+            </p>
+            <p className="mb-5">
+              somos fogo, mas somos calma.<br />
+              somos essência, mas somos presença.<br />
+              somos brasileiros, feitos à mão, com técnica e alma.
+            </p>
+            <p>
+              não vendemos velas.<br />
+              criamos atmosferas.
+            </p>
+          </div>
+
+        </div>
       </div>
     </section>
   );
