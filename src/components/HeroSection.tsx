@@ -1,29 +1,54 @@
-import { storageUrl } from '@/lib/storage';
-import { VideoPlayer } from '@/components/ui/VideoPlayer';
+import { useState, useEffect } from 'react';
+import { bannerUrl } from '@/lib/storage';
 
-/* ─── video config ─── */
-const VIDEO_SRC = storageUrl('escritorio_cadeira__1_.mp4');
+/* ─── banner images ─── */
+const BANNER_IMAGES = [
+  bannerUrl('banners (1).webp'),
+  bannerUrl('banners (1) (1).webp'),
+  bannerUrl('banners (2).webp'),
+  bannerUrl('banners (3).webp'),
+  bannerUrl('banners (4).webp'),
+  bannerUrl('banners (5).webp'),
+  bannerUrl('banners (6).webp'),
+  bannerUrl('banners (7).webp'),
+  bannerUrl('banners (8).webp'),
+];
 
 /* ─── grain SVG data URI ─── */
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
 
 /* ─── component ─── */
 const HeroSection = () => {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % BANNER_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section
       className="relative w-full h-screen overflow-hidden"
       style={{ background: '#29241f' }}
     >
-      {/* ── video ── */}
-      <VideoPlayer
-        src={VIDEO_SRC}
-        poster="/hero/hero-poster.jpg"
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{
-          filter: 'saturate(0.65) brightness(0.60) contrast(1.05)',
-        }}
-      />
+      {/* ── banner images ── */}
+      {BANNER_IMAGES.map((src, i) => (
+        <img
+          key={src}
+          src={src}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            opacity: i === current ? 1 : 0,
+            transition: 'opacity 1.2s ease',
+            filter: 'saturate(0.65) brightness(0.60) contrast(1.05)',
+          }}
+          loading={i === 0 ? 'eager' : 'lazy'}
+        />
+      ))}
 
       {/* ── overlay ── */}
       <div
@@ -120,7 +145,12 @@ const HeroSection = () => {
           className="scroll-indicator flex flex-col items-center gap-2 hero-fadeUp"
           style={{ color: 'rgba(244,237,210,0.3)', animationDelay: '1.4s' }}
         >
-          <span className="loi-label" style={{ color: 'rgba(244,237,210,0.3)' }}>scroll</span>
+          <span
+            className="loi-label"
+            style={{ color: 'rgba(244,237,210,0.3)', textTransform: 'none' }}
+          >
+            scroll
+          </span>
           <svg width="16" height="24" viewBox="0 0 16 24" fill="none" stroke="currentColor" strokeWidth="1.2">
             <path d="M8 4v12M4 12l4 4 4-4" />
           </svg>
