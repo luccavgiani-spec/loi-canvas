@@ -3,11 +3,14 @@ import { useParams, Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { VideoPlayer } from '@/components/ui/VideoPlayer';
 import { getProductBySlug, getRelatedProducts } from '@/lib/api';
+import { FAMILIES } from '@/lib/families';
 import type { Product } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { Star, Truck, RefreshCw, Leaf, Package } from 'lucide-react';
 import ReviewSection from '@/components/product/ReviewSection';
 import ShippingCalculator from '@/components/ShippingCalculator';
+
+const FONT_BODY = "'Sackers Gothic', sans-serif";
 
 const benefits = [
   { icon: Truck, label: 'Frete grátis acima de R$ 299' },
@@ -50,6 +53,11 @@ const ProductDetail = () => {
       </Layout>
     );
   }
+
+  /* Famílias às quais este produto pertence */
+  const productFamilies = FAMILIES.filter((fam) =>
+    fam.products.some((p) => p.slug === product.slug)
+  );
 
   return (
     <Layout>
@@ -115,11 +123,74 @@ const ProductDetail = () => {
             {/* Info */}
             {/* FIX: min-w-0 impede que o grid item expanda além da coluna */}
             <div className="min-w-0">
+
+              {/* Nav família aromática */}
+              {productFamilies.length > 0 && (
+                <div className="mb-5 space-y-2">
+                  {productFamilies.map((fam) => (
+                    <div key={fam.label} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <span
+                        style={{
+                          fontFamily: FONT_BODY,
+                          fontWeight: 300,
+                          fontSize: '0.6rem',
+                          letterSpacing: '0.18em',
+                          color: 'rgba(0,0,0,0.4)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {fam.label}
+                      </span>
+                      <span style={{ color: 'rgba(0,0,0,0.2)', fontSize: '0.6rem' }}>·</span>
+                      {fam.products.map((p, i, arr) => {
+                        const isCurrent = p.slug === product.slug;
+                        return (
+                          <span key={p.slug} className="flex items-baseline gap-x-1">
+                            {isCurrent ? (
+                              <span
+                                style={{
+                                  fontFamily: FONT_BODY,
+                                  fontWeight: 300,
+                                  fontSize: '0.65rem',
+                                  letterSpacing: '0.12em',
+                                  color: '#000',
+                                }}
+                              >
+                                {p.name}
+                              </span>
+                            ) : (
+                              <Link
+                                to={`/product/${p.slug}`}
+                                style={{
+                                  fontFamily: FONT_BODY,
+                                  fontWeight: 300,
+                                  fontSize: '0.65rem',
+                                  letterSpacing: '0.12em',
+                                  color: 'rgba(0,0,0,0.4)',
+                                  textDecoration: 'none',
+                                  transition: 'color 0.3s ease',
+                                }}
+                                className="hover:!text-black"
+                              >
+                                {p.name}
+                              </Link>
+                            )}
+                            {i < arr.length - 1 && (
+                              <span style={{ color: 'rgba(0,0,0,0.2)', fontSize: '0.65rem', marginLeft: '2px' }}>·</span>
+                            )}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {product.badge && (
                 <span
                   className="inline-block mb-3"
                   style={{
-                    fontFamily: "'Sackers Gothic', sans-serif",
+                    fontFamily: FONT_BODY,
                     fontWeight: 300,
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
@@ -154,7 +225,7 @@ const ProductDetail = () => {
                 </div>
                 <span
                   style={{
-                    fontFamily: "'Sackers Gothic', sans-serif",
+                    fontFamily: FONT_BODY,
                     fontWeight: 300,
                     fontSize: '0.75rem',
                     color: '#000',
@@ -175,7 +246,7 @@ const ProductDetail = () => {
                 {product.compare_at_price && (
                   <span
                     style={{
-                      fontFamily: "'Sackers Gothic', sans-serif",
+                      fontFamily: FONT_BODY,
                       fontWeight: 300,
                       fontSize: '1rem',
                       color: '#000',
@@ -193,7 +264,7 @@ const ProductDetail = () => {
                 <p
                   className="mb-2 break-words"
                   style={{
-                    fontFamily: "'Sackers Gothic', 'Sackers Gothic', sans-serif",
+                    fontFamily: FONT_BODY,
                     fontWeight: 300,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
@@ -219,8 +290,9 @@ const ProductDetail = () => {
                 </p>
               )}
 
+              {/* Descrição — texto corrido, sem título */}
               <p
-                className="mb-8 break-words"
+                className="mb-6 break-words"
                 style={{
                   fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
@@ -232,6 +304,57 @@ const ProductDetail = () => {
               >
                 {product.description}
               </p>
+
+              {/* Sugestão de uso — sem título, conteúdo direto */}
+              {product.suggested_use && (
+                <p
+                  className="mb-6 break-words"
+                  style={{
+                    fontFamily: FONT_BODY,
+                    fontWeight: 300,
+                    fontSize: '0.82rem',
+                    color: '#000',
+                    lineHeight: 1.9,
+                  }}
+                >
+                  {product.suggested_use}
+                </p>
+              )}
+
+              {/* Composição — Cormorant Garamond, destaque visual */}
+              {product.composition && (
+                <p
+                  className="mb-6 break-words"
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontWeight: 400,
+                    fontStyle: 'italic',
+                    fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
+                    color: '#000',
+                    lineHeight: 1.7,
+                    borderLeft: '2px solid rgba(0,0,0,0.12)',
+                    paddingLeft: '1rem',
+                  }}
+                >
+                  {product.composition}
+                </p>
+              )}
+
+              {/* Ritual de uso — bloco sem título, integrado ao fluxo */}
+              {product.ritual && (
+                <p
+                  className="mb-6 break-words"
+                  style={{
+                    fontFamily: "'Wagon', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.9rem',
+                    color: 'rgba(0,0,0,0.7)',
+                    lineHeight: 1.85,
+                  }}
+                >
+                  {product.ritual}
+                </p>
+              )}
 
               {/* Shipping calculator */}
               <div className="mb-8">
@@ -245,7 +368,7 @@ const ProductDetail = () => {
                     <b.icon size={14} style={{ color: '#000', flexShrink: 0 }} />
                     <span
                       style={{
-                        fontFamily: "'Sackers Gothic', sans-serif",
+                        fontFamily: FONT_BODY,
                         fontWeight: 300,
                         fontSize: '0.72rem',
                         color: '#000',
@@ -278,44 +401,37 @@ const ProductDetail = () => {
                 </button>
               </div>
 
-              {/* Details */}
-              <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
-                {[
-                  product.suggested_use ? { title: 'uso sugerido', content: product.suggested_use } : null,
-                  product.composition ? { title: 'composição', content: product.composition } : null,
-                  product.ritual ? { title: 'ritual de uso', content: product.ritual } : null,
-                  product.details ? { title: 'detalhes', content: product.details } : null,
-                ]
-                  .filter(Boolean)
-                  .map((item) => (
-                    <details key={item!.title} style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
-                      <summary
-                        className="flex items-center justify-between py-4 cursor-pointer list-none"
-                        style={{
-                          fontFamily: "'Wagon', sans-serif",
-                          fontWeight: 400,
-                          fontSize: '1rem',
-                          color: '#000',
-                        }}
-                      >
-                        {item!.title}
-                        <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
-                      </summary>
-                      <p
-                        className="pb-4 break-words"
-                        style={{
-                          fontFamily: "'Sackers Gothic', sans-serif",
-                          fontWeight: 300,
-                          fontSize: '0.82rem',
-                          color: '#000',
-                          lineHeight: 1.8,
-                        }}
-                      >
-                        {item!.content}
-                      </p>
-                    </details>
-                  ))}
-              </div>
+              {/* Detalhes — accordion residual (apenas `details`) */}
+              {product.details && (
+                <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
+                  <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
+                    <summary
+                      className="flex items-center justify-between py-4 cursor-pointer list-none"
+                      style={{
+                        fontFamily: "'Wagon', sans-serif",
+                        fontWeight: 400,
+                        fontSize: '1rem',
+                        color: '#000',
+                      }}
+                    >
+                      detalhes
+                      <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
+                    </summary>
+                    <p
+                      className="pb-4 break-words"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.82rem',
+                        color: '#000',
+                        lineHeight: 1.8,
+                      }}
+                    >
+                      {product.details}
+                    </p>
+                  </details>
+                </div>
+              )}
 
             </div>
           </div>
@@ -356,7 +472,7 @@ const ProductDetail = () => {
                       <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1rem', color: '#000', marginBottom: 4 }}>
                         {p.name}
                       </h3>
-                      <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
+                      <span style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
                         R$ {p.price.toFixed(2)}
                       </span>
                     </Link>
