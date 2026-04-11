@@ -129,7 +129,7 @@ const PixForm = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1.05rem', color: '#000000', lineHeight: 1.6 }}>
+      <p style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1.05rem', color: '#000000', lineHeight: 1.6 }}>
         Clique no botão abaixo para gerar o QR Code PIX. O pagamento é confirmado instantaneamente.
       </p>
       <button
@@ -176,7 +176,7 @@ const PixQRCode = ({ qrCode, qrCodeBase64, amount }: { qrCode: string; qrCodeBas
         copiar código
       </button>
     </div>
-    <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000', textAlign: 'center' }}>
+    <p style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000', textAlign: 'center' }}>
       R$ {amount.toFixed(2)} — você receberá a confirmação por e-mail assim que o pagamento for processado.
     </p>
   </div>
@@ -442,7 +442,7 @@ const CardForm = ({
           {!mpReady ? 'carregando...' : isSubmitting ? 'processando...' : 'finalizar compra'}
         </button>
 
-        <p style={{ textAlign: 'center', fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '0.9rem', color: '#000000' }}>
+        <p style={{ textAlign: 'center', fontFamily: "'Wagon', sans-serif", fontSize: '0.9rem', color: '#000000' }}>
           pagamento seguro via Mercado Pago
         </p>
       </div>
@@ -620,7 +620,7 @@ const Checkout = () => {
     return (
       <Layout>
         <div style={{ maxWidth: 640, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
-          <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', color: '#000000' }}>
+          <p style={{ fontFamily: "'Wagon', sans-serif", color: '#000000' }}>
             Seu carrinho está vazio.
           </p>
         </div>
@@ -730,7 +730,7 @@ const Checkout = () => {
             <h2 style={{ fontFamily: "'Wagon', sans-serif", fontSize: '2.5rem', fontWeight: 300, color: '#000000', marginBottom: 12 }}>
               Pedido confirmado
             </h2>
-            <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', color: '#000000' }}>
+            <p style={{ fontFamily: "'Wagon', sans-serif", color: '#000000' }}>
               Você receberá um e-mail de confirmação em breve.
             </p>
           </div>
@@ -794,7 +794,7 @@ const Checkout = () => {
                     {shippingStatus === 'loading' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                         <Loader2 size={13} className="animate-spin" style={{ color: `${CHAR}66`, flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '0.95rem', color: '#000000' }}>
+                        <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '0.95rem', color: '#000000' }}>
                           Calculando prazo e custo de envio...
                         </span>
                       </div>
@@ -842,7 +842,7 @@ const Checkout = () => {
                 {step === 'form' && (
                   <>
                     {!isFormComplete && (
-                      <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000', marginBottom: 24 }}>
+                      <p style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000', marginBottom: 24 }}>
                         Preencha todos os dados acima para continuar.
                       </p>
                     )}
@@ -937,7 +937,7 @@ const Checkout = () => {
                 {step === 'processing' && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '32px 0' }}>
                     <Loader2 size={18} className="animate-spin" style={{ color: CHAR }} />
-                    <span style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1rem', color: '#000000' }}>
+                    <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>
                       processando...
                     </span>
                   </div>

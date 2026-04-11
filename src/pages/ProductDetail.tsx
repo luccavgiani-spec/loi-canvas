@@ -296,7 +296,6 @@ const ProductDetail = () => {
                 style={{
                   fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
-                  fontStyle: 'italic',
                   fontSize: '1.05rem',
                   color: '#000',
                   lineHeight: 1.8,
@@ -321,14 +320,13 @@ const ProductDetail = () => {
                 </p>
               )}
 
-              {/* Composição — Cormorant Garamond, destaque visual */}
+              {/* Composição — destaque visual */}
               {product.composition && (
                 <p
                   className="mb-6 break-words"
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "var(--font-body)",
                     fontWeight: 400,
-                    fontStyle: 'italic',
                     fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
                     color: '#000',
                     lineHeight: 1.7,

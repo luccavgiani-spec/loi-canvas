@@ -148,7 +148,6 @@ const OrderConfirmation = () => {
 
             <p style={{
               fontFamily: "'Wagon', sans-serif",
-              fontStyle: 'italic',
               fontSize: '0.95rem',
               color: `${CHAR}77`,
               lineHeight: 1.6,
@@ -259,7 +258,6 @@ const OrderConfirmation = () => {
                 </p>
                 <p style={{
                   fontFamily: "'Wagon', sans-serif",
-                  fontStyle: 'italic',
                   fontSize: '0.9rem',
                   color: `${CHAR}77`,
                   margin: '0 0 12px',
@@ -398,7 +396,6 @@ const OrderConfirmation = () => {
             </button>
             <p style={{
               fontFamily: "'Wagon', sans-serif",
-              fontStyle: 'italic',
               fontSize: '0.85rem',
               color: `${CHAR}55`,
             }}>

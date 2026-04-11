@@ -75,7 +75,6 @@ const Hero = () => {
           style={{
             fontFamily: "'Wagon', sans-serif",
             fontWeight: 200,
-            fontStyle: 'italic',
             fontSize: 'clamp(1rem, 2.5vw, 1.4rem)',
             color: 'rgba(244,237,210,0.75)',
             letterSpacing: '0.06em',

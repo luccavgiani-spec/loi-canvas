@@ -1,18 +1,10 @@
-/* Fonts: Wagon (local) + Sackers Gothic (local) — Cormorant Garamond and Montserrat removed */
+/* Fonts: Wagon (local) + Sackers Gothic (local) */
 
 @font-face {
   font-family: 'Wagon';
   src: url('/Wagon-ExtraLight.woff2') format('woff2');
   font-weight: 200;
   font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Wagon';
-  src: url('/Wagon-ExtraLightItalic.woff2') format('woff2');
-  font-weight: 200;
-  font-style: italic;
   font-display: swap;
 }
 

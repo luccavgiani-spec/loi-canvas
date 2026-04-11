@@ -90,7 +90,6 @@ const About = () => {
                   style={{
                     fontFamily: "'Wagon', sans-serif",
                     fontWeight: 300,
-                    fontStyle: 'italic',
                     fontSize: '1.05rem',
                     color: '#000',
                     lineHeight: 1.8,
@@ -161,7 +160,6 @@ const About = () => {
                     style={{
                       fontFamily: "'Wagon', sans-serif",
                       fontWeight: 200,
-                      fontStyle: 'italic',
                       fontSize: 'clamp(1.5rem, 4vw, 3rem)',
                       color: '#29241f',
                       lineHeight: 1.35,

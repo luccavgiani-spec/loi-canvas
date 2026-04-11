@@ -73,7 +73,7 @@ const CollectionPage = () => {
   if (loading || !collection) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">
-        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
+        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
           Carregando...
         </p>
       </div>
@@ -124,7 +124,6 @@ const CollectionPage = () => {
                 style={{
                   fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
-                  fontStyle: 'italic',
                   fontSize: '1.1rem',
                   color: 'rgba(244,237,210,0.35)',
                 }}
@@ -146,7 +145,6 @@ const CollectionPage = () => {
                 style={{
                   fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
-                  fontStyle: 'italic',
                   fontSize: 'clamp(1rem, 2vw, 1.15rem)',
                   color: 'rgba(244,237,210,0.55)',
                   lineHeight: 1.8,
@@ -212,7 +210,7 @@ const CollectionPage = () => {
             {/* Grid */}
             {sorted.length === 0 ? (
               <div className="min-h-[40vh] flex items-center justify-center">
-                <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 300, fontStyle: 'italic', color: 'rgba(0,0,0,0.5)' }}>
+                <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
                   Nenhum produto nesta coleção ainda.
                 </p>
               </div>
@@ -277,7 +275,6 @@ const CollectionPage = () => {
                         style={{
                           fontFamily: "'Wagon', sans-serif",
                           fontWeight: 300,
-                          fontStyle: 'italic',
                           fontSize: '0.82rem',
                           color: 'rgba(0,0,0,0.55)',
                           lineHeight: 1.5,
@@ -363,7 +360,6 @@ const CollectionPage = () => {
                           style={{
                             fontFamily: "'Wagon', sans-serif",
                             fontWeight: 300,
-                            fontStyle: 'italic',
                             fontSize: '0.85rem',
                             color: 'rgba(244,237,210,0.4)',
                             marginBottom: 4,

@@ -25,7 +25,6 @@ const NotFound = () => {
           style={{
             fontFamily: "'Wagon', sans-serif",
             fontWeight: 300,
-            fontStyle: 'italic',
             fontSize: '1.2rem',
             color: 'rgba(244,237,210,0.5)',
           }}

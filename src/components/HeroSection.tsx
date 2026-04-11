@@ -84,7 +84,7 @@ const HeroSection = () => {
             <span className="block overflow-hidden">
               <span
                 className="inline-block hero-wordReveal"
-                style={{ color: '#565600', fontStyle: 'italic', animationDelay: '0.3s' }}
+                style={{ color: '#565600', animationDelay: '0.3s' }}
               >
                 o aroma é
               </span>
@@ -104,7 +104,6 @@ const HeroSection = () => {
             style={{
               fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
-              fontStyle: 'italic',
               fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
               color: 'rgba(244,237,210,0.6)',
               lineHeight: 1.7,

@@ -148,7 +148,6 @@ const ProductCarousel = ({
               style={{
                 fontFamily: "'Wagon', sans-serif",
                 fontWeight: 300,
-                fontStyle: 'italic',
                 fontSize: '0.82rem',
                 color: 'rgba(0,0,0,0.55)',
                 lineHeight: 1.5,
@@ -261,7 +260,6 @@ const Shop = () => {
               style={{
                 fontFamily: "'Wagon', sans-serif",
                 fontWeight: 300,
-                fontStyle: 'italic',
                 fontSize: 'clamp(1rem, 2vw, 1.2rem)',
                 color: 'rgba(244,237,210,0.5)',
                 lineHeight: 1.8
@@ -294,7 +292,6 @@ const Shop = () => {
                       style={{
                         fontFamily: "'Wagon', sans-serif",
                         fontWeight: 300,
-                        fontStyle: 'italic',
                         fontSize: '1rem',
                         color: 'rgba(0,0,0,0.35)',
                         display: 'block',
@@ -317,7 +314,6 @@ const Shop = () => {
                       style={{
                         fontFamily: "'Wagon', sans-serif",
                         fontWeight: 300,
-                        fontStyle: 'italic',
                         fontSize: '1rem',
                         color: 'rgba(0,0,0,0.55)',
                         lineHeight: 1.7,

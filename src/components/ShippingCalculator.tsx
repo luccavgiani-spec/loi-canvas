@@ -98,7 +98,6 @@ const ShippingCalculator = () => {
           <Loader2 size={13} className="animate-spin" style={{ color: `${CHAR}66`, flexShrink: 0 }} />
           <span style={{
             fontFamily: "'Wagon', sans-serif",
-            fontStyle: 'italic',
             fontSize: '0.82rem',
             color: `${CHAR}77`,
           }}>

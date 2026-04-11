@@ -49,7 +49,6 @@ const Contact = () => {
                 style={{
                   fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
-                  fontStyle: 'italic',
                   fontSize: '1rem',
                   color: '#000',
                   lineHeight: 1.7,
