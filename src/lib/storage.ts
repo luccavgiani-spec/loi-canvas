@@ -13,7 +13,7 @@ export function storageUrl(filename: string): string {
 }
 
 export function bannerUrl(filename: string): string {
-  return `${SUPABASE_URL}/storage/v1/object/public/${BANNER_BUCKET}/${encodeURIComponent(filename)}?cache-control=${encodeURIComponent(CACHE_CONTROL)}`;
+  return `${SUPABASE_URL}/storage/v1/object/public/${BANNER_BUCKET}/${encodeURIComponent(filename)}`;
 }
 
 export function lembrancasUrl(filename: string): string {

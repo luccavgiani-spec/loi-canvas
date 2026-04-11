@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { bannerUrl } from '@/lib/storage';
 
+/* ─── olfactory families ─── */
+const FAMILIES = [
+  'cítricos e frescos',
+  'verdes e verbais',
+  'florais',
+  'amadeirados',
+  'especiados e quentes',
+  'gourmand e conforto',
+];
+
 /* ─── banner images ─── */
 const BANNER_IMAGES = [
   bannerUrl('banners (1).webp'),
@@ -20,6 +30,7 @@ const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 /* ─── component ─── */
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
+  const [activeFamily, setActiveFamily] = useState<string | null>(null);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -135,26 +146,47 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* ── bottom bar: scroll + symbol ── */}
+      {/* ── aromatics family bar ── */}
       <div
-        className="absolute z-[3] bottom-0 left-0 right-0 flex flex-col items-center gap-6 pb-[2rem] md:flex-row md:items-end md:justify-between md:px-[5rem] md:pb-[2.5rem]"
+        className="absolute z-[3] bottom-0 left-0 right-0"
+        style={{
+          background: 'rgba(41,36,31,0.35)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderTop: '1px solid rgba(244,237,210,0.08)',
+        }}
       >
-        {/* scroll indicator */}
-        <div
-          className="scroll-indicator flex flex-col items-center gap-2 hero-fadeUp"
-          style={{ color: 'rgba(244,237,210,0.3)', animationDelay: '1.4s' }}
-        >
+        <div className="max-w-[1400px] mx-auto px-6 md:px-[5rem] py-3 flex flex-wrap items-center gap-2">
           <span
-            className="loi-label"
-            style={{ color: 'rgba(244,237,210,0.3)', textTransform: 'none' }}
+            className="loi-label mr-2 hidden md:inline"
+            style={{ color: 'rgba(244,237,210,0.3)', whiteSpace: 'nowrap' }}
           >
-            scroll
+            família aromática
           </span>
-          <svg width="16" height="24" viewBox="0 0 16 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-            <path d="M8 4v12M4 12l4 4 4-4" />
-          </svg>
+          {FAMILIES.map((fam) => {
+            const isActive = activeFamily === fam;
+            return (
+              <button
+                key={fam}
+                onClick={() => setActiveFamily(isActive ? null : fam)}
+                style={{
+                  fontFamily: "'Sackers Gothic', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.6rem',
+                  letterSpacing: '0.18em',
+                  color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
+                  background: 'transparent',
+                  border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
+                  padding: '5px 14px',
+                  cursor: 'pointer',
+                  transition: 'color 0.3s ease, border-color 0.3s ease',
+                }}
+              >
+                {fam}
+              </button>
+            );
+          })}
         </div>
-
       </div>
     </section>
   );
