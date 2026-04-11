@@ -124,65 +124,61 @@ const ProductDetail = () => {
             {/* FIX: min-w-0 impede que o grid item expanda além da coluna */}
             <div className="min-w-0">
 
-              {/* Nav família aromática */}
+              {/* Nav família aromática — exibe apenas a primeira família, linha única */}
               {productFamilies.length > 0 && (
-                <div className="mb-5 space-y-2">
-                  {productFamilies.map((fam) => (
-                    <div key={fam.label} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <span
-                        style={{
-                          fontFamily: FONT_BODY,
-                          fontWeight: 300,
-                          fontSize: '0.6rem',
-                          letterSpacing: '0.18em',
-                          color: 'rgba(0,0,0,0.4)',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {fam.label}
-                      </span>
-                      <span style={{ color: 'rgba(0,0,0,0.2)', fontSize: '0.6rem' }}>·</span>
-                      {fam.products.map((p, i, arr) => {
-                        const isCurrent = p.slug === product.slug;
-                        return (
-                          <span key={p.slug} className="flex items-baseline gap-x-1">
-                            {isCurrent ? (
-                              <span
-                                style={{
-                                  fontFamily: FONT_BODY,
-                                  fontWeight: 300,
-                                  fontSize: '0.65rem',
-                                  letterSpacing: '0.12em',
-                                  color: '#000',
-                                }}
-                              >
-                                {p.name}
-                              </span>
-                            ) : (
-                              <Link
-                                to={`/product/${p.slug}`}
-                                style={{
-                                  fontFamily: FONT_BODY,
-                                  fontWeight: 300,
-                                  fontSize: '0.65rem',
-                                  letterSpacing: '0.12em',
-                                  color: 'rgba(0,0,0,0.4)',
-                                  textDecoration: 'none',
-                                  transition: 'color 0.3s ease',
-                                }}
-                                className="hover:!text-black"
-                              >
-                                {p.name}
-                              </Link>
-                            )}
-                            {i < arr.length - 1 && (
-                              <span style={{ color: 'rgba(0,0,0,0.2)', fontSize: '0.65rem', marginLeft: '2px' }}>·</span>
-                            )}
+                <div className="flex items-baseline mb-5" style={{ flexWrap: 'nowrap', overflowX: 'auto', gap: '0.75rem' }}>
+                  <span
+                    style={{
+                      fontFamily: FONT_BODY,
+                      fontWeight: 300,
+                      fontSize: '0.6rem',
+                      letterSpacing: '0.18em',
+                      color: 'rgba(0,0,0,0.4)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {productFamilies[0].label}
+                  </span>
+                  <span style={{ color: 'rgba(0,0,0,0.2)', fontSize: '0.6rem', flexShrink: 0 }}>·</span>
+                  {productFamilies[0].products.map((p, i, arr) => {
+                    const isCurrent = p.slug === product.slug;
+                    return (
+                      <span key={p.slug} className="flex items-baseline" style={{ gap: '0.25rem', flexShrink: 0 }}>
+                        {isCurrent ? (
+                          <span
+                            style={{
+                              fontFamily: FONT_BODY,
+                              fontWeight: 300,
+                              fontSize: '0.65rem',
+                              letterSpacing: '0.12em',
+                              color: '#000',
+                            }}
+                          >
+                            {p.name}
                           </span>
-                        );
-                      })}
-                    </div>
-                  ))}
+                        ) : (
+                          <Link
+                            to={`/product/${p.slug}`}
+                            style={{
+                              fontFamily: FONT_BODY,
+                              fontWeight: 300,
+                              fontSize: '0.65rem',
+                              letterSpacing: '0.12em',
+                              color: 'rgba(0,0,0,0.4)',
+                              textDecoration: 'none',
+                              transition: 'color 0.3s ease',
+                            }}
+                            className="hover:!text-black"
+                          >
+                            {p.name}
+                          </Link>
+                        )}
+                        {i < arr.length - 1 && (
+                          <span style={{ color: 'rgba(0,0,0,0.2)', fontSize: '0.65rem', marginLeft: '2px' }}>·</span>
+                        )}
+                      </span>
+                    );
+                  })}
                 </div>
               )}
 
@@ -258,61 +254,84 @@ const ProductDetail = () => {
                 )}
               </div>
 
-              {/* Accord & Notes */}
-              {product.notes && (
-                // FIX: break-words para notas longas não vazarem
+              {/* Família olfativa */}
+              {product.accord && (
                 <p
-                  className="mb-2 break-words"
+                  className="mb-3 break-words"
                   style={{
                     fontFamily: FONT_BODY,
                     fontWeight: 300,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
                     fontSize: '0.65rem',
-                    color: 'rgba(0,0,0,0.45)',
-                  }}
-                >
-                  {product.notes}
-                </p>
-              )}
-              {product.accord && (
-                <p
-                  className="mb-5 break-words"
-                  style={{
-                    fontFamily: "'Wagon', sans-serif",
-                    fontWeight: 400,
-                    fontSize: '0.9rem',
-                    color: 'rgba(0,0,0,0.55)',
-                    letterSpacing: '0.04em',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(0,0,0,0.5)',
                   }}
                 >
                   {product.accord}
                 </p>
               )}
 
-              {/* Descrição — texto corrido, sem título */}
-              <p
-                className="mb-6 break-words"
-                style={{
-                  fontFamily: "'Wagon', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '1.05rem',
-                  color: '#000',
-                  lineHeight: 1.8,
-                }}
-              >
-                {product.description}
-              </p>
-
-              {/* Sugestão de uso — sem título, conteúdo direto */}
-              {product.suggested_use && (
+              {/* Composição — texto corrido, sem caixa */}
+              {product.composition && (
                 <p
                   className="mb-6 break-words"
                   style={{
                     fontFamily: FONT_BODY,
                     fontWeight: 300,
-                    fontSize: '0.82rem',
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
                     color: '#000',
+                    lineHeight: 1.8,
+                  }}
+                >
+                  {product.composition}
+                </p>
+              )}
+
+              {/* Dropdown — Ritual de uso */}
+              {product.ritual && (
+                <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
+                  <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
+                    <summary
+                      className="flex items-center justify-between py-4 cursor-pointer list-none"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.72rem',
+                        letterSpacing: '0.12em',
+                        color: '#000',
+                      }}
+                    >
+                      RITUAL DE USO
+                      <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
+                    </summary>
+                    <p
+                      className="pb-4 break-words"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.82rem',
+                        color: '#000',
+                        lineHeight: 1.8,
+                      }}
+                    >
+                      {product.ritual}
+                    </p>
+                  </details>
+                </div>
+              )}
+
+              {/* Manual de uso — texto corrido, entre os dois dropdowns */}
+              {product.suggested_use && (
+                <p
+                  className="my-4 break-words"
+                  style={{
+                    fontFamily: FONT_BODY,
+                    fontWeight: 300,
+                    fontSize: '0.72rem',
+                    letterSpacing: '0.08em',
+                    color: 'rgba(0,0,0,0.6)',
                     lineHeight: 1.9,
                   }}
                 >
@@ -320,42 +339,41 @@ const ProductDetail = () => {
                 </p>
               )}
 
-              {/* Composição — destaque visual */}
-              {product.composition && (
-                <p
-                  className="mb-6 break-words"
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 400,
-                    fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
-                    color: '#000',
-                    lineHeight: 1.7,
-                    borderLeft: '2px solid rgba(0,0,0,0.12)',
-                    paddingLeft: '1rem',
-                  }}
-                >
-                  {product.composition}
-                </p>
-              )}
-
-              {/* Ritual de uso — bloco sem título, integrado ao fluxo */}
-              {product.ritual && (
-                <p
-                  className="mb-6 break-words"
-                  style={{
-                    fontFamily: "'Wagon', sans-serif",
-                    fontWeight: 300,
-                    fontSize: '0.9rem',
-                    color: 'rgba(0,0,0,0.7)',
-                    lineHeight: 1.85,
-                  }}
-                >
-                  {product.ritual}
-                </p>
+              {/* Dropdown — Indicação */}
+              {product.details && (
+                <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
+                  <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
+                    <summary
+                      className="flex items-center justify-between py-4 cursor-pointer list-none"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.72rem',
+                        letterSpacing: '0.12em',
+                        color: '#000',
+                      }}
+                    >
+                      INDICAÇÃO
+                      <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
+                    </summary>
+                    <p
+                      className="pb-4 break-words"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.82rem',
+                        color: '#000',
+                        lineHeight: 1.8,
+                      }}
+                    >
+                      {product.details}
+                    </p>
+                  </details>
+                </div>
               )}
 
               {/* Shipping calculator */}
-              <div className="mb-8">
+              <div className="mb-8 mt-6">
                 <ShippingCalculator />
               </div>
 
@@ -399,37 +417,6 @@ const ProductDetail = () => {
                 </button>
               </div>
 
-              {/* Detalhes — accordion residual (apenas `details`) */}
-              {product.details && (
-                <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
-                  <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
-                    <summary
-                      className="flex items-center justify-between py-4 cursor-pointer list-none"
-                      style={{
-                        fontFamily: "'Wagon', sans-serif",
-                        fontWeight: 400,
-                        fontSize: '1rem',
-                        color: '#000',
-                      }}
-                    >
-                      detalhes
-                      <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
-                    </summary>
-                    <p
-                      className="pb-4 break-words"
-                      style={{
-                        fontFamily: FONT_BODY,
-                        fontWeight: 300,
-                        fontSize: '0.82rem',
-                        color: '#000',
-                        lineHeight: 1.8,
-                      }}
-                    >
-                      {product.details}
-                    </p>
-                  </details>
-                </div>
-              )}
 
             </div>
           </div>

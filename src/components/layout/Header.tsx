@@ -205,7 +205,7 @@ const Header = () => {
                           {item.num}
                         </span>
                         <span
-                          style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'lowercase', fontSize: '0.68rem', color: 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'inline' }}
+                          style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', fontSize: '0.68rem', color: 'rgba(244,237,210,0.6)', transition: 'color 0.3s ease', display: 'inline' }}
                           className="group-hover/item:!text-[#989857]"
                         >
                           {item.label}

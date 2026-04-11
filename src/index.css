@@ -145,6 +145,7 @@
     @apply bg-background text-foreground;
     font-family: var(--font-body);
     color: #29241f;
+    text-transform: uppercase;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
