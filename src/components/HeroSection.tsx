@@ -156,7 +156,7 @@ const HeroSection = () => {
           borderTop: '1px solid rgba(244,237,210,0.08)',
         }}
       >
-        <div className="max-w-[1400px] mx-auto px-6 md:px-[5rem] py-3 flex flex-wrap items-center gap-2">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-[5rem] py-3 flex flex-nowrap md:flex-wrap items-center gap-2 aromatic-bar">
           <span
             className="loi-label mr-2 hidden md:inline"
             style={{ color: 'rgba(244,237,210,0.3)', whiteSpace: 'nowrap' }}
@@ -169,6 +169,7 @@ const HeroSection = () => {
               <button
                 key={fam}
                 onClick={() => setActiveFamily(isActive ? null : fam)}
+                className="shrink-0"
                 style={{
                   fontFamily: "'Sackers Gothic', sans-serif",
                   fontWeight: 300,
@@ -180,6 +181,7 @@ const HeroSection = () => {
                   padding: '5px 14px',
                   cursor: 'pointer',
                   transition: 'color 0.3s ease, border-color 0.3s ease',
+                  scrollSnapAlign: 'start',
                 }}
               >
                 {fam}
