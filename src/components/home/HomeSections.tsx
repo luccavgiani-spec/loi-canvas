@@ -452,7 +452,6 @@ const HomeSections = () => {
             fontWeight: 300,
             fontSize: '0.6rem',
             letterSpacing: '0.28em',
-            textTransform: 'lowercase',
             color: 'rgba(41,36,31,0.3)',
           }}
         >

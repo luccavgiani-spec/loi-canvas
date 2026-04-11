@@ -131,7 +131,6 @@ const Footer = () => {
                 fontWeight: 300,
                 fontSize: '0.58rem',
                 letterSpacing: '0.2em',
-                textTransform: 'lowercase',
                 color: 'rgba(244,237,210,0.2)',
                 marginTop: '0.75rem',
               }}
@@ -282,7 +281,7 @@ const Footer = () => {
         {/* ── Brand signature ── */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', marginTop: '1.2rem' }}>
           <img src="/hero/SIMBOLO_t.png" alt="" width={18} height={18} loading="lazy" style={{ opacity: 0.15 }} />
-          <span style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(244,237,210,0.2)', textTransform: 'lowercase' }}>
+          <span style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(244,237,210,0.2)' }}>
             somos brasileiros, feitos à mão, com técnica e com alma
           </span>
         </div>
