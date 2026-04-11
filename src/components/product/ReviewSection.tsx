@@ -143,7 +143,7 @@ const ReviewSection = ({ productId }: ReviewSectionProps) => {
           Carregando avaliações...
         </p>
       ) : reviews.length === 0 ? (
-        <p style={{ textAlign: 'center', fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1rem', color: 'rgba(41,36,31,0.5)' }}>
+        <p style={{ textAlign: 'center', fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: 'rgba(41,36,31,0.5)' }}>
           Seja o primeiro a avaliar este produto.
         </p>
       ) : (
@@ -196,7 +196,7 @@ const ReviewSection = ({ productId }: ReviewSectionProps) => {
         </h3>
 
         {submitted ? (
-          <p style={{ fontFamily: "'Wagon', sans-serif", fontStyle: 'italic', fontSize: '1.1rem', color: '#29241f' }}>
+          <p style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1.1rem', color: '#29241f' }}>
             Avaliação recebida. Publicaremos em breve.
           </p>
         ) : (

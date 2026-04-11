@@ -118,7 +118,6 @@ const Footer = () => {
               style={{
                 fontFamily: "'Wagon', sans-serif",
                 fontWeight: 200,
-                fontStyle: 'italic',
                 fontSize: '0.95rem',
                 color: 'rgba(244,237,210,0.4)',
                 lineHeight: 1.7,

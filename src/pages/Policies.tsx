@@ -47,7 +47,6 @@ const Policies = () => {
                   style={{
                     fontFamily: "'Wagon', sans-serif",
                     fontWeight: 300,
-                    fontStyle: 'italic',
                     fontSize: '1rem',
                     color: 'rgba(41,36,31,0.5)',
                     lineHeight: 1.8,

@@ -233,7 +233,6 @@ const ProductFocusBanner = memo(({
             style={{
               fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
-              fontStyle: 'italic',
               fontSize: '1.05rem',
               color: '#29241f',
               lineHeight: 1.8,
@@ -398,7 +397,6 @@ const HomeSections = () => {
           style={{
             fontFamily: "'Wagon', sans-serif",
             fontWeight: 300,
-            fontStyle: 'italic',
             fontSize: 'clamp(1.1rem, 2.2vw, 1.5rem)',
             color: 'rgba(41,36,31,0.35)',
             letterSpacing: '0.02em',
@@ -560,7 +558,6 @@ const HomeSections = () => {
             style={{
               fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
-              fontStyle: 'italic',
               fontSize: '1.05rem',
               color: '#000',
               lineHeight: 1.7,

@@ -211,7 +211,7 @@ const Header = () => {
                           {item.label}
                         </span>
                         {item.desc && (
-                          <span style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 200, fontStyle: 'italic', fontSize: '0.75rem', color: dropdownMuted, display: 'block', marginTop: 2, paddingLeft: '1.2rem' }}>
+                          <span style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 200, fontSize: '0.75rem', color: dropdownMuted, display: 'block', marginTop: 2, paddingLeft: '1.2rem' }}>
                             {item.desc}
                           </span>
                         )}

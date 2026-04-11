@@ -80,7 +80,6 @@ const CollabDetailCard = ({ collab }: { collab: Collab }) => {
           style={{
             fontFamily: "'Wagon', sans-serif",
             fontWeight: 300,
-            fontStyle: 'italic',
             fontSize: '1.05rem',
             color: '#000',
             lineHeight: 1.8,
@@ -122,7 +121,6 @@ const Collabs = () => {
               style={{
                 fontFamily: "'Wagon', sans-serif",
                 fontWeight: 300,
-                fontStyle: 'italic',
                 fontSize: '1.1rem',
                 color: '#000',
                 maxWidth: 500,
