@@ -1,15 +1,16 @@
 import Layout from '@/components/layout/Layout';
 import { Link } from 'react-router-dom';
+import { aboutUrl } from '@/lib/storage';
 
 const About = () => {
   return (
     <Layout>
       {/* ─── BLOCO 1 — ABERTURA ─── */}
       <section
-        className="min-h-screen flex items-end"
+        className="min-h-[45vh] md:min-h-[50vh] flex items-end"
         style={{ background: '#29241f' }}
       >
-        <div className="pb-16 pl-8 md:pl-16">
+        <div className="pb-10 pl-8 md:pl-16">
           <span
             style={{
               fontFamily: "'Sackers Gothic', sans-serif",
@@ -42,7 +43,7 @@ const About = () => {
       {/* ─── BLOCO 2 — INTRODUÇÃO EDITORIAL ─── */}
       <section style={{ background: '#fcf5e0' }}>
         <div className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-          {/* Coluna esquerda — texto */}
+          {/* Coluna esquerda — manifesto */}
           <div
             className="md:sticky"
             style={{
@@ -51,6 +52,50 @@ const About = () => {
               padding: 'clamp(2rem, 6vw, 4rem)',
             }}
           >
+            {[
+              'acendemos uma vela como quem abre uma porta.',
+              'uma porta pra dentro. pra memória. pra beleza que mora no silêncio.',
+              'a loiê nasceu de uma casa antiga, de um ritual secreto, de um saber que se aprende com as mãos e os sentidos.',
+              'cada aroma é uma narrativa, cada frasco é um convite a ficar mais tempo com o que importa.',
+            ].map((line, i) => (
+              <p
+                key={i}
+                style={{
+                  fontFamily: "'Sackers Gothic', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.85rem',
+                  color: '#29241f',
+                  lineHeight: 1.9,
+                  maxWidth: '24rem',
+                  marginBottom: '2rem',
+                }}
+              >
+                {line}
+              </p>
+            ))}
+
+            {[
+              'somos fogo, mas somos calma.',
+              'somos essência, mas somos presença.',
+              'somos brasileiros, feitos à mão, com técnica e alma.',
+            ].map((line, i) => (
+              <p
+                key={`italic-${i}`}
+                style={{
+                  fontFamily: "'Sackers Gothic', sans-serif",
+                  fontWeight: 300,
+                  fontStyle: 'italic',
+                  fontSize: '0.85rem',
+                  color: '#29241f',
+                  lineHeight: 1.9,
+                  maxWidth: '24rem',
+                  marginBottom: '2rem',
+                }}
+              >
+                {line}
+              </p>
+            ))}
+
             <p
               style={{
                 fontFamily: "'Sackers Gothic', sans-serif",
@@ -59,12 +104,10 @@ const About = () => {
                 color: '#29241f',
                 lineHeight: 1.9,
                 maxWidth: '24rem',
-                marginBottom: '2rem',
+                marginBottom: '0.5rem',
               }}
             >
-              a loiê nasceu de uma casa antiga. de um saber que se aprende com
-              as mãos. de um tempo em que o perfume ainda tinha nome próprio e
-              endereço.
+              não vendemos velas.
             </p>
             <p
               style={{
@@ -76,13 +119,11 @@ const About = () => {
                 maxWidth: '24rem',
               }}
             >
-              cada vela é uma afirmação silenciosa: de que beleza não precisa
-              explicar. de que o aroma faz o que a palavra não consegue. de que
-              existe arte no que queima.
+              criamos atmosferas.
             </p>
           </div>
 
-          {/* Coluna direita — slots de imagem */}
+          {/* Coluna direita — imagens */}
           <div
             style={{
               display: 'flex',
@@ -91,42 +132,14 @@ const About = () => {
               padding: '1rem 1rem 1rem 0',
             }}
           >
-            {/* TODO: substituir pelos paths reais do bucket Supabase */}
-            <div
-              className="aspect-[3/4] bg-stone-200 flex items-center justify-center w-full"
-              style={{
-                fontFamily: "'Sackers Gothic', sans-serif",
-                fontSize: '0.6rem',
-                letterSpacing: '0.15em',
-                color: '#a8a29e',
-                textTransform: 'uppercase',
-              }}
-            >
-              [FOTO 1 — aguardando entrega]
+            <div className="aspect-[3/4] w-full overflow-hidden">
+              <img src={aboutUrl('banner hero.jpg')} alt="" className="w-full h-full object-cover" />
             </div>
-            <div
-              className="aspect-[3/4] bg-stone-200 flex items-center justify-center w-full"
-              style={{
-                fontFamily: "'Sackers Gothic', sans-serif",
-                fontSize: '0.6rem',
-                letterSpacing: '0.15em',
-                color: '#a8a29e',
-                textTransform: 'uppercase',
-              }}
-            >
-              [FOTO 2 — aguardando entrega]
+            <div className="aspect-[3/4] w-full overflow-hidden">
+              <img src={aboutUrl('conceitual 4.jpg')} alt="" className="w-full h-full object-cover" />
             </div>
-            <div
-              className="aspect-[3/4] bg-stone-200 flex items-center justify-center w-full"
-              style={{
-                fontFamily: "'Sackers Gothic', sans-serif",
-                fontSize: '0.6rem',
-                letterSpacing: '0.15em',
-                color: '#a8a29e',
-                textTransform: 'uppercase',
-              }}
-            >
-              [FOTO 3 — aguardando entrega]
+            <div className="aspect-[3/4] w-full overflow-hidden">
+              <img src={aboutUrl('conceitual 2.jpg')} alt="" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -155,89 +168,35 @@ const About = () => {
             MANIFESTO
           </span>
 
-          {[
-            'acendemos uma vela como quem abre uma porta.',
-            'uma porta pra dentro. pra memória. pra beleza que mora no silêncio.',
-            'a loiê nasceu de uma casa antiga, de um ritual secreto, de um saber que se aprende com as mãos e os sentidos.',
-            'cada aroma é uma narrativa, cada frasco é um convite a ficar mais tempo com o que importa.',
-          ].map((line, i) => (
-            <p
-              key={i}
-              style={{
-                fontFamily: "'Wagon', sans-serif",
-                fontWeight: 300,
-                fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
-                color: '#f4edd2',
-                lineHeight: 1.7,
-                marginBottom: '1.5rem',
-              }}
-            >
-              {line}
-            </p>
-          ))}
-
-          {[
-            'somos fogo, mas somos calma.',
-            'somos essência, mas somos presença.',
-            'somos brasileiros, feitos à mão, com técnica e alma.',
-          ].map((line, i) => (
-            <p
-              key={`italic-${i}`}
-              style={{
-                fontFamily: "'Wagon', sans-serif",
-                fontWeight: 300,
-                fontStyle: 'italic',
-                fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
-                color: '#f4edd2',
-                lineHeight: 1.7,
-                marginBottom: '1.5rem',
-              }}
-            >
-              {line}
-            </p>
-          ))}
-
-          <div style={{ marginTop: '2.5rem' }}>
-            <p
-              style={{
-                fontFamily: "'Wagon', sans-serif",
-                fontWeight: 300,
-                fontSize: 'clamp(1.6rem, 4vw, 2.25rem)',
-                color: '#f4edd2',
-                lineHeight: 1.3,
-                marginBottom: '0.75rem',
-              }}
-            >
-              não vendemos velas.
-            </p>
-            <p
-              style={{
-                fontFamily: "'Wagon', sans-serif",
-                fontWeight: 300,
-                fontSize: 'clamp(1.6rem, 4vw, 2.25rem)',
-                color: '#f4edd2',
-                lineHeight: 1.3,
-              }}
-            >
-              criamos atmosferas.
-            </p>
-          </div>
+          <p
+            style={{
+              fontFamily: "'Wagon', sans-serif",
+              fontWeight: 300,
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+              color: '#f4edd2',
+              lineHeight: 1.7,
+              marginBottom: '1.5rem',
+            }}
+          >
+            a loiê nasceu de uma casa antiga. de um saber que se aprende com as mãos. de um tempo em que o perfume ainda tinha nome próprio e endereço.
+          </p>
+          <p
+            style={{
+              fontFamily: "'Wagon', sans-serif",
+              fontWeight: 300,
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+              color: '#f4edd2',
+              lineHeight: 1.7,
+            }}
+          >
+            cada vela é uma afirmação silenciosa: de que beleza não precisa explicar. de que o aroma faz o que a palavra não consegue. de que existe arte no que queima.
+          </p>
         </div>
       </section>
 
       {/* ─── BLOCO 4 — IMAGEM CONCEITUAL ─── */}
-      <div
-        className="w-full aspect-[21/9] bg-stone-300 flex items-center justify-center"
-        style={{
-          fontFamily: "'Sackers Gothic', sans-serif",
-          fontSize: '0.6rem',
-          letterSpacing: '0.15em',
-          color: '#a8a29e',
-          textTransform: 'uppercase',
-        }}
-      >
-        {/* TODO: substituir pelo path da imagem conceitual no bucket Supabase */}
-        [FOTO CONCEITUAL — aguardando entrega]
+      <div className="w-full aspect-[21/9] overflow-hidden">
+        <img src={aboutUrl('banner conceitual.jpg')} alt="" className="w-full h-full object-cover" />
       </div>
 
       {/* ─── BLOCO 5 — FILOSOFIA (3 pilares) ─── */}
@@ -321,18 +280,8 @@ const About = () => {
       {/* ─── BLOCO 6 — IMAGEM + CITAÇÃO ─── */}
       <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
         {/* Coluna esquerda — imagem */}
-        <div
-          className="aspect-square bg-stone-200 flex items-center justify-center"
-          style={{
-            fontFamily: "'Sackers Gothic', sans-serif",
-            fontSize: '0.6rem',
-            letterSpacing: '0.15em',
-            color: '#a8a29e',
-            textTransform: 'uppercase',
-          }}
-        >
-          {/* TODO: substituir pelo path da imagem no bucket Supabase */}
-          [FOTO — aguardando entrega]
+        <div className="aspect-square overflow-hidden">
+          <img src={aboutUrl('conceitual 3.jpg')} alt="" className="w-full h-full object-cover" />
         </div>
 
         {/* Coluna direita — citação */}
