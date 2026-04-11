@@ -1,233 +1,412 @@
 import Layout from '@/components/layout/Layout';
-import { VideoPlayer } from '@/components/ui/VideoPlayer';
-import { storageUrl } from '@/lib/storage';
-
-const banner01 = storageUrl('loie_vela_campos_imagem.JPG');
-const heroVideo = storageUrl('Cartao_Postal_Loie.mp4');
-/* grain SVG (same as home hero) */
-const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
 import { Link } from 'react-router-dom';
-import { useReveal } from '@/hooks/useReveal';
 
 const About = () => {
-  const ref = useReveal();
-
   return (
     <Layout>
-      <div ref={ref}>
-        {/* Hero banner */}
-        <section className="relative w-full overflow-hidden" style={{ height: 'clamp(350px, 60vh, 720px)', background: '#29241f' }}>
-          {/* video */}
-          <VideoPlayer
-            src={heroVideo}
-            poster={banner01}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: 'saturate(0.70) brightness(0.72) contrast(1.05)' }}
-          />
-
-          {/* overlay (radial vignette + top/bottom gradient) */}
-          <div
-            className="absolute inset-0 pointer-events-none"
+      {/* ─── BLOCO 1 — ABERTURA ─── */}
+      <section
+        className="min-h-screen flex items-end"
+        style={{ background: '#29241f' }}
+      >
+        <div className="pb-16 pl-8 md:pl-16">
+          <span
             style={{
-              background: `
-                radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.02) 0%, rgba(41,36,31,0.35) 100%),
-                linear-gradient(to bottom, rgba(41,36,31,0.40) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 55%, rgba(41,36,31,0.70) 100%)
-              `,
+              fontFamily: "'Sackers Gothic', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.7rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: '#989857',
+              display: 'block',
+              marginBottom: '1rem',
             }}
-          />
-
-          {/* bottom fade into brown — seamless transition */}
-          <div
-            className="absolute bottom-0 left-0 right-0 pointer-events-none"
+          >
+            SOBRE
+          </span>
+          <h1
             style={{
-              height: '40%',
-              background: 'linear-gradient(to bottom, transparent 0%, rgba(41,36,31,0.20) 40%, rgba(41,36,31,0.55) 70%, #29241f 100%)',
+              fontFamily: "'Wagon', sans-serif",
+              fontWeight: 300,
+              fontSize: 'clamp(3.5rem, 9vw, 7rem)',
+              color: '#f4edd2',
+              lineHeight: 1,
+              margin: 0,
             }}
-          />
+          >
+            SALA AROMÁTICA
+          </h1>
+        </div>
+      </section>
 
-          {/* grain */}
+      {/* ─── BLOCO 2 — INTRODUÇÃO EDITORIAL ─── */}
+      <section style={{ background: '#fcf5e0' }}>
+        <div className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
+          {/* Coluna esquerda — texto */}
           <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ opacity: 0.04, backgroundImage: GRAIN_SVG, backgroundSize: '200px 200px' }}
-          />
-
-          {/* content */}
-          <div className="relative z-[1] flex items-center justify-center h-full px-6">
-            <div className="text-center">
-              <span className="loi-label block mb-4">sobre a loiê</span>
-              <h1
-                className="heading-display"
-                style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', color: '#f4edd2', lineHeight: 0.95 }}
-              >
-                Nossa História
-              </h1>
-            </div>
-          </div>
-        </section>
-
-        {/* Story */}
-        <section className="py-12 md:py-16 px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-              <div className="reveal-left">
-                <img
-                  src={banner01}
-                  alt="Produção artesanal"
-                  className="w-full aspect-[4/3] object-cover"
-                  style={{ filter: 'saturate(0.6) brightness(0.7)' }}
-                />
-              </div>
-              <div className="reveal-right">
-                <span className="loi-label block mb-4">origem</span>
-                <h2
-                  className="heading-display mb-6"
-                  style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: '#000', lineHeight: 1.15 }}
-                >
-                  Manifesto
-                </h2>
-                <div className="loi-divider mb-6" />
-                <p
-                  style={{
-                    fontFamily: "'Wagon', sans-serif",
-                    fontWeight: 300,
-                    fontSize: '1.05rem',
-                    color: '#000',
-                    lineHeight: 1.8,
-                    marginBottom: '1rem',
-                  }}
-                >
-                  Acendemos uma vela como quem abre uma porta. Uma porta para dentro. Pra memória. Pra beleza que mora no silêncio.
-                  {'\n\n'}
-                  A Loiê nasceu de uma casa antiga, de um ritual secreto, de um saber que se aprende com as mãos e os sentidos.
-                  {'\n\n'}
-                  Cada aroma é uma narrativa, cada frasco é um convite a ficar mais tempo com o que importa.
-                  {'\n\n'}
-                  Somos fogo, mas somos calma. Somos essência, mas somos presença. Somos brasileiros, feitos à mão, com técnica e com alma.
-                  {'\n\n'}
-                  Não vendemos velas. Criamos atmosferas.
-                </p>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="reveal-stagger grid md:grid-cols-3 gap-8 text-center mb-20">
-              {[
-                { num: '100%', label: 'Cera de soja vegetal' },
-                { num: '50h+', label: 'Duração por vela' },
-                { num: '12', label: 'Etapas artesanais' },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="reveal py-10 px-6"
-                  style={{ border: '1px solid rgba(86,86,0,0.15)' }}
-                >
-                  <p
-                    className="heading-display mb-2"
-                    style={{ fontSize: '2.5rem', color: '#000' }}
-                  >
-                    {stat.num}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "'Sackers Gothic', sans-serif",
-                      fontWeight: 300,
-                      fontSize: '0.75rem',
-                      color: '#000',
-                      letterSpacing: '0.15em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Manifesto — editorial typographic layout */}
-            <div className="reveal">
-              <span className="loi-label block mb-12 text-center">manifesto</span>
-
-              {/* Stanzas */}
-              <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
-                {[
-                  'acendemos uma vela como quem abre uma porta.\numa porta pra dentro. pra memória. pra beleza que mora no silêncio.',
-                  'a loiê nasceu de uma casa antiga, de um ritual secreto, de um saber\nque se aprende com as mãos e os sentidos.',
-                  'cada aroma é uma narrativa, cada frasco é um convite\na ficar mais tempo com o que importa.',
-                  'somos fogo, mas somos calma.\nsomos essência, mas somos presença.\nsomos brasileiros, feitos à mão, com técnica e alma.',
-                ].map((stanza, i) => (
-                  <p
-                    key={i}
-                    style={{
-                      fontFamily: "'Wagon', sans-serif",
-                      fontWeight: 200,
-                      fontSize: 'clamp(1.5rem, 4vw, 3rem)',
-                      color: '#29241f',
-                      lineHeight: 1.35,
-                      letterSpacing: '0.01em',
-                      whiteSpace: 'pre-line',
-                      marginBottom: 'clamp(2rem, 4vh, 3rem)',
-                    }}
-                  >
-                    {stanza}
-                  </p>
-                ))}
-
-                {/* Final stanza — larger for emphasis */}
-                <p
-                  style={{
-                    fontFamily: "'Wagon', sans-serif",
-                    fontWeight: 700,
-                    fontSize: 'clamp(1.8rem, 5vw, 3.6rem)',
-                    color: '#29241f',
-                    lineHeight: 1.2,
-                    letterSpacing: '0.02em',
-                    marginBottom: 'clamp(2rem, 4vh, 3rem)',
-                  }}
-                >
-                  não vendemos velas.<br />criamos atmosferas.
-                </p>
-
-                {/* Photo placeholder */}
-                <div
-                  style={{
-                    border: '1px dashed rgba(41,36,31,0.2)',
-                    padding: '4rem 2rem',
-                    textAlign: 'center',
-                    color: 'rgba(41,36,31,0.3)',
-                    fontFamily: "'Sackers Gothic', sans-serif",
-                    fontSize: '0.65rem',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    marginTop: '4rem',
-                  }}
-                >
-                  espaço reservado — foto do ateliê a ser fornecida
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Brand philosophy — subtle, for SEO and the curious reader */}
-          <div className="reveal mt-16 pt-12" style={{ borderTop: '1px solid rgba(41,36,31,0.06)', maxWidth: '520px', margin: '4rem auto 0' }}>
+            className="md:sticky"
+            style={{
+              top: '6rem',
+              alignSelf: 'start',
+              padding: 'clamp(2rem, 6vw, 4rem)',
+            }}
+          >
             <p
               style={{
                 fontFamily: "'Sackers Gothic', sans-serif",
                 fontWeight: 300,
-                fontSize: '0.7rem',
-                letterSpacing: '0.08em',
-                color: 'rgba(41,36,31,0.28)',
-                lineHeight: 2,
-                textAlign: 'center',
+                fontSize: '0.85rem',
+                color: '#29241f',
+                lineHeight: 1.9,
+                maxWidth: '24rem',
+                marginBottom: '2rem',
               }}
             >
-              Profundo conhecimento em construção olfativa, com foco em óleos essenciais,
-              mas abertura para fragrâncias que elevem a experiência sem comprometer a
-              identidade e segurança da marca.
+              a loiê nasceu de uma casa antiga. de um saber que se aprende com
+              as mãos. de um tempo em que o perfume ainda tinha nome próprio e
+              endereço.
+            </p>
+            <p
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.85rem',
+                color: '#29241f',
+                lineHeight: 1.9,
+                maxWidth: '24rem',
+              }}
+            >
+              cada vela é uma afirmação silenciosa: de que beleza não precisa
+              explicar. de que o aroma faz o que a palavra não consegue. de que
+              existe arte no que queima.
             </p>
           </div>
-        </section>
+
+          {/* Coluna direita — slots de imagem */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              padding: '1rem 1rem 1rem 0',
+            }}
+          >
+            {/* TODO: substituir pelos paths reais do bucket Supabase */}
+            <div
+              className="aspect-[3/4] bg-stone-200 flex items-center justify-center w-full"
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontSize: '0.6rem',
+                letterSpacing: '0.15em',
+                color: '#a8a29e',
+                textTransform: 'uppercase',
+              }}
+            >
+              [FOTO 1 — aguardando entrega]
+            </div>
+            <div
+              className="aspect-[3/4] bg-stone-200 flex items-center justify-center w-full"
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontSize: '0.6rem',
+                letterSpacing: '0.15em',
+                color: '#a8a29e',
+                textTransform: 'uppercase',
+              }}
+            >
+              [FOTO 2 — aguardando entrega]
+            </div>
+            <div
+              className="aspect-[3/4] bg-stone-200 flex items-center justify-center w-full"
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontSize: '0.6rem',
+                letterSpacing: '0.15em',
+                color: '#a8a29e',
+                textTransform: 'uppercase',
+              }}
+            >
+              [FOTO 3 — aguardando entrega]
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── BLOCO 3 — MANIFESTO ─── */}
+      <section
+        style={{
+          background: '#29241f',
+          padding: 'clamp(5rem, 10vw, 8rem) clamp(1.5rem, 6vw, 4rem)',
+        }}
+      >
+        <div style={{ maxWidth: '42rem', margin: '0 auto', textAlign: 'center' }}>
+          <span
+            style={{
+              fontFamily: "'Sackers Gothic', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.7rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: '#989857',
+              display: 'block',
+              marginBottom: '3rem',
+            }}
+          >
+            MANIFESTO
+          </span>
+
+          {[
+            'acendemos uma vela como quem abre uma porta.',
+            'uma porta pra dentro. pra memória. pra beleza que mora no silêncio.',
+            'a loiê nasceu de uma casa antiga, de um ritual secreto, de um saber que se aprende com as mãos e os sentidos.',
+            'cada aroma é uma narrativa, cada frasco é um convite a ficar mais tempo com o que importa.',
+          ].map((line, i) => (
+            <p
+              key={i}
+              style={{
+                fontFamily: "'Wagon', sans-serif",
+                fontWeight: 300,
+                fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+                color: '#f4edd2',
+                lineHeight: 1.7,
+                marginBottom: '1.5rem',
+              }}
+            >
+              {line}
+            </p>
+          ))}
+
+          {[
+            'somos fogo, mas somos calma.',
+            'somos essência, mas somos presença.',
+            'somos brasileiros, feitos à mão, com técnica e alma.',
+          ].map((line, i) => (
+            <p
+              key={`italic-${i}`}
+              style={{
+                fontFamily: "'Wagon', sans-serif",
+                fontWeight: 300,
+                fontStyle: 'italic',
+                fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+                color: '#f4edd2',
+                lineHeight: 1.7,
+                marginBottom: '1.5rem',
+              }}
+            >
+              {line}
+            </p>
+          ))}
+
+          <div style={{ marginTop: '2.5rem' }}>
+            <p
+              style={{
+                fontFamily: "'Wagon', sans-serif",
+                fontWeight: 300,
+                fontSize: 'clamp(1.6rem, 4vw, 2.25rem)',
+                color: '#f4edd2',
+                lineHeight: 1.3,
+                marginBottom: '0.75rem',
+              }}
+            >
+              não vendemos velas.
+            </p>
+            <p
+              style={{
+                fontFamily: "'Wagon', sans-serif",
+                fontWeight: 300,
+                fontSize: 'clamp(1.6rem, 4vw, 2.25rem)',
+                color: '#f4edd2',
+                lineHeight: 1.3,
+              }}
+            >
+              criamos atmosferas.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── BLOCO 4 — IMAGEM CONCEITUAL ─── */}
+      <div
+        className="w-full aspect-[21/9] bg-stone-300 flex items-center justify-center"
+        style={{
+          fontFamily: "'Sackers Gothic', sans-serif",
+          fontSize: '0.6rem',
+          letterSpacing: '0.15em',
+          color: '#a8a29e',
+          textTransform: 'uppercase',
+        }}
+      >
+        {/* TODO: substituir pelo path da imagem conceitual no bucket Supabase */}
+        [FOTO CONCEITUAL — aguardando entrega]
       </div>
+
+      {/* ─── BLOCO 5 — FILOSOFIA (3 pilares) ─── */}
+      <section
+        style={{
+          background: '#fcf5e0',
+          padding: 'clamp(4rem, 8vw, 6rem) clamp(1.5rem, 6vw, 4rem)',
+        }}
+      >
+        <hr
+          style={{
+            border: 'none',
+            borderTop: '1px solid rgba(41,36,31,0.2)',
+            marginBottom: '4rem',
+          }}
+        />
+        <div className="md:grid md:grid-cols-3" style={{ gap: '3rem' }}>
+          {[
+            {
+              label: 'ORIGEM',
+              titulo: 'feita à mão',
+              texto:
+                'cada vela começa no gesto. na escolha da cera, no cálculo do aroma, na hora certa de despejar. não há pressa no que queremos que dure.',
+            },
+            {
+              label: 'MATÉRIA',
+              titulo: 'só o essencial',
+              texto:
+                'ceras vegetais de coco, arroz e palma. óleos essenciais puros. pavios de algodão. sem sintéticos, sem atalhos, sem compostos que o nariz detecta como artificiais.',
+            },
+            {
+              label: 'PROPÓSITO',
+              titulo: 'atmosfera como linguagem',
+              texto:
+                'não acreditamos em decoração. acreditamos em presença. uma vela não enfeita o espaço — ela o define. o aroma diz o que o ambiente quer ser.',
+            },
+          ].map(({ label, titulo, texto }) => (
+            <div key={label}>
+              <span
+                style={{
+                  fontFamily: "'Sackers Gothic', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.65rem',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: '#989857',
+                  display: 'block',
+                  marginBottom: '1rem',
+                }}
+              >
+                {label}
+              </span>
+              <h3
+                style={{
+                  fontFamily: "'Wagon', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '1.5rem',
+                  color: '#29241f',
+                  marginBottom: '1rem',
+                  lineHeight: 1.2,
+                }}
+              >
+                {titulo}
+              </h3>
+              <p
+                style={{
+                  fontFamily: "'Sackers Gothic', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.82rem',
+                  color: '#29241f',
+                  lineHeight: 1.9,
+                }}
+              >
+                {texto}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── BLOCO 6 — IMAGEM + CITAÇÃO ─── */}
+      <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
+        {/* Coluna esquerda — imagem */}
+        <div
+          className="aspect-square bg-stone-200 flex items-center justify-center"
+          style={{
+            fontFamily: "'Sackers Gothic', sans-serif",
+            fontSize: '0.6rem',
+            letterSpacing: '0.15em',
+            color: '#a8a29e',
+            textTransform: 'uppercase',
+          }}
+        >
+          {/* TODO: substituir pelo path da imagem no bucket Supabase */}
+          [FOTO — aguardando entrega]
+        </div>
+
+        {/* Coluna direita — citação */}
+        <div
+          style={{
+            background: '#29241f',
+            padding: 'clamp(3rem, 6vw, 4rem)',
+            display: 'flex',
+            alignItems: 'flex-end',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "'Wagon', sans-serif",
+              fontWeight: 300,
+              fontStyle: 'italic',
+              fontSize: 'clamp(1.4rem, 3vw, 1.9rem)',
+              color: '#f4edd2',
+              lineHeight: 1.5,
+            }}
+          >
+            o ritual não está na vela. está em quem a acende.
+          </p>
+        </div>
+      </section>
+
+      {/* ─── BLOCO 7 — CTA FINAL ─── */}
+      <section
+        style={{
+          background: '#fcf5e0',
+          padding: 'clamp(4rem, 8vw, 6rem) 1.5rem',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: "'Sackers Gothic', sans-serif",
+            fontWeight: 300,
+            fontSize: '0.7rem',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: '#29241f',
+            marginBottom: '2rem',
+          }}
+        >
+          PARA CONHECER NOSSAS CRIAÇÕES
+        </p>
+        <Link
+          to="/shop"
+          style={{
+            display: 'inline-block',
+            border: '1px solid #29241f',
+            fontFamily: "'Sackers Gothic', sans-serif",
+            fontWeight: 300,
+            fontSize: '0.7rem',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: '#29241f',
+            padding: '1rem 2.5rem',
+            textDecoration: 'none',
+            transition: 'background-color 0.2s, color 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#29241f';
+            (e.currentTarget as HTMLAnchorElement).style.color = '#fcf5e0';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'transparent';
+            (e.currentTarget as HTMLAnchorElement).style.color = '#29241f';
+          }}
+        >
+          NAVEGAR A COLEÇÃO
+        </Link>
+      </section>
     </Layout>
   );
 };
