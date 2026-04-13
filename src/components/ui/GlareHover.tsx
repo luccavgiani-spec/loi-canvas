@@ -1,5 +1,3 @@
-"use client";
-
 import { useRef, CSSProperties, ReactNode } from "react";
 
 interface GlareHoverProps {
