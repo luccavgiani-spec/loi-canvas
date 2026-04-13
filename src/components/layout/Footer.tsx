@@ -147,11 +147,11 @@ const Footer = () => {
             <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>coleção</h4>
             <ul className="space-y-3">
               {[
-                { to: '/shop', label: 'Todas as Coleções' },
-                { to: '/shop/cotidianas', label: 'Cotidianas' },
-                { to: '/shop/sala-ou-estar', label: 'Sala' },
-                { to: '/shop/refugio', label: 'Refúgio' },
-                { to: '/shop/botanicas-e-florais', label: 'Botânicas e Florais' },
+                { to: '/colecoes', label: 'Todas as Coleções' },
+                { to: '/colecoes/cotidianas', label: 'Cotidianas' },
+                { to: '/colecoes/sala-ou-estar', label: 'Sala' },
+                { to: '/colecoes/refugio', label: 'Refúgio' },
+                { to: '/colecoes/botanicas-e-florais', label: 'Botânicas e Florais' },
               ].map((link) => (
                 <li key={link.to}>
                   <Link

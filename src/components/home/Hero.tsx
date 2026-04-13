@@ -114,7 +114,7 @@ const Hero = () => {
         </div>
 
         {/* navegar button */}
-        <Link to="/shop" className="loi-ghost group" style={{ color: 'rgba(244,237,210,0.65)' }}>
+        <Link to="/colecoes" className="loi-ghost group" style={{ color: 'rgba(244,237,210,0.65)' }}>
           <span style={{ color: 'rgba(244,237,210,0.65)' }}>navegar</span>
           <span className="loi-ghost-dash" style={{ background: 'rgba(244,237,210,0.65)' }} />
           <span className="transition-transform duration-300 group-hover:translate-x-1" style={{ color: 'rgba(244,237,210,0.65)' }}>→</span>
