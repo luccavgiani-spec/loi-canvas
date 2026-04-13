@@ -1,0 +1,7 @@
+.glare-hover-container {
+  display: inline-block;
+}
+
+.glare-hover-effect {
+  will-change: opacity, left, top;
+}

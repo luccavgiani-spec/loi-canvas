@@ -1,9 +1,10 @@
-import { useRef, CSSProperties, ReactNode } from "react";
+import React, { useRef } from 'react';
+import './GlareHover.css';
 
 interface GlareHoverProps {
-  children?: ReactNode;
-  width?: string | number;
-  height?: string | number;
+  children: React.ReactNode;
+  width?: string;
+  height?: string;
   background?: string;
   glareColor?: string;
   glareOpacity?: number;
@@ -11,74 +12,72 @@ interface GlareHoverProps {
   glareSize?: number;
   transitionDuration?: number;
   borderRadius?: string;
+  style?: React.CSSProperties;
   className?: string;
-  style?: CSSProperties;
 }
 
-const GlareHover = ({
+const GlareHover: React.FC<GlareHoverProps> = ({
   children,
-  width = "auto",
-  height = "auto",
-  background = "transparent",
-  glareColor = "#ffffff",
-  glareOpacity = 0.25,
+  width = 'auto',
+  height = 'auto',
+  background = 'transparent',
+  glareColor = '#ffffff',
+  glareOpacity = 0.2,
   glareAngle = -45,
   glareSize = 300,
-  transitionDuration = 800,
-  borderRadius = "0px",
-  className = "",
+  transitionDuration = 600,
+  borderRadius = '0px',
   style = {},
-}: GlareHoverProps) => {
+  className = '',
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const glareRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    const glare = glareRef.current;
-    if (!container || !glare) return;
-
-    const rect = container.getBoundingClientRect();
+    if (!containerRef.current || !glareRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-
-    glare.style.setProperty("--glare-x", `${x}px`);
-    glare.style.setProperty("--glare-y", `${y}px`);
-    glare.style.opacity = String(glareOpacity);
+    glareRef.current.style.left = `${x}px`;
+    glareRef.current.style.top = `${y}px`;
+    glareRef.current.style.opacity = String(glareOpacity);
   };
 
   const handleMouseLeave = () => {
-    const glare = glareRef.current;
-    if (glare) glare.style.opacity = "0";
+    if (!glareRef.current) return;
+    glareRef.current.style.opacity = '0';
   };
 
   return (
     <div
       ref={containerRef}
-      className={className}
+      className={`glare-hover-container ${className}`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       style={{
-        position: "relative",
+        position: 'relative',
+        overflow: 'hidden',
         width,
         height,
         background,
         borderRadius,
-        overflow: "hidden",
         ...style,
       }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
     >
       {children}
       <div
         ref={glareRef}
+        className="glare-hover-effect"
         style={{
-          position: "absolute",
-          inset: 0,
+          position: 'absolute',
+          width: `${glareSize}px`,
+          height: `${glareSize}px`,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${glareColor} 0%, transparent 70%)`,
+          transform: `translate(-50%, -50%) rotate(${glareAngle}deg)`,
+          pointerEvents: 'none',
           opacity: 0,
-          pointerEvents: "none",
           transition: `opacity ${transitionDuration}ms ease`,
-          background: `radial-gradient(circle ${glareSize}px at var(--glare-x, 50%) var(--glare-y, 50%), ${glareColor}, transparent)`,
-          transform: `rotate(${glareAngle}deg) scale(2)`,
-          borderRadius,
         }}
       />
     </div>

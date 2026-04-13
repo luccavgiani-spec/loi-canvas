@@ -84,7 +84,17 @@ const HeroSection = () => {
         className="relative z-[2] flex flex-col items-center justify-center h-full"
         style={{ paddingTop: '5rem' }}
       >
-        <div className="flex flex-col items-center text-center" style={{ maxWidth: 1000 }}>
+        <div
+          className="flex flex-col items-center"
+          style={{
+            position: 'absolute',
+            bottom: '5rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            textAlign: 'center',
+            width: '100%',
+          }}
+        >
           <p
             className="hero-fadeUp mt-8"
             style={{
@@ -152,7 +162,7 @@ const HeroSection = () => {
                 glareSize={250}
                 transitionDuration={600}
                 borderRadius="0px"
-                style={{ display: 'inline-block' }}
+                style={{ display: 'inline-block', flexShrink: 0 }}
               >
                 <button
                   onClick={() => setActiveFamily(isActive ? null : fam)}
@@ -169,6 +179,7 @@ const HeroSection = () => {
                     cursor: 'pointer',
                     transition: 'color 0.3s ease, border-color 0.3s ease',
                     scrollSnapAlign: 'start',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {fam}
