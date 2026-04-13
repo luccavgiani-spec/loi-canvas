@@ -16,15 +16,15 @@ const NAV_SECTIONS = [
   {
     label: 'borrifadores',
     items: [
-      { num: 'i',  label: 'matéria 150ml',             desc: 'perfumaria pura e autoral',    to: '/shop/materia' },
-      { num: 'ii', label: 'atmosfera 200ml',            desc: 'aromas de projeção imediata', to: '/shop/atmosfera' },
+      { num: 'i',  label: 'matéria 150ml',             desc: 'perfumaria pura e autoral',    to: '/shop' },
+      { num: 'ii', label: 'atmosfera 200ml',            desc: 'aromas de projeção imediata', to: '/shop' },
     ],
   },
   {
     label: 'corpo',
     items: [
-      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/shop/corpo' },
-      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/shop/corpo' },
+      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/shop' },
+      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/shop' },
     ],
   },
 ];
@@ -246,7 +246,7 @@ const Header = () => {
         <div className="flex items-center gap-5">
           {/* Espaço + Sobre — right of logo, desktop only */}
           <Link
-            to="/shop/lembrancas"
+            to="/lembrancas"
             className={`hidden md:inline ${linkClass}`}
             style={{ textDecoration: 'none' }}
           >
@@ -387,7 +387,7 @@ const Header = () => {
 
             <li>
               <Link
-                to="/shop/lembrancas"
+                to="/lembrancas"
                 onClick={() => setMobileOpen(false)}
                 className="block py-2.5"
                 style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}

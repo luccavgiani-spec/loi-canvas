@@ -1,17 +1,9 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { bannerUrl } from '@/lib/storage';
 import { supabase } from '@/integrations/supabase/client';
 import GlareHover from '@/components/ui/GlareHover';
-
-/* ─── olfactory families ─── */
-const FAMILIES = [
-  'cítricos e frescos',
-  'verdes e verbais',
-  'florais',
-  'amadeirados',
-  'especiados e quentes',
-  'gourmand e conforto',
-];
+import { FAMILIES } from '@/lib/families';
 
 /* ─── grain SVG data URI ─── */
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
@@ -23,7 +15,11 @@ const HeroSection = () => {
   const [bannerImages, setBannerImages] = useState<string[]>([]);
 
   useEffect(() => {
-    supabase.storage.from('banner').list().then(({ data }) => {
+    supabase.storage.from('banner').list().then(({ data, error }) => {
+      if (error) {
+        console.error('[HeroSection] banner list() failed:', error.message);
+        return;
+      }
       if (data) {
         const urls = data
           .filter(f => f.name.match(/\.(webp|jpg|jpeg|png)$/i))
@@ -143,52 +139,82 @@ const HeroSection = () => {
           borderTop: '1px solid rgba(244,237,210,0.08)',
         }}
       >
-        <div className="max-w-[1400px] mx-auto px-6 md:px-[5rem] py-3 flex flex-nowrap md:flex-wrap items-center gap-2 aromatic-bar">
-          <span
-            className="loi-label mr-2 hidden md:inline"
-            style={{ color: 'rgba(244,237,210,0.3)', whiteSpace: 'nowrap' }}
-          >
-            família aromática
-          </span>
-          {FAMILIES.map((fam) => {
-            const isActive = activeFamily === fam;
-            return (
-              <GlareHover
-                key={fam}
-                width="auto"
-                height="auto"
-                background="transparent"
-                glareColor="#fcf5e0"
-                glareOpacity={0.18}
-                glareAngle={-45}
-                glareSize={250}
-                transitionDuration={600}
-                borderRadius="0px"
-                style={{ display: 'inline-block', flexShrink: 0 }}
-              >
-                <button
-                  onClick={() => setActiveFamily(isActive ? null : fam)}
-                  className="shrink-0"
-                  style={{
-                    fontFamily: "'Sackers Gothic', sans-serif",
-                    fontWeight: 300,
-                    fontSize: '0.6rem',
-                    letterSpacing: '0.18em',
-                    color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
-                    background: 'transparent',
-                    border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
-                    padding: '5px 14px',
-                    cursor: 'pointer',
-                    transition: 'color 0.3s ease, border-color 0.3s ease',
-                    scrollSnapAlign: 'start',
-                    whiteSpace: 'nowrap',
-                  }}
+        <div className="max-w-[1400px] mx-auto px-6 md:px-[5rem] py-3">
+          {/* product links row — visible when a family is active */}
+          {activeFamily && (
+            <div
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.75rem',
+                letterSpacing: '0.12em',
+                color: 'rgba(244,237,210,0.55)',
+                marginBottom: '0.6rem',
+              }}
+            >
+              {FAMILIES.find((f) => f.label === activeFamily)?.products.map((product, i, arr) => (
+                <span key={product.slug}>
+                  <Link
+                    to={`/product/${product.slug}`}
+                    style={{ color: 'rgba(244,237,210,0.55)', textDecoration: 'none', transition: 'color 0.3s ease' }}
+                    className="hover:!text-[#f4edd2]"
+                  >
+                    {product.name}
+                  </Link>
+                  {i < arr.length - 1 && <span style={{ opacity: 0.3, margin: '0 0.4em' }}>·</span>}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* family buttons row */}
+          <div className="flex flex-nowrap md:flex-wrap items-center gap-2 aromatic-bar">
+            <span
+              className="loi-label mr-2 hidden md:inline"
+              style={{ color: 'rgba(244,237,210,0.3)', whiteSpace: 'nowrap' }}
+            >
+              família aromática
+            </span>
+            {FAMILIES.map((fam) => {
+              const isActive = activeFamily === fam.label;
+              return (
+                <GlareHover
+                  key={fam.label}
+                  width="auto"
+                  height="auto"
+                  background="transparent"
+                  glareColor="#fcf5e0"
+                  glareOpacity={0.18}
+                  glareAngle={-45}
+                  glareSize={250}
+                  transitionDuration={600}
+                  borderRadius="0px"
+                  style={{ display: 'inline-block', flexShrink: 0 }}
                 >
-                  {fam}
-                </button>
-              </GlareHover>
-            );
-          })}
+                  <button
+                    onClick={() => setActiveFamily(isActive ? null : fam.label)}
+                    className="shrink-0"
+                    style={{
+                      fontFamily: "'Sackers Gothic', sans-serif",
+                      fontWeight: 300,
+                      fontSize: '0.6rem',
+                      letterSpacing: '0.18em',
+                      color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
+                      background: 'transparent',
+                      border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
+                      padding: '5px 14px',
+                      cursor: 'pointer',
+                      transition: 'color 0.3s ease, border-color 0.3s ease',
+                      scrollSnapAlign: 'start',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {fam.label}
+                  </button>
+                </GlareHover>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
