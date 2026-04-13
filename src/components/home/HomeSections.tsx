@@ -2,11 +2,10 @@ import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
 import { getProducts } from '@/lib/api';
-import { storageUrl } from '@/lib/storage';
+import { storageUrl, collabsUrl } from '@/lib/storage';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/LazyVideo';
-import { VideoPlayer } from '@/components/ui/VideoPlayer';
 import type { Product } from '@/types';
 
 /* ── Horizontal carousel with snap scrolling ── */
@@ -257,12 +256,13 @@ const ProductFocusBanner = memo(({
 
 ProductFocusBanner.displayName = 'ProductFocusBanner';
 
-/* ── Collabs grid item with lazy rotating videos ── */
+/* ── Collabs grid item with lazy rotating images ── */
 const COLLAB_ITEMS = [
-  { name: 'Ateliê Cerâmica', slug: 'atelie-ceramica', images: [storageUrl('loie_vela_bosque_compress (1).mp4'), storageUrl('loie_vela_pomar.mp4')], caption: 'Vasos artesanais × Loiê' },
-  { name: 'Estúdio Botânico', slug: 'estudio-botanico', images: [storageUrl('Cartao_Postal_Loie.mp4'), storageUrl('loie_vela_estela (1).mp4')], caption: 'Arranjos vivos × fragrâncias' },
-  { name: 'Casa de Chá', slug: 'casa-de-cha', images: [storageUrl('escritorio_cadeira__1_.mp4'), storageUrl('loie_vela_bosque_compress (1).mp4')], caption: 'Rituais de chá × velas' },
-  { name: 'Galeria Têxtil', slug: 'galeria-textil', images: [storageUrl('loie_vela_estela (1).mp4'), storageUrl('Cartao_Postal_Loie.mp4')], caption: 'Tecidos naturais × aromas' },
+  { slug: 'natura', category: 'kit de imprensa', name: 'Natura', year: '2022', images: [collabsUrl('natura.jpeg')] },
+  { slug: 'salon-line', category: 'kit de imprensa', name: 'Salon Line', year: '2021', images: [collabsUrl('salon_line (1).jpeg'), collabsUrl('salon_line (2).jpeg'), collabsUrl('salon_line (3).jpeg')] },
+  { slug: 'malu-muhamad', category: 'desenvolvidos em colaboração', name: 'Malu Muhamad', year: '2022', images: [collabsUrl('malu (1).jpeg'), collabsUrl('malu (2).jpeg'), collabsUrl('malu (3).jpeg'), collabsUrl('malu (4).jpeg')] },
+  { slug: 'neco-cunha', category: 'desenvolvidos em colaboração', name: 'Neco Cunha', year: '2023', images: [collabsUrl('neco (1).jpeg'), collabsUrl('neco (2).jpeg'), collabsUrl('neco (3).jpeg'), collabsUrl('neco (4).jpeg')] },
+  { slug: 'canal-concept', category: 'kit de imprensa', name: 'Canal Concept', year: '2023', images: [collabsUrl('concept.jpeg')] },
 ];
 
 const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
@@ -294,7 +294,7 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
 
   return (
     <div className="reveal group" ref={containerRef}>
-      <Link to={`/collabs?collab=${collab.slug}`} className="block">
+      <Link to={`/collabs#${collab.slug}`} className="block">
         <div className="relative overflow-hidden mb-3" style={{ aspectRatio: '4/5' }}>
           {isVisible && collab.images.map((src, i) => (
             <div
@@ -302,10 +302,12 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
               className="absolute inset-0 transition-opacity duration-1000"
               style={{ opacity: currentImage === i ? 1 : 0, willChange: 'opacity' }}
             >
-              <VideoPlayer
+              <img
                 src={src}
-                poster={storageUrl('loie_vela_campos_principal.JPG')}
+                alt=""
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           ))}
@@ -314,14 +316,14 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)' }}
           />
         </div>
-        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 2 }}>
-          {collab.name}
+        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.5)', marginBottom: 4 }}>
+          {collab.category}
         </p>
-        <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.72rem', color: '#000', marginBottom: 8 }}>
-          {collab.caption}
+        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 8 }}>
+          {collab.name} — {collab.year}
         </p>
       </Link>
-      <Link to={`/collabs?collab=${collab.slug}`} className="loi-ghost group/link" style={{ fontSize: '0.65rem' }}>
+      <Link to={`/collabs#${collab.slug}`} className="loi-ghost group/link" style={{ fontSize: '0.65rem' }}>
         <span className="md:hidden">ver</span>
         <span className="hidden md:inline">ver colaboração</span>
         <span className="loi-ghost-dash" />
