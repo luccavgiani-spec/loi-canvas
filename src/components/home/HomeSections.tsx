@@ -335,6 +335,91 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
 
 CollabCard.displayName = 'CollabCard';
 
+/* ── Circular collab carousel – button-driven, no scrollbar ── */
+const CLONE_COUNT = 3; // clones appended for seamless loop (SHOW - 1)
+const COLLAB_EXTENDED = [...COLLAB_ITEMS, ...COLLAB_ITEMS.slice(0, CLONE_COUNT)];
+
+const CollabCarousel = memo(() => {
+  const N = COLLAB_ITEMS.length;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const posRef = useRef(0);
+  const lockRef = useRef(false);
+  const [cardWidth, setCardWidth] = useState<number | null>(null);
+
+  useEffect(() => {
+    const compute = () => {
+      const c = containerRef.current;
+      if (!c) return;
+      const show = c.offsetWidth >= 600 ? 4 : 2;
+      const gap = 24; // 1.5rem at 16px base
+      setCardWidth((c.offsetWidth - gap * (show - 1)) / show);
+      // Reset position on resize to avoid stale offset
+      const track = trackRef.current;
+      if (track) {
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0)';
+      }
+      posRef.current = 0;
+      lockRef.current = false;
+    };
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
+  }, []);
+
+  const advance = useCallback(() => {
+    if (lockRef.current || cardWidth === null) return;
+    lockRef.current = true;
+    const track = trackRef.current;
+    if (!track) { lockRef.current = false; return; }
+
+    const step = cardWidth + 24;
+    const next = posRef.current + 1;
+
+    track.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
+    track.style.transform = `translateX(-${next * step}px)`;
+    posRef.current = next;
+
+    if (next >= N) {
+      setTimeout(() => {
+        track.style.transition = 'none';
+        posRef.current = 0;
+        track.style.transform = 'translateX(0)';
+        track.getBoundingClientRect(); // force reflow before re-enabling transition
+        lockRef.current = false;
+      }, 460);
+    } else {
+      setTimeout(() => { lockRef.current = false; }, 460);
+    }
+  }, [cardWidth, N]);
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden' }}>
+      <div ref={trackRef} style={{ display: 'flex', gap: '1.5rem' }}>
+        {COLLAB_EXTENDED.map((collab, i) => (
+          <div
+            key={`${collab.slug}-${i}`}
+            style={{ flexShrink: 0, width: cardWidth !== null ? cardWidth : 'calc(25% - 1.125rem)' }}
+          >
+            <CollabCard collab={collab} />
+          </div>
+        ))}
+      </div>
+      <button
+        onClick={advance}
+        aria-label="Próxima colaboração"
+        className="absolute right-0 top-1/3 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center transition-opacity duration-300 hover:opacity-80"
+        style={{ background: 'rgba(0,0,0,0.6)', color: '#f4edd2', backdropFilter: 'blur(4px)' }}
+      >
+        <ChevronRight size={18} />
+      </button>
+    </div>
+  );
+});
+
+CollabCarousel.displayName = 'CollabCarousel';
+
 /* ────────────────────────────────────────────────────────────── */
 const HomeSections = () => {
   const { addItem } = useCart();
@@ -478,24 +563,7 @@ const HomeSections = () => {
               collabs
             </span>
           </div>
-          <div
-            className="reveal-stagger"
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'nowrap',
-              overflowX: 'auto',
-              gap: '1.5rem',
-              scrollSnapType: 'x mandatory',
-              WebkitOverflowScrolling: 'touch',
-            }}
-          >
-            {COLLAB_ITEMS.map((collab) => (
-              <div key={collab.slug} style={{ flexShrink: 0, scrollSnapAlign: 'start', minWidth: '240px' }}>
-                <CollabCard collab={collab} />
-              </div>
-            ))}
-          </div>
+          <CollabCarousel />
           <div className="reveal text-center mt-10">
             <Link to="/collabs" className="loi-ghost group">
               <span>ver todas as colaborações</span>
