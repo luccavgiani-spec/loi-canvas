@@ -89,7 +89,7 @@ const Lembrancas = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundImage: `url(${lembrancasUrl('banner hero lembrancas.jpg')})`,
+          backgroundImage: `url(${lembrancasUrl('andreloie-96.jpg')})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

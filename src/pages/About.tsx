@@ -1,6 +1,6 @@
 import Layout from '@/components/layout/Layout';
 import { Link } from 'react-router-dom';
-import { aboutUrl } from '@/lib/storage';
+import { aboutUrl, lembrancasUrl } from '@/lib/storage';
 
 const About = () => {
   return (
@@ -133,7 +133,7 @@ const About = () => {
             }}
           >
             <div className="aspect-[3/4] w-full overflow-hidden">
-              <img src={aboutUrl('banner hero.jpg')} alt="" className="w-full h-full object-cover" />
+              <img src={lembrancasUrl('banner hero lembrancas.jpg')} alt="" className="w-full h-full object-cover" />
             </div>
             <div className="aspect-[3/4] w-full overflow-hidden">
               <img src={aboutUrl('conceitual 4.jpg')} alt="" className="w-full h-full object-cover" />
