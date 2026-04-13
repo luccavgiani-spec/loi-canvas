@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Instagram, Facebook } from 'lucide-react';
 import { useState } from 'react';
 import MensagemForm from '@/components/MensagemForm';
+import GlareHover from '@/components/ui/GlareHover';
 
 /* ── Olfactory families data ── */
 const FAMILIES = [
@@ -58,24 +59,37 @@ const Footer = () => {
           {FAMILIES.map((fam) => {
             const isActive = activeFamily === fam.label;
             return (
-              <button
+              <GlareHover
                 key={fam.label}
-                onClick={() => setActiveFamily(isActive ? null : fam.label)}
-                style={{
-                  fontFamily: FONT_BODY,
-                  fontWeight: 300,
-                  fontSize: '0.6rem',
-                  letterSpacing: '0.18em',
-                  color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
-                  background: 'transparent',
-                  border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
-                  padding: '5px 14px',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease, border-color 0.3s ease',
-                }}
+                width="auto"
+                height="auto"
+                background="transparent"
+                glareColor="#fcf5e0"
+                glareOpacity={0.18}
+                glareAngle={-45}
+                glareSize={250}
+                transitionDuration={600}
+                borderRadius="0px"
+                style={{ display: 'inline-block' }}
               >
-                {fam.label}
-              </button>
+                <button
+                  onClick={() => setActiveFamily(isActive ? null : fam.label)}
+                  style={{
+                    fontFamily: FONT_BODY,
+                    fontWeight: 300,
+                    fontSize: '0.6rem',
+                    letterSpacing: '0.18em',
+                    color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
+                    background: 'transparent',
+                    border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
+                    padding: '5px 14px',
+                    cursor: 'pointer',
+                    transition: 'color 0.3s ease, border-color 0.3s ease',
+                  }}
+                >
+                  {fam.label}
+                </button>
+              </GlareHover>
             );
           })}
         </div>
@@ -124,18 +138,6 @@ const Footer = () => {
               }}
             >
               A loiê é uma marca brasileira de velas aromáticas feita com óleos essenciais e estética autoral.
-            </p>
-            <p
-              style={{
-                fontFamily: "'Sackers Gothic', sans-serif",
-                fontWeight: 300,
-                fontSize: '0.58rem',
-                letterSpacing: '0.2em',
-                color: 'rgba(244,237,210,0.2)',
-                marginTop: '0.75rem',
-              }}
-            >
-              amantes de rituais discretos
             </p>
           </div>
 

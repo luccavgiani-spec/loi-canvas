@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { bannerUrl } from '@/lib/storage';
+import GlareHover from '@/components/ui/GlareHover';
 
 /* ─── olfactory families ─── */
 const FAMILIES = [
@@ -84,32 +85,6 @@ const HeroSection = () => {
         style={{ paddingTop: '5rem' }}
       >
         <div className="flex flex-col items-center text-center" style={{ maxWidth: 1000 }}>
-          <h1
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontSize: 'clamp(5rem, 12.5vw, 11rem)',
-              lineHeight: 0.88,
-            }}
-          >
-            <span className="block overflow-hidden">
-              <span
-                className="inline-block hero-wordReveal"
-                style={{ color: '#565600', animationDelay: '0.3s' }}
-              >
-                o aroma é
-              </span>
-            </span>
-            <span className="block overflow-hidden">
-              <span
-                className="inline-block hero-wordReveal"
-                style={{ color: '#f4edd2', animationDelay: '0.45s' }}
-              >
-                uma linguagem.
-              </span>
-            </span>
-          </h1>
-
           <p
             className="hero-fadeUp mt-8"
             style={{
@@ -166,26 +141,39 @@ const HeroSection = () => {
           {FAMILIES.map((fam) => {
             const isActive = activeFamily === fam;
             return (
-              <button
+              <GlareHover
                 key={fam}
-                onClick={() => setActiveFamily(isActive ? null : fam)}
-                className="shrink-0"
-                style={{
-                  fontFamily: "'Sackers Gothic', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '0.6rem',
-                  letterSpacing: '0.18em',
-                  color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
-                  background: 'transparent',
-                  border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
-                  padding: '5px 14px',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease, border-color 0.3s ease',
-                  scrollSnapAlign: 'start',
-                }}
+                width="auto"
+                height="auto"
+                background="transparent"
+                glareColor="#fcf5e0"
+                glareOpacity={0.18}
+                glareAngle={-45}
+                glareSize={250}
+                transitionDuration={600}
+                borderRadius="0px"
+                style={{ display: 'inline-block' }}
               >
-                {fam}
-              </button>
+                <button
+                  onClick={() => setActiveFamily(isActive ? null : fam)}
+                  className="shrink-0"
+                  style={{
+                    fontFamily: "'Sackers Gothic', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.6rem',
+                    letterSpacing: '0.18em',
+                    color: isActive ? '#f4edd2' : 'rgba(244,237,210,0.4)',
+                    background: 'transparent',
+                    border: `1px solid ${isActive ? 'rgba(244,237,210,0.5)' : 'rgba(244,237,210,0.15)'}`,
+                    padding: '5px 14px',
+                    cursor: 'pointer',
+                    transition: 'color 0.3s ease, border-color 0.3s ease',
+                    scrollSnapAlign: 'start',
+                  }}
+                >
+                  {fam}
+                </button>
+              </GlareHover>
             );
           })}
         </div>
