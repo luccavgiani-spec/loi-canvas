@@ -23,7 +23,7 @@ const About = () => {
               marginBottom: '1rem',
             }}
           >
-            SOBRE
+            SALA AROMÁTICA
           </span>
           <h1
             style={{
@@ -35,7 +35,7 @@ const About = () => {
               margin: 0,
             }}
           >
-            SALA AROMÁTICA
+            Loiê
           </h1>
         </div>
       </section>
@@ -132,10 +132,10 @@ const About = () => {
               padding: '1rem 1rem 1rem 0',
             }}
           >
-            <div className="aspect-[3/4] w-full overflow-hidden">
+            <div className="hidden md:block aspect-[3/4] w-full overflow-hidden">
               <img src={lembrancasUrl('banner hero lembrancas.jpg')} alt="" className="w-full h-full object-cover" />
             </div>
-            <div className="aspect-[3/4] w-full overflow-hidden">
+            <div className="hidden md:block aspect-[3/4] w-full overflow-hidden">
               <img src={aboutUrl('conceitual 4.jpg')} alt="" className="w-full h-full object-cover" />
             </div>
             <div className="aspect-[3/4] w-full overflow-hidden">
@@ -194,9 +194,9 @@ const About = () => {
         </div>
       </section>
 
-      {/* ─── BLOCO 4 — IMAGEM CONCEITUAL ─── */}
-      <div className="w-full aspect-[21/9] overflow-hidden">
-        <img src={aboutUrl('banner conceitual.jpg')} alt="" className="w-full h-full object-cover" />
+      {/* ─── BLOCO 4 — IMAGEM ─── */}
+      <div className="w-full aspect-[3/4] md:aspect-[21/9] overflow-hidden">
+        <img src={aboutUrl('andreloie-15PB.jpg')} alt="" className="w-full h-full object-cover" />
       </div>
 
       {/* ─── BLOCO 5 — FILOSOFIA (3 pilares) ─── */}
@@ -213,7 +213,7 @@ const About = () => {
             marginBottom: '4rem',
           }}
         />
-        <div className="md:grid md:grid-cols-3" style={{ gap: '3rem' }}>
+        <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: '3rem' }}>
           {[
             {
               label: 'ORIGEM',
@@ -234,7 +234,7 @@ const About = () => {
                 'não acreditamos em decoração. acreditamos em presença. uma vela não enfeita o espaço — ela o define. o aroma diz o que o ambiente quer ser.',
             },
           ].map(({ label, titulo, texto }) => (
-            <div key={label}>
+            <div key={label} className="pb-10 md:pb-0">
               <span
                 style={{
                   fontFamily: "'Sackers Gothic', sans-serif",
@@ -327,7 +327,7 @@ const About = () => {
             marginBottom: '2rem',
           }}
         >
-          PARA CONHECER NOSSAS CRIAÇÕES
+          CONHEÇA NOSSOS PRODUTOS
         </p>
         <Link
           to="/colecoes"
@@ -353,7 +353,7 @@ const About = () => {
             (e.currentTarget as HTMLAnchorElement).style.color = '#29241f';
           }}
         >
-          NAVEGAR A COLEÇÃO
+          CONHECER COLEÇÕES
         </Link>
       </section>
     </Layout>
