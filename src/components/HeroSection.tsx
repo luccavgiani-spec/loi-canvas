@@ -117,7 +117,7 @@ const HeroSection = () => {
             </a>
 
             <a
-              href="/about"
+              href="/sobre"
               className="hero-fadeUp hero-btn-ghost group"
               style={{ animationDelay: '1.1s' }}
             >

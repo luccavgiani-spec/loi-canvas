@@ -178,7 +178,7 @@ const Footer = () => {
             <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>sobre</h4>
             <ul className="space-y-3">
               {[
-                { to: '/about', label: 'Nossa História' },
+                { to: '/sobre', label: 'Nossa História' },
                 { to: '/collabs', label: 'Colaborações' },
                 { to: '/contact', label: 'Contato' },
                 { to: '/policies', label: 'Políticas' },
