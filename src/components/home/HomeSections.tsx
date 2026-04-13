@@ -258,11 +258,46 @@ ProductFocusBanner.displayName = 'ProductFocusBanner';
 
 /* ── Collabs grid item with lazy rotating images ── */
 const COLLAB_ITEMS = [
-  { slug: 'natura', category: 'kit de imprensa', name: 'Natura', year: '2022', images: [collabsUrl('natura.jpeg')] },
-  { slug: 'salon-line', category: 'kit de imprensa', name: 'Salon Line', year: '2021', images: [collabsUrl('salon_line (1).jpeg'), collabsUrl('salon_line (2).jpeg'), collabsUrl('salon_line (3).jpeg')] },
-  { slug: 'malu-muhamad', category: 'desenvolvidos em colaboração', name: 'Malu Muhamad', year: '2022', images: [collabsUrl('malu (1).jpeg'), collabsUrl('malu (2).jpeg'), collabsUrl('malu (3).jpeg'), collabsUrl('malu (4).jpeg')] },
-  { slug: 'neco-cunha', category: 'desenvolvidos em colaboração', name: 'Neco Cunha', year: '2023', images: [collabsUrl('neco (1).jpeg'), collabsUrl('neco (2).jpeg'), collabsUrl('neco (3).jpeg'), collabsUrl('neco (4).jpeg')] },
-  { slug: 'canal-concept', category: 'kit de imprensa', name: 'Canal Concept', year: '2023', images: [collabsUrl('concept.jpeg')] },
+  {
+    slug: 'natura',
+    category: 'kit de imprensa',
+    name: 'Natura',
+    year: '2022',
+    description: 'oito velas aromáticas criadas como extensão sensorial para o kit de imprensa do lançamento de produtos de cuidado corporal da natura.',
+    images: [collabsUrl('natura.jpeg')],
+  },
+  {
+    slug: 'salon-line',
+    category: 'kit de imprensa',
+    name: 'Salon Line',
+    year: '2021',
+    description: 'velas pensadas como gesto de acolhimento e atmosfera de autocuidado para o kit dos embaixadores da salon line no "reencontrinho".',
+    images: [collabsUrl('salon_line (1).jpeg'), collabsUrl('salon_line (2).jpeg'), collabsUrl('salon_line (3).jpeg')],
+  },
+  {
+    slug: 'malu-muhamad',
+    category: 'desenvolvidos em colaboração',
+    name: 'Malu Muhamad',
+    year: '2022',
+    description: 'vasos produzidos em pequenos lotes em colaboração com a ceramista malu muhamad, pensados com atenção à forma, à matéria e ao gesto manual.',
+    images: [collabsUrl('malu (1).jpeg'), collabsUrl('malu (2).jpeg'), collabsUrl('malu (3).jpeg'), collabsUrl('malu (4).jpeg')],
+  },
+  {
+    slug: 'neco-cunha',
+    category: 'desenvolvidos em colaboração',
+    name: 'Neco Cunha',
+    year: '2023',
+    description: 'porta-velas em marchetaria com madeiras nobres, criados em colaboração com o artista regional neco cunha.',
+    images: [collabsUrl('neco (1).jpeg'), collabsUrl('neco (2).jpeg'), collabsUrl('neco (3).jpeg'), collabsUrl('neco (4).jpeg')],
+  },
+  {
+    slug: 'canal-concept',
+    category: 'kit de imprensa',
+    name: 'Canal Concept',
+    year: '2023',
+    description: 'vela aromática desenvolvida para evento da canal concept, distribuída entre colaboradores, clientes e parceiros.',
+    images: [collabsUrl('concept.jpeg')],
+  },
 ];
 
 const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
@@ -293,7 +328,7 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
   }, [collab.images.length, isVisible]);
 
   return (
-    <div className="reveal group" ref={containerRef}>
+    <div className="reveal group" ref={containerRef} style={{ textAlign: 'left' }}>
       <Link to={`/collabs#${collab.slug}`} className="block">
         <div className="relative overflow-hidden mb-3" style={{ aspectRatio: '4/5' }}>
           {isVisible && collab.images.map((src, i) => (
@@ -316,11 +351,17 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)' }}
           />
         </div>
-        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.5)', marginBottom: 4 }}>
+        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.45)', marginBottom: 5, lineHeight: 1.5 }}>
           {collab.category}
         </p>
-        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 8 }}>
-          {collab.name} — {collab.year}
+        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1rem', color: '#000', marginBottom: 2, lineHeight: 1.3 }}>
+          {collab.name}
+        </p>
+        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(0,0,0,0.45)', marginBottom: 8 }}>
+          {collab.year}
+        </p>
+        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.05em', color: 'rgba(0,0,0,0.55)', lineHeight: 1.7, marginBottom: 12, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          {collab.description}
         </p>
       </Link>
       <Link to={`/collabs#${collab.slug}`} className="loi-ghost group/link" style={{ fontSize: '0.65rem' }}>
@@ -395,22 +436,25 @@ const CollabCarousel = memo(() => {
   }, [cardWidth, N]);
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden' }}>
-      <div ref={trackRef} style={{ display: 'flex', gap: '1.5rem' }}>
-        {COLLAB_EXTENDED.map((collab, i) => (
-          <div
-            key={`${collab.slug}-${i}`}
-            style={{ flexShrink: 0, width: cardWidth !== null ? cardWidth : 'calc(25% - 1.125rem)' }}
-          >
-            <CollabCard collab={collab} />
-          </div>
-        ))}
+    <div style={{ position: 'relative' }}>
+      {/* overflow:hidden lives here so the button is never clipped */}
+      <div ref={containerRef} style={{ overflow: 'hidden' }}>
+        <div ref={trackRef} style={{ display: 'flex', gap: '1.5rem' }}>
+          {COLLAB_EXTENDED.map((collab, i) => (
+            <div
+              key={`${collab.slug}-${i}`}
+              style={{ flexShrink: 0, width: cardWidth !== null ? cardWidth : 'calc(25% - 1.125rem)' }}
+            >
+              <CollabCard collab={collab} />
+            </div>
+          ))}
+        </div>
       </div>
       <button
         onClick={advance}
         aria-label="Próxima colaboração"
-        className="absolute right-0 top-1/3 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center transition-opacity duration-300 hover:opacity-80"
-        style={{ background: 'rgba(0,0,0,0.6)', color: '#f4edd2', backdropFilter: 'blur(4px)' }}
+        className="absolute right-0 top-1/3 -translate-y-1/2 z-10 flex items-center justify-center transition-opacity duration-300 hover:opacity-80"
+        style={{ width: 40, height: 40, background: 'rgba(0,0,0,0.6)', color: '#f4edd2', backdropFilter: 'blur(4px)', flexShrink: 0 }}
       >
         <ChevronRight size={18} />
       </button>
