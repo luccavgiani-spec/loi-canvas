@@ -129,44 +129,26 @@ const HeroSection = () => {
         </div>
       </div>
 
+      {/* ── soft fade that eases the banner image into the aromatic bar ── */}
+      <div
+        className="absolute z-[2] bottom-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: '160px',
+          background: 'linear-gradient(to bottom, rgba(41,36,31,0) 0%, rgba(41,36,31,0.55) 100%)',
+        }}
+      />
+
       {/* ── aromatics family bar ── */}
       <div
         className="absolute z-[3] bottom-0 left-0 right-0"
         style={{
-          background: 'rgba(41,36,31,0.35)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(244,237,210,0.08)',
+          background: 'rgba(41,36,31,0.25)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          borderTop: '1px solid rgba(244,237,210,0.06)',
         }}
       >
         <div className="max-w-[1400px] mx-auto px-6 md:px-[5rem] py-3">
-          {/* product links row — visible when a family is active */}
-          {activeFamily && (
-            <div
-              style={{
-                fontFamily: "'Sackers Gothic', sans-serif",
-                fontWeight: 300,
-                fontSize: '0.75rem',
-                letterSpacing: '0.12em',
-                color: 'rgba(244,237,210,0.55)',
-                marginBottom: '0.6rem',
-              }}
-            >
-              {FAMILIES.find((f) => f.label === activeFamily)?.products.map((product, i, arr) => (
-                <span key={product.slug}>
-                  <Link
-                    to={`/product/${product.slug}`}
-                    style={{ color: 'rgba(244,237,210,0.55)', textDecoration: 'none', transition: 'color 0.3s ease' }}
-                    className="hover:!text-[#f4edd2]"
-                  >
-                    {product.name}
-                  </Link>
-                  {i < arr.length - 1 && <span style={{ opacity: 0.3, margin: '0 0.4em' }}>·</span>}
-                </span>
-              ))}
-            </div>
-          )}
-
           {/* family buttons row */}
           <div className="flex flex-nowrap md:flex-wrap items-center gap-2 aromatic-bar">
             <span
@@ -215,6 +197,33 @@ const HeroSection = () => {
               );
             })}
           </div>
+
+          {/* product links row — visible below the buttons when a family is active */}
+          {activeFamily && (
+            <div
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.75rem',
+                letterSpacing: '0.12em',
+                color: 'rgba(244,237,210,0.55)',
+                marginTop: '0.5rem',
+              }}
+            >
+              {FAMILIES.find((f) => f.label === activeFamily)?.products.map((product, i, arr) => (
+                <span key={product.slug}>
+                  <Link
+                    to={`/product/${product.slug}`}
+                    style={{ color: 'rgba(244,237,210,0.55)', textDecoration: 'none', transition: 'color 0.3s ease' }}
+                    className="hover:!text-[#f4edd2]"
+                  >
+                    {product.name}
+                  </Link>
+                  {i < arr.length - 1 && <span style={{ opacity: 0.3, margin: '0 0.4em' }}>·</span>}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>
