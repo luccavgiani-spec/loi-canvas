@@ -250,7 +250,7 @@ const Shop = () => {
                 lineHeight: 1.1
               }}>
               
-              Atmosferas que ficam
+              cada aroma é uma narrativa
             </h1>
             <p
               className="reveal-fade max-w-xl mx-auto"
@@ -262,8 +262,7 @@ const Shop = () => {
                 lineHeight: 1.8
               }}>
 
-              Quatro coleções, uma filosofia: velas artesanais feitas com cera de soja
-              100% natural e fragrâncias cuidadosamente desenvolvidas.
+              quatro atos. cada coleção uma proposta de aroma, presença e permanência — pensada para habitar os seus ambientes com intenção.
             </p>
           </div>
         </section>
@@ -311,7 +310,7 @@ const Shop = () => {
                       style={{
                         fontFamily: "var(--font-body)",
                         fontWeight: 300,
-                        fontSize: '1rem',
+                        fontSize: '0.85rem',
                         color: 'rgba(0,0,0,0.55)',
                         lineHeight: 1.7,
                         maxWidth: 500
@@ -321,18 +320,6 @@ const Shop = () => {
                     </p>
                   </div>
                   <div className="flex flex-col items-start md:items-end gap-2">
-                    <span
-                      style={{
-                        fontFamily: "var(--font-body)",
-                        fontWeight: 300,
-                        letterSpacing: '0.15em',
-                        textTransform: 'uppercase',
-                        fontSize: '0.65rem',
-                        color: 'rgba(0,0,0,0.4)'
-                      }}>
-                      
-                      {col.detail}
-                    </span>
                     <span
                       style={{
                         fontFamily: "var(--font-body)",
