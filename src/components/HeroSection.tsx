@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { bannerUrl } from '@/lib/storage';
+import { supabase } from '@/integrations/supabase/client';
 import GlareHover from '@/components/ui/GlareHover';
 
 /* ─── olfactory families ─── */
@@ -12,19 +13,6 @@ const FAMILIES = [
   'gourmand e conforto',
 ];
 
-/* ─── banner images ─── */
-const BANNER_IMAGES = [
-  bannerUrl('banners (1).webp'),
-  bannerUrl('banners (1) (1).webp'),
-  bannerUrl('banners (2).webp'),
-  bannerUrl('banners (3).webp'),
-  bannerUrl('banners (4).webp'),
-  bannerUrl('banners (5).webp'),
-  bannerUrl('banners (6).webp'),
-  bannerUrl('banners (7).webp'),
-  bannerUrl('banners (8).webp'),
-];
-
 /* ─── grain SVG data URI ─── */
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
 
@@ -32,13 +20,27 @@ const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
   const [activeFamily, setActiveFamily] = useState<string | null>(null);
+  const [bannerImages, setBannerImages] = useState<string[]>([]);
 
   useEffect(() => {
+    supabase.storage.from('banner').list().then(({ data }) => {
+      if (data) {
+        const urls = data
+          .filter(f => f.name.match(/\.(webp|jpg|jpeg|png)$/i))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(f => bannerUrl(f.name));
+        setBannerImages(urls);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (bannerImages.length === 0) return;
     const id = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % BANNER_IMAGES.length);
+      setCurrent((prev) => (prev + 1) % bannerImages.length);
     }, 5000);
     return () => clearInterval(id);
-  }, []);
+  }, [bannerImages.length]);
 
   return (
     <section
@@ -46,7 +48,7 @@ const HeroSection = () => {
       style={{ background: '#29241f' }}
     >
       {/* ── banner images ── */}
-      {BANNER_IMAGES.map((src, i) => (
+      {bannerImages.map((src, i) => (
         <img
           key={src}
           src={src}
