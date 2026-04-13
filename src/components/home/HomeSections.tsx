@@ -231,11 +231,13 @@ const ProductFocusBanner = memo(({
           <div className="loi-divider mb-6" />
           <p
             style={{
-              fontFamily: "'Wagon', sans-serif",
+              fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
               fontWeight: 300,
-              fontSize: '1.05rem',
-              color: '#29241f',
-              lineHeight: 1.8,
+              fontSize: '0.72rem',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'rgba(0,0,0,0.75)',
+              lineHeight: 1.9,
               marginBottom: '1.5rem',
             }}
           >
@@ -497,7 +499,15 @@ const HomeSections = () => {
               <details key={i} className="group" style={{ borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
                 <summary
                   className="flex items-center py-5 cursor-pointer list-none"
-                  style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#29241f' }}
+                  style={{
+                    fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.72rem',
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(0,0,0,0.75)',
+                    lineHeight: 1.9,
+                  }}
                 >
                   {faq.q}
                 </summary>
