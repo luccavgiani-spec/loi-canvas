@@ -46,6 +46,7 @@ const FAMILIES = [
 ];
 
 const FONT_BODY = "'Sackers Gothic', sans-serif";
+const FONT_HEADING = "'Wagon', sans-serif";
 
 const Footer = () => {
   const [activeFamily, setActiveFamily] = useState<string | null>(null);
@@ -143,7 +144,7 @@ const Footer = () => {
 
           {/* Shop */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>coleção</h4>
+            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>coleção</h4>
             <ul className="space-y-3">
               {[
                 { to: '/shop', label: 'Todas as Coleções' },
@@ -174,7 +175,7 @@ const Footer = () => {
 
           {/* About */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>sobre</h4>
+            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>sobre</h4>
             <ul className="space-y-3">
               {[
                 { to: '/about', label: 'Nossa História' },
@@ -204,7 +205,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>contato</h4>
+            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>contato</h4>
             <ul className="space-y-3">
               <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 loie.aromatica@gmail.com
@@ -244,7 +245,7 @@ const Footer = () => {
           </div>
           {/* Mensagem — desktop only (grid column) */}
           <div id="mensagem" className="hidden md:block">
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>deixe uma mensagem</h4>
+            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>deixe uma mensagem</h4>
             <MensagemForm dark />
           </div>
         </div>

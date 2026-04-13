@@ -12,7 +12,7 @@ function wrapLayout(subject: string, bodyHtml: string): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escHtml(subject)}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#fcf5e0;font-family:Georgia,'Cormorant Garamond',serif;color:#29241f;">
+<body style="margin:0;padding:0;background-color:#fcf5e0;font-family:Georgia,serif;color:#29241f;">
   <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#fcf5e0;padding:32px 16px;">
     <tr>
       <td align="center">
@@ -21,7 +21,7 @@ function wrapLayout(subject: string, bodyHtml: string): string {
           <!-- Logo -->
           <tr>
             <td align="center" style="padding:32px 0 24px;">
-              <h1 style="margin:0;font-family:Georgia,'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:0.35em;color:#29241f;text-transform:uppercase;">LOIÊ</h1>
+              <h1 style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:400;letter-spacing:0.35em;color:#29241f;text-transform:uppercase;">LOIÊ</h1>
               <div style="width:40px;height:1px;background-color:#726f09;margin:10px auto 0;"></div>
             </td>
           </tr>
