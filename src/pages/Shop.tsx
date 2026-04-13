@@ -146,7 +146,7 @@ const ProductCarousel = ({
               </h3>
               <p
               style={{
-                fontFamily: "'Wagon', sans-serif",
+                fontFamily: "var(--font-body)",
                 fontWeight: 300,
                 fontSize: '0.82rem',
                 color: 'rgba(0,0,0,0.55)',
@@ -157,7 +157,7 @@ const ProductCarousel = ({
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden'
               }}>
-              
+
                 {product.description}
               </p>
               <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
@@ -258,13 +258,13 @@ const Shop = () => {
             <p
               className="reveal-fade max-w-xl mx-auto"
               style={{
-                fontFamily: "'Wagon', sans-serif",
+                fontFamily: "var(--font-body)",
                 fontWeight: 300,
                 fontSize: 'clamp(1rem, 2vw, 1.2rem)',
                 color: 'rgba(244,237,210,0.5)',
                 lineHeight: 1.8
               }}>
-              
+
               Quatro coleções, uma filosofia: velas artesanais feitas com cera de soja
               100% natural e fragrâncias cuidadosamente desenvolvidas.
             </p>
@@ -312,14 +312,14 @@ const Shop = () => {
                     </h2>
                     <p
                       style={{
-                        fontFamily: "'Wagon', sans-serif",
+                        fontFamily: "var(--font-body)",
                         fontWeight: 300,
                         fontSize: '1rem',
                         color: 'rgba(0,0,0,0.55)',
                         lineHeight: 1.7,
                         maxWidth: 500
                       }}>
-                      
+
                       {col.description}
                     </p>
                   </div>

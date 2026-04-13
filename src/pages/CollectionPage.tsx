@@ -73,7 +73,7 @@ const CollectionPage = () => {
   if (loading || !collection) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">
-        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
+        <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
           Carregando...
         </p>
       </div>
@@ -143,7 +143,7 @@ const CollectionPage = () => {
               <p
                 className="reveal-fade mb-6"
                 style={{
-                  fontFamily: "'Wagon', sans-serif",
+                  fontFamily: "var(--font-body)",
                   fontWeight: 300,
                   fontSize: 'clamp(1rem, 2vw, 1.15rem)',
                   color: 'rgba(244,237,210,0.55)',
@@ -210,7 +210,7 @@ const CollectionPage = () => {
             {/* Grid */}
             {sorted.length === 0 ? (
               <div className="min-h-[40vh] flex items-center justify-center">
-                <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
+                <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
                   Nenhum produto nesta coleção ainda.
                 </p>
               </div>
@@ -273,7 +273,7 @@ const CollectionPage = () => {
                       </h3>
                       <p
                         style={{
-                          fontFamily: "'Wagon', sans-serif",
+                          fontFamily: "var(--font-body)",
                           fontWeight: 300,
                           fontSize: '0.82rem',
                           color: 'rgba(0,0,0,0.55)',
