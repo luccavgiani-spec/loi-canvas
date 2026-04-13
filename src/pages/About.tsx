@@ -2,24 +2,47 @@ import Layout from '@/components/layout/Layout';
 import { Link } from 'react-router-dom';
 import { aboutUrl, lembrancasUrl } from '@/lib/storage';
 
+const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
+
 const About = () => {
   return (
     <Layout>
       {/* ─── BLOCO 1 — ABERTURA ─── */}
       <section
         className="min-h-[45vh] md:min-h-[50vh] flex items-end relative overflow-hidden"
+        style={{ background: '#29241f' }}
       >
+        {/* Mobile: andre e brisa.jpg, cropped center-bottom to focus on the dog */}
         <img
           src={aboutUrl('andre e brisa.jpg')}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: 'center bottom' }}
-        />
-        <div
-          className="absolute inset-0"
+          className="md:hidden absolute inset-0 w-full h-full object-cover"
           style={{
-            background: 'linear-gradient(to bottom, rgba(41,36,31,0.35) 0%, rgba(41,36,31,0.65) 100%)',
+            objectPosition: 'center bottom',
+            filter: 'saturate(0.65) brightness(0.60) contrast(1.05)',
           }}
+        />
+        {/* Desktop: banner hero.jpg */}
+        <img
+          src={aboutUrl('banner hero.jpg')}
+          alt=""
+          className="hidden md:block absolute inset-0 w-full h-full object-cover"
+          style={{ filter: 'saturate(0.65) brightness(0.60) contrast(1.05)' }}
+        />
+        {/* Overlay — igual à hero da home page */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.60) 100%),
+              linear-gradient(to bottom, rgba(41,36,31,0.62) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 72%, rgba(41,36,31,0.72) 100%)
+            `,
+          }}
+        />
+        {/* Grain — igual à hero da home page */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ opacity: 0.04, backgroundImage: GRAIN_SVG, backgroundSize: '200px 200px' }}
         />
         <div className="pb-10 pl-8 md:pl-16 relative z-10">
           <span
