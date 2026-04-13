@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 
 const NAV_SECTIONS = [
   {
-    label: 'produtos',
+    label: 'velas',
     items: [
       { num: 'i',   label: 'cotidianas',           desc: 'ritmos naturais',            to: '/colecoes/cotidianas' },
       { num: 'ii',  label: 'sala',                 desc: 'atmosfera do espaço',        to: '/colecoes/sala-ou-estar' },
