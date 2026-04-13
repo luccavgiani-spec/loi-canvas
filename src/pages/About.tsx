@@ -7,10 +7,21 @@ const About = () => {
     <Layout>
       {/* ─── BLOCO 1 — ABERTURA ─── */}
       <section
-        className="min-h-[45vh] md:min-h-[50vh] flex items-end"
-        style={{ background: '#29241f' }}
+        className="min-h-[45vh] md:min-h-[50vh] flex items-end relative overflow-hidden"
       >
-        <div className="pb-10 pl-8 md:pl-16">
+        <img
+          src={aboutUrl('andre e brisa.jpg')}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: 'center bottom' }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(41,36,31,0.35) 0%, rgba(41,36,31,0.65) 100%)',
+          }}
+        />
+        <div className="pb-10 pl-8 md:pl-16 relative z-10">
           <span
             style={{
               fontFamily: "'Sackers Gothic', sans-serif",
