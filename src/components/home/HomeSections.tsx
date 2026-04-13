@@ -506,7 +506,18 @@ const HomeSections = () => {
       <section className="py-16 px-6 md:py-0 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4">mais pedidas</span>
+            <span style={{
+              fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.65rem',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
+              color: 'rgba(0,0,0,0.4)',
+              display: 'block',
+              marginBottom: '0.4rem',
+            }}>
+              bestsellers
+            </span>
             <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
               mais pedidas
             </h2>
@@ -589,9 +600,6 @@ const HomeSections = () => {
       <section className="py-16 px-6 md:py-[5px] loi-section-lazy" style={{ background: '#f4edd2' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
-              Colaborações
-            </h2>
             <span
               style={{
                 fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
@@ -601,11 +609,14 @@ const HomeSections = () => {
                 textTransform: 'uppercase',
                 color: 'rgba(0,0,0,0.4)',
                 display: 'block',
-                marginTop: '0.35rem',
+                marginBottom: '0.4rem',
               }}
             >
               collabs
             </span>
+            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
+              Colaborações
+            </h2>
           </div>
           <CollabCarousel />
           <div className="reveal text-center mt-10">
@@ -675,11 +686,13 @@ const HomeSections = () => {
           <p
             className="reveal mb-10"
             style={{
-              fontFamily: "'Wagon', sans-serif",
+              fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
               fontWeight: 300,
-              fontSize: '1.05rem',
+              fontSize: '0.72rem',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
               color: '#000',
-              lineHeight: 1.7,
+              lineHeight: 1.9,
             }}
           >
             Cadastre seu e-mail e receba um cupom exclusivo de boas-vindas,
