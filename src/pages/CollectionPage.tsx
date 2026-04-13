@@ -86,7 +86,7 @@ const CollectionPage = () => {
     <Layout>
       <div ref={ref}>
         {/* Hero */}
-        <section className="relative overflow-hidden" style={{ background: '#29241f' }}>
+        <section className="relative overflow-hidden" style={{ background: '#aabbd6' }}>
           {collection.cover_image && (
             <div className="absolute inset-0">
               <img
@@ -95,7 +95,7 @@ const CollectionPage = () => {
                 className="w-full h-full object-cover"
                 style={{ opacity: 0.2, filter: 'saturate(0.5) brightness(0.6)' }}
               />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(41,36,31,0.4) 0%, rgba(41,36,31,0.95) 100%)' }} />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(170,187,214,0.4) 0%, rgba(170,187,214,0.95) 100%)' }} />
             </div>
           )}
 
@@ -109,7 +109,7 @@ const CollectionPage = () => {
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 fontSize: '0.65rem',
-                color: 'rgba(244,237,210,0.4)',
+                color: 'rgba(41,36,31,0.5)',
                 textDecoration: 'none',
                 transition: 'color 0.3s ease',
               }}
@@ -125,7 +125,7 @@ const CollectionPage = () => {
                   fontFamily: "'Wagon', sans-serif",
                   fontWeight: 300,
                   fontSize: '1.1rem',
-                  color: 'rgba(244,237,210,0.35)',
+                  color: 'rgba(41,36,31,0.4)',
                 }}
               >
                 {collection.numeral}
@@ -134,7 +134,7 @@ const CollectionPage = () => {
                 className="reveal-fade heading-display mb-5"
                 style={{
                   fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-                  color: '#f4edd2',
+                  color: '#29241f',
                   lineHeight: 1.1,
                 }}
               >
@@ -146,25 +146,12 @@ const CollectionPage = () => {
                   fontFamily: "var(--font-body)",
                   fontWeight: 300,
                   fontSize: 'clamp(1rem, 2vw, 1.15rem)',
-                  color: 'rgba(244,237,210,0.55)',
+                  color: 'rgba(41,36,31,0.65)',
                   lineHeight: 1.8,
                 }}
               >
                 {collection.story}
               </p>
-              <span
-                className="reveal-fade"
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 300,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  fontSize: '0.62rem',
-                  color: 'rgba(244,237,210,0.3)',
-                }}
-              >
-                {collection.detail}
-              </span>
             </div>
           </div>
         </section>
