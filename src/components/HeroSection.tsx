@@ -94,7 +94,7 @@ const HeroSection = () => {
           }}
         >
           <p
-            className="hero-fadeUp mt-8"
+            className="hero-fadeUp mt-8 px-8 sm:px-0"
             style={{
               fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
