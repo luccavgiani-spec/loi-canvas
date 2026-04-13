@@ -1,148 +1,174 @@
-import { useSearchParams } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
-import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
-import { getAdminCollabs } from '@/lib/api';
-import { storageUrl } from '@/lib/storage';
-import { VideoPlayer } from '@/components/ui/VideoPlayer';
-import type { Collab } from '@/types';
+import { collabsUrl } from '@/lib/storage';
 
-const COLLAB_POSTER = storageUrl('loie_vela_campos_principal.JPG');
+const COLLABS = [
+  {
+    slug: 'natura',
+    category: 'kit de imprensa',
+    title: 'Natura',
+    year: '2022',
+    description: 'a loiê desenvolveu uma série especial de oito velas aromáticas para acompanhar o lançamento de produtos de cuidado corporal. criadas exclusivamente para kit de imprensa, essas peças foram pensadas como extensão sensorial das fórmulas — um gesto silencioso de atmosfera e presença.',
+    images: ['natura.jpeg'],
+  },
+  {
+    slug: 'salon-line',
+    category: 'kit de imprensa',
+    title: 'Salon Line',
+    year: '2021',
+    description: 'a loiê desenvolveu velas aromáticas para um kit de imprensa destinado aos embaixadores da salon line, em ocasião do "reencontrinho". peças pensadas como gesto de acolhimento e atmosfera de autocuidado.',
+    images: ['salon_line (1).jpeg', 'salon_line (2).jpeg', 'salon_line (3).jpeg'],
+  },
+  {
+    slug: 'malu-muhamad',
+    category: 'desenvolvidos em colaboração',
+    title: 'Malu Muhamad',
+    year: '2022',
+    description: 'duas coleções de velas da loiê receberam vasos desenvolvidos em colaboração com a ceramista malu muhamad. produzidas em pequenos lotes, as peças foram pensadas com atenção à forma, à matéria e ao gesto manual.',
+    images: ['malu (1).jpeg', 'malu (2).jpeg', 'malu (3).jpeg', 'malu (4).jpeg'],
+  },
+  {
+    slug: 'neco-cunha',
+    category: 'desenvolvidos em colaboração',
+    title: 'Neco Cunha',
+    year: '2023',
+    description: 'a loiê encomendou uma coleção de porta-velas ao artista regional neco cunha. as peças, desenvolvidas em marchetaria com madeiras nobres, revelam o encontro entre desenho, matéria e precisão manual.',
+    images: ['neco (1).jpeg', 'neco (2).jpeg', 'neco (3).jpeg', 'neco (4).jpeg'],
+  },
+  {
+    slug: 'canal-concept',
+    category: 'kit de imprensa',
+    title: 'Canal Concept',
+    year: '2023',
+    description: 'a loiê desenvolveu uma vela aromática para um evento da canal concept. distribuídas entre colaboradores, clientes e parceiros.',
+    images: ['concept.jpeg'],
+  },
+];
 
-const CollabDetailCard = ({ collab }: { collab: Collab }) => {
-  const [currentImage, setCurrentImage] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+const CollabBlock = ({ collab, reverse }: { collab: typeof COLLABS[0]; reverse: boolean }) => (
+  <section id={collab.slug} className="reveal md:grid md:grid-cols-2" style={{ gap: 0 }}>
+    {/* Imagem — no HTML sempre primeiro; em desktop ímpar fica à direita via order */}
+    <div
+      style={{ overflow: 'hidden', order: reverse ? 1 : 0 }}
+      className={reverse ? 'md:order-none' : ''}
+    >
+      <img
+        src={collabsUrl(collab.images[0])}
+        alt={collab.title}
+        loading="lazy"
+        style={{
+          width: '100%',
+          aspectRatio: '4 / 5',
+          objectFit: 'cover',
+          display: 'block',
+        }}
+      />
+    </div>
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { rootMargin: '200px 0px' }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!isVisible) return;
-    const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % collab.images.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [collab.images.length, isVisible]);
-
-  return (
-    <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-      <div ref={containerRef} className="relative overflow-hidden aspect-[4/5]">
-        {isVisible ? collab.images.map((src, i) => (
-          <div
-            key={src}
-            className="absolute inset-0 transition-opacity duration-1000"
-            style={{ opacity: currentImage === i ? 1 : 0, willChange: 'opacity' }}
-          >
-            <VideoPlayer
-              src={src}
-              poster={COLLAB_POSTER}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )) : (
-          <img src={COLLAB_POSTER} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        )}
-      </div>
-      <div className="flex flex-col justify-center">
-        <span className="loi-label block mb-4">collab</span>
-        <h2
-          className="heading-display mb-4"
-          style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', color: '#000', lineHeight: 1.15 }}
+    {/* Texto */}
+    <div
+      style={{
+        background: '#fcf5e0',
+        display: 'flex',
+        alignItems: 'center',
+        padding: 'clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem)',
+        order: reverse ? 0 : 1,
+      }}
+      className={reverse ? 'md:order-none' : ''}
+    >
+      <div style={{ maxWidth: '480px' }}>
+        <span
+          style={{
+            fontFamily: "'Sackers Gothic', sans-serif",
+            fontWeight: 300,
+            fontSize: '0.65rem',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: 'rgba(0,0,0,0.5)',
+            display: 'block',
+            marginBottom: '0.75rem',
+          }}
         >
-          {collab.name}
+          {collab.category}
+        </span>
+
+        <h2
+          className="heading-display"
+          style={{
+            fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
+            color: '#000',
+            lineHeight: 1.15,
+            marginBottom: '1rem',
+          }}
+        >
+          {collab.title} — {collab.year}
         </h2>
-        <div className="loi-divider mb-6" />
+
+        <div className="loi-divider" style={{ marginBottom: '1.5rem' }} />
+
         <p
           style={{
             fontFamily: "'Sackers Gothic', sans-serif",
             fontWeight: 300,
             fontSize: '0.72rem',
-            color: '#000',
-            letterSpacing: '0.2em',
+            letterSpacing: '0.18em',
             textTransform: 'uppercase',
-            marginBottom: '1rem',
-          }}
-        >
-          {collab.caption}
-        </p>
-        <p
-          style={{
-            fontFamily: "'Wagon', sans-serif",
-            fontWeight: 300,
-            fontSize: '1.05rem',
-            color: '#000',
-            lineHeight: 1.8,
+            color: 'rgba(0,0,0,0.75)',
+            lineHeight: 1.9,
+            margin: 0,
           }}
         >
           {collab.description}
         </p>
       </div>
     </div>
-  );
-};
+  </section>
+);
 
 const Collabs = () => {
   const ref = useReveal();
-  const [searchParams] = useSearchParams();
-  const highlightedCollab = searchParams.get('collab');
-  const [collabs, setCollabs] = useState<Collab[]>([]);
-
-  useEffect(() => {
-    getAdminCollabs().then(items => setCollabs(items.filter(c => c.is_active)));
-  }, []);
 
   return (
     <>
       <CartDrawer />
       <Header />
       <main ref={ref} style={{ background: '#fcf5e0', paddingTop: '8rem' }}>
-        <div className="max-w-[1200px] mx-auto px-6 pb-20">
-          <div className="text-center mb-16">
-            <span className="reveal loi-label block mb-4">parcerias</span>
-            <h1
-              className="reveal heading-display"
-              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#000' }}
-            >
-              Collabs
-            </h1>
-            <p
-              className="reveal mt-4"
-              style={{
-                fontFamily: "'Wagon', sans-serif",
-                fontWeight: 300,
-                fontSize: '1.1rem',
-                color: '#000',
-                maxWidth: 500,
-                margin: '1rem auto 0',
-              }}
-            >
-              Conexões que transformam espaços em experiências.
-            </p>
-          </div>
-
-          <div className="space-y-20">
-            {collabs.map((collab) => (
-              <div
-                key={collab.slug}
-                id={collab.slug}
-                className={highlightedCollab === collab.slug ? 'ring-2 ring-[#565600]/20 rounded-lg p-4 -m-4' : ''}
-              >
-                <CollabDetailCard collab={collab} />
-              </div>
-            ))}
-          </div>
+        {/* ── Header da página ── */}
+        <div className="text-center pb-16 px-6">
+          <h1
+            className="reveal heading-display"
+            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#000', marginBottom: '0.75rem' }}
+          >
+            colaborações
+          </h1>
+          <span
+            className="reveal"
+            style={{
+              fontFamily: "'Sackers Gothic', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.72rem',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'rgba(0,0,0,0.5)',
+              display: 'block',
+            }}
+          >
+            parcerias &amp; projetos especiais
+          </span>
         </div>
+
+        {/* ── Blocos alternados ── */}
+        {COLLABS.map((collab, index) => (
+          <div key={collab.slug}>
+            <hr style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.1)', margin: 0 }} />
+            <CollabBlock collab={collab} reverse={index % 2 !== 0} />
+          </div>
+        ))}
+
+        <hr style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.1)', margin: 0 }} />
+        <div style={{ paddingBottom: '5rem' }} />
       </main>
       <Footer />
     </>
