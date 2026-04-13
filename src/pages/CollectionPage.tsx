@@ -364,18 +364,6 @@ const CollectionPage = () => {
                         >
                           {other.name}
                         </h3>
-                        <span
-                          style={{
-                            fontFamily: "var(--font-body)",
-                            fontWeight: 300,
-                            letterSpacing: '0.15em',
-                            textTransform: 'uppercase',
-                            fontSize: '0.6rem',
-                            color: 'rgba(244,237,210,0.35)',
-                          }}
-                        >
-                          {other.detail}
-                        </span>
                       </div>
                     </Link>
                   );
