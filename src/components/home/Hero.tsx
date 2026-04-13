@@ -69,7 +69,7 @@ const Hero = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/10 to-transparent" />
 
       {/* Phrase text */}
-      <div className="absolute inset-0 flex items-center justify-center px-8">
+      <div className="absolute inset-0 flex items-center justify-center px-12 sm:px-8">
         <p
           key={currentSlide}
           style={{
