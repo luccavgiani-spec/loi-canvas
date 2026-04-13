@@ -10,7 +10,7 @@ interface Props {
   ctaLink?: string;
 }
 
-const CollectionGrid = ({ title, subtitle, products, ctaLabel = 'Ver todos', ctaLink = '/shop' }: Props) => {
+const CollectionGrid = ({ title, subtitle, products, ctaLabel = 'Ver todos', ctaLink = '/colecoes' }: Props) => {
   return (
     <section className="py-16 md:py-24">
       <div className="container">

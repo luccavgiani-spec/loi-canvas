@@ -7,24 +7,24 @@ const NAV_SECTIONS = [
   {
     label: 'produtos',
     items: [
-      { num: 'i',   label: 'cotidianas',           desc: 'ritmos naturais',            to: '/shop/cotidianas' },
-      { num: 'ii',  label: 'sala',                 desc: 'atmosfera do espaço',        to: '/shop/sala-ou-estar' },
-      { num: 'iii', label: 'refúgio',              desc: 'densas e envolventes',       to: '/shop/refugio' },
-      { num: 'iv',  label: 'botânicas & florais',  desc: 'expressivas e detalhadas',   to: '/shop/botanicas-e-florais' },
+      { num: 'i',   label: 'cotidianas',           desc: 'ritmos naturais',            to: '/colecoes/cotidianas' },
+      { num: 'ii',  label: 'sala',                 desc: 'atmosfera do espaço',        to: '/colecoes/sala-ou-estar' },
+      { num: 'iii', label: 'refúgio',              desc: 'densas e envolventes',       to: '/colecoes/refugio' },
+      { num: 'iv',  label: 'botânicas & florais',  desc: 'expressivas e detalhadas',   to: '/colecoes/botanicas-e-florais' },
     ],
   },
   {
     label: 'borrifadores',
     items: [
-      { num: 'i',  label: 'matéria 150ml',             desc: 'perfumaria pura e autoral',    to: '/shop' },
-      { num: 'ii', label: 'atmosfera 200ml',            desc: 'aromas de projeção imediata', to: '/shop' },
+      { num: 'i',  label: 'matéria 150ml',             desc: 'perfumaria pura e autoral',    to: '/colecoes' },
+      { num: 'ii', label: 'atmosfera 200ml',            desc: 'aromas de projeção imediata', to: '/colecoes' },
     ],
   },
   {
     label: 'corpo',
     items: [
-      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/shop' },
-      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/shop' },
+      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/colecoes' },
+      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/colecoes' },
     ],
   },
 ];
@@ -97,7 +97,7 @@ const Header = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/shop?q=${encodeURIComponent(searchQuery.trim())}`;
+      window.location.href = `/colecoes?q=${encodeURIComponent(searchQuery.trim())}`;
       setSearchOpen(false);
       setSearchQuery('');
     }
@@ -211,7 +211,7 @@ const Header = () => {
                           {item.label}
                         </span>
                         {item.desc && (
-                          <span style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 200, fontSize: '0.75rem', color: dropdownMuted, display: 'block', marginTop: 2, paddingLeft: '1.2rem' }}>
+                          <span style={{ fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif", fontWeight: 200, fontSize: '0.75rem', color: dropdownMuted, display: 'block', marginTop: 2, paddingLeft: '1.2rem' }}>
                             {item.desc}
                           </span>
                         )}

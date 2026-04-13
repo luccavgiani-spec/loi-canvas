@@ -526,7 +526,7 @@ const HomeSections = () => {
             <ProductCarousel products={salaOuEstar} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/shop/sala-ou-estar" className="loi-ghost group">
+            <Link to="/colecoes/sala-ou-estar" className="loi-ghost group">
               <span>ver toda a coleção</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -587,7 +587,7 @@ const HomeSections = () => {
             <ProductCarousel products={refugio} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/shop/refugio" className="loi-ghost group">
+            <Link to="/colecoes/refugio" className="loi-ghost group">
               <span>ver toda a coleção</span>
               <span className="loi-ghost-dash" />
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>

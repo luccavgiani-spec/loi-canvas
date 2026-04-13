@@ -60,7 +60,7 @@ const CollectionPage = () => {
     return result;
   }, [products, sort]);
 
-  if (notFound && !loading) return <Navigate to="/shop" replace />;
+  if (notFound && !loading) return <Navigate to="/colecoes" replace />;
 
   if (error) return (
     <Layout>
@@ -101,7 +101,7 @@ const CollectionPage = () => {
 
           <div className="relative z-10 max-w-[1400px] mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24">
             <Link
-              to="/shop"
+              to="/colecoes"
               className="reveal-fade inline-flex items-center gap-2 mb-10 group/back"
               style={{
                 fontFamily: "var(--font-body)",
@@ -338,7 +338,7 @@ const CollectionPage = () => {
                   return (
                     <Link
                       key={other.id}
-                      to={`/shop/${other.slug}`}
+                      to={`/colecoes/${other.slug}`}
                       className="reveal group relative overflow-hidden block"
                       style={{ aspectRatio: '4/3' }}
                     >

@@ -330,7 +330,7 @@ const About = () => {
           PARA CONHECER NOSSAS CRIAÇÕES
         </p>
         <Link
-          to="/shop"
+          to="/colecoes"
           style={{
             display: 'inline-block',
             border: '1px solid #29241f',

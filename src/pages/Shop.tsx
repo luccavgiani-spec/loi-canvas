@@ -6,8 +6,7 @@ import type { Product, Collection } from '@/types';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { storageUrl } from '@/lib/storage';
-import { VideoPlayer } from '@/components/ui/VideoPlayer';
+import { storageUrl, bannerUrl } from '@/lib/storage';
 
 
 /* ── Horizontal carousel with snap scrolling ── */
@@ -211,14 +210,12 @@ const Shop = () => {
           className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-6 overflow-hidden"
           style={{ background: '#29241f' }}>
 
-          {/* Background video */}
-          <VideoPlayer
-            src={storageUrl('Cartao_Postal_Loie.mp4')}
-            poster={storageUrl('loie_vela_campos_principal.JPG')}
+          {/* Background image */}
+          <img
+            src={bannerUrl('banners (6).webp')}
+            alt=""
             className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              filter: 'saturate(0.5) brightness(0.35) contrast(1.05)',
-            }}
+            style={{ filter: 'saturate(0.5) brightness(0.35) contrast(1.05)' }}
           />
 
           <div
@@ -368,7 +365,7 @@ const Shop = () => {
                 {/* View collection link */}
                 <div className="mt-10 text-center">
                   <Link
-                    to={`/shop/${col.slug}`}
+                    to={`/colecoes/${col.slug}`}
                     className="inline-flex items-center gap-2 group/link"
                     style={{
                       fontFamily: "var(--font-body)",
