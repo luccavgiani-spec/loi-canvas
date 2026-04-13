@@ -79,7 +79,7 @@ const HeroSection = () => {
       />
 
       {/* ── clock widget ── */}
-      <div style={{ position: 'absolute', top: '24px', left: '32px', zIndex: 20 }}>
+      <div style={{ position: 'absolute', top: 'calc(5rem + 16px)', left: '32px', zIndex: 20 }}>
         <LoieClock />
       </div>
 

@@ -6,11 +6,67 @@ const MONTHS_PT = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
 
+function AnalogClock({ now }: { now: Date }) {
+  const h = now.getHours() % 12;
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+
+  // Angles in radians, 12 o'clock = 0
+  const hourAngle = ((h + m / 60 + s / 3600) / 12) * 2 * Math.PI;
+  const minuteAngle = ((m + s / 60) / 60) * 2 * Math.PI;
+
+  const cx = 17;
+  const cy = 17;
+  const hourLen = 7;
+  const minuteLen = 11;
+
+  return (
+    <svg
+      width="34"
+      height="34"
+      viewBox="0 0 34 34"
+      style={{ flexShrink: 0, display: "block" }}
+    >
+      {/* Face border */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r="15.5"
+        fill="none"
+        stroke="rgba(41,36,31,0.5)"
+        strokeWidth="1.5"
+      />
+      {/* Hour hand */}
+      <line
+        x1={cx}
+        y1={cy}
+        x2={cx + hourLen * Math.sin(hourAngle)}
+        y2={cy - hourLen * Math.cos(hourAngle)}
+        stroke="#29241f"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      {/* Minute hand */}
+      <line
+        x1={cx}
+        y1={cy}
+        x2={cx + minuteLen * Math.sin(minuteAngle)}
+        y2={cy - minuteLen * Math.cos(minuteAngle)}
+        stroke="#29241f"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      {/* Center dot */}
+      <circle cx={cx} cy={cy} r="1.5" fill="#29241f" />
+    </svg>
+  );
+}
+
 export function LoieClock() {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30000);
+    const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
 
@@ -53,7 +109,7 @@ export function LoieClock() {
           gap: "6px",
         }}
       >
-        {/* Left column: day abbreviation (top) + R circle (bottom) */}
+        {/* Left column: day abbreviation (top) + analog clock (bottom) */}
         <div
           style={{
             display: "flex",
@@ -85,23 +141,8 @@ export function LoieClock() {
             </span>
           </div>
 
-          {/* R circle emblem */}
-          <div
-            style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "50%",
-              border: "1.5px solid rgba(41,36,31,0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
-              fontSize: "15px",
-              flexShrink: 0,
-            }}
-          >
-            R
-          </div>
+          {/* Analog clock */}
+          <AnalogClock now={now} />
         </div>
 
         {/* Right column: large day number (top) + month name (bottom) */}
