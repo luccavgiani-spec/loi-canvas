@@ -35,7 +35,7 @@ const COLLABS = [
     title: 'Neco Cunha',
     year: '2023',
     description: 'a loiê encomendou uma coleção de porta-velas ao artista regional neco cunha. as peças, desenvolvidas em marchetaria com madeiras nobres, revelam o encontro entre desenho, matéria e precisão manual.',
-    images: ['neco (1).jpeg', 'neco (2).jpeg', 'neco (3).jpeg', 'neco (4).jpeg'],
+    images: ['neco (3).jpeg', 'neco (1).jpeg', 'neco (2).jpeg', 'neco (4).jpeg'],
   },
   {
     slug: 'canal-concept',

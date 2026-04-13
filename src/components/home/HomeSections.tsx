@@ -463,10 +463,37 @@ const HomeSections = () => {
             <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
               Colaborações
             </h2>
+            <span
+              style={{
+                fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.65rem',
+                letterSpacing: '0.25em',
+                textTransform: 'uppercase',
+                color: 'rgba(0,0,0,0.4)',
+                display: 'block',
+                marginTop: '0.35rem',
+              }}
+            >
+              collabs
+            </span>
           </div>
-          <div className="reveal-stagger grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+          <div
+            className="reveal-stagger"
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'nowrap',
+              overflowX: 'auto',
+              gap: '1.5rem',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+            }}
+          >
             {COLLAB_ITEMS.map((collab) => (
-              <CollabCard key={collab.slug} collab={collab} />
+              <div key={collab.slug} style={{ flexShrink: 0, scrollSnapAlign: 'start', minWidth: '240px' }}>
+                <CollabCard collab={collab} />
+              </div>
             ))}
           </div>
           <div className="reveal text-center mt-10">
