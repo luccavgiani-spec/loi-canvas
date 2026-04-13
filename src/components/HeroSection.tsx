@@ -4,6 +4,7 @@ import { bannerUrl } from '@/lib/storage';
 import { supabase } from '@/integrations/supabase/client';
 import GlareHover from '@/components/ui/GlareHover';
 import { FAMILIES } from '@/lib/families';
+import { LoieClock } from '@/components/LoieClock';
 
 /* ─── grain SVG data URI ─── */
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
@@ -76,6 +77,11 @@ const HeroSection = () => {
         className="absolute inset-0 pointer-events-none"
         style={{ opacity: 0.04, backgroundImage: GRAIN_SVG, backgroundSize: '200px 200px' }}
       />
+
+      {/* ── clock widget ── */}
+      <div style={{ position: 'absolute', top: '24px', left: '32px', zIndex: 20 }}>
+        <LoieClock />
+      </div>
 
       {/* ── central content ── */}
       <div
