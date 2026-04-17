@@ -86,7 +86,7 @@ const CollectionPage = () => {
     <Layout>
       <div ref={ref} style={{ textTransform: 'uppercase' }}>
         {/* Hero */}
-        <section className="relative overflow-hidden" style={{ background: '#aabbd6' }}>
+        <section className="relative overflow-hidden" style={{ background: '#afc4e2' }}>
           {collection.cover_image && (
             <div className="absolute inset-0">
               <img
@@ -95,7 +95,7 @@ const CollectionPage = () => {
                 className="w-full h-full object-cover"
                 style={{ opacity: 0.2, filter: 'saturate(0.5) brightness(0.6)' }}
               />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(170,187,214,0.4) 0%, rgba(170,187,214,0.95) 100%)' }} />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(175,196,226,0.4) 0%, rgba(175,196,226,0.95) 100%)' }} />
             </div>
           )}
 
@@ -258,22 +258,24 @@ const CollectionPage = () => {
                       <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
                         {product.name}
                       </h3>
-                      <p
-                        style={{
-                          fontFamily: "var(--font-body)",
-                          fontWeight: 300,
-                          fontSize: '0.82rem',
-                          color: 'rgba(0,0,0,0.55)',
-                          lineHeight: 1.5,
-                          marginBottom: 8,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {product.description}
-                      </p>
+                      {product.notes && (
+                        <p
+                          style={{
+                            fontFamily: "var(--font-body)",
+                            fontWeight: 300,
+                            fontSize: '0.72rem',
+                            color: 'rgba(0,0,0,0.5)',
+                            lineHeight: 1.6,
+                            marginBottom: 8,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {product.notes}
+                        </p>
+                      )}
                       <div className="flex items-center gap-3">
                         <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
                           R$ {product.price.toFixed(2)}
