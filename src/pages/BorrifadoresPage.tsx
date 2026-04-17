@@ -1,10 +1,45 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getProductsByCollectionSlug } from '@/lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import type { Product } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { useReveal } from '@/hooks/useReveal';
+
+const SUPABASE_STORAGE_URL =
+  'https://xigituxddrtsqhmrmsvy.supabase.co/storage/v1/object/public/produtos';
+
+const fileToUrl = (filename: string) =>
+  `${SUPABASE_STORAGE_URL}/${encodeURIComponent(filename)}`;
+
+const mapRowToProduct = (row: any): Product => ({
+  id: row.id,
+  collection_id: row.collection_id,
+  collection: row.collections?.name ?? '',
+  collection_slug: row.collections?.slug ?? '',
+  slug: row.slug,
+  name: row.name,
+  sku: row.sku ?? '',
+  price: Number(row.price),
+  weight_g: row.weight_g ?? null,
+  burn_hours: row.burn_hours ?? null,
+  accord: row.accord ?? '',
+  description: row.description ?? '',
+  details: row.details ?? undefined,
+  suggested_use: row.suggested_use ?? '',
+  composition: row.composition ?? '',
+  notes: row.notes ?? '',
+  ritual: row.ritual ?? '',
+  is_bestseller: row.is_bestseller ?? false,
+  images: (row.product_images as { filename: string; sort_order: number }[] | null | undefined ?? [])
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((img) => fileToUrl(img.filename)),
+  tags: [],
+  rating_avg: 0,
+  rating_count: 0,
+  created_at: row.created_at || '',
+});
 
 const sortOptions = [
   { value: 'default', label: 'Destaque' },
@@ -33,20 +68,38 @@ const BorrifadoresPage = () => {
   const ref = useReveal(0.15, [loading]);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     setError(null);
 
-    Promise.all([
-      getProductsByCollectionSlug('materia'),
-      getProductsByCollectionSlug('atmosfera'),
-    ])
-      .then(([materia, atmosfera]) => {
-        setProducts([...materia.products, ...atmosfera.products]);
-      })
-      .catch((err) => {
-        setError(err.message || 'Erro ao carregar produtos');
-      })
-      .finally(() => setLoading(false));
+    (async () => {
+      try {
+        const { data: col, error: colError } = await supabase
+          .from('collections')
+          .select('id')
+          .eq('slug', 'borrifadores')
+          .single();
+        if (colError || !col) throw colError || new Error('Coleção borrifadores não encontrada');
+
+        const { data, error: prodError } = await (supabase
+          .from('products')
+          .select('*, collections(name, slug), product_images(filename, sort_order)') as any)
+          .eq('collection_id', col.id)
+          .eq('visible', true)
+          .order('created_at', { ascending: false });
+        if (prodError) throw prodError;
+
+        if (!cancelled) setProducts(((data as any[]) || []).map(mapRowToProduct));
+      } catch (err: any) {
+        if (!cancelled) setError(err?.message || 'Erro ao carregar produtos');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const sorted = useMemo(() => {
