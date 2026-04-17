@@ -58,6 +58,7 @@ function mapDbProduct(row: any): Product {
     burn_hours: row.burn_hours ?? null,
     accord: row.accord ?? '',
     description: row.description ?? '',
+    details: row.details ?? '',
     suggested_use: row.suggested_use ?? '',
     composition: row.composition ?? '',
     notes: row.notes ?? '',
