@@ -118,7 +118,7 @@ const Lembrancas = () => {
               marginBottom: '1.2rem',
             }}
           >
-            lembranças sob curadoria
+            Lembranças sob Curadoria
           </h1>
           <p
             style={{
@@ -130,7 +130,7 @@ const Lembrancas = () => {
               margin: 0,
             }}
           >
-            lembrança — memória e sofisticação
+            memória e sofisticação: há gestos que permanecem
           </p>
         </div>
       </section>
@@ -150,55 +150,9 @@ const Lembrancas = () => {
               fontSize: 'clamp(0.88rem, 1.5vw, 1.02rem)',
               lineHeight: 2.1,
               color: '#29241f',
-              marginBottom: '2rem',
             }}
           >
-            há gestos que permanecem.<br />
-            as lembranças da loiê nascem com esse propósito: transformar
-            ocasiões em presenças sensoriais que atravessam o tempo.
-          </p>
-          <p
-            style={{
-              fontFamily: "var(--font-body)",
-              fontWeight: 300,
-              fontSize: 'clamp(0.88rem, 1.5vw, 1.02rem)',
-              lineHeight: 2.1,
-              color: '#29241f',
-              marginBottom: '2rem',
-            }}
-          >
-            criamos pequenas peças que carregam atmosfera, cuidado e
-            significado. trabalhamos com um formato exclusivo, desenhado para
-            valorizar o essencial: proporção, acabamento e harmonia. cada
-            vela é produzida manualmente, com ceras vegetais e um olhar
-            preciso sobre cada detalhe — do recipiente ao rótulo.
-          </p>
-          <p
-            style={{
-              fontFamily: "var(--font-body)",
-              fontWeight: 300,
-              fontSize: 'clamp(0.88rem, 1.5vw, 1.02rem)',
-              lineHeight: 2.1,
-              color: '#29241f',
-              marginBottom: '2rem',
-            }}
-          >
-            como assinatura da casa, todas as peças são desenvolvidas a
-            partir de uma única fragrância: o capim-cidreira. um aroma
-            luminoso e equilibrado, que acolhe sem invadir, trazendo
-            frescor e serenidade ao ambiente.
-          </p>
-          <p
-            style={{
-              fontFamily: "var(--font-body)",
-              fontWeight: 300,
-              fontSize: 'clamp(0.88rem, 1.5vw, 1.02rem)',
-              lineHeight: 2.1,
-              color: '#29241f',
-            }}
-          >
-            o resultado são lembranças que não se dispersam — permanecem
-            no espaço, na memória e na experiência de quem recebe.
+            as lembranças da loiê nascem com...
           </p>
         </div>
       </section>
@@ -238,7 +192,7 @@ const Lembrancas = () => {
               lineHeight: 1.6,
             }}
           >
-            uma vela que leva o nome deles. que cheira ao dia em que disseram sim.
+            Uma vela que leva o nome deles. Que traduz o dia em que disseram sim
           </p>
         </div>
       </section>
@@ -265,7 +219,7 @@ const Lembrancas = () => {
               lineHeight: 1.6,
             }}
           >
-            para quem merece algo que não some depois da festa.
+            Para quem não some depois da festa
           </p>
         </div>
         <div style={{ overflow: 'hidden', order: 0 }} className="md:order-none">
@@ -316,7 +270,7 @@ const Lembrancas = () => {
               lineHeight: 1.6,
             }}
           >
-            cada cliente lembra. cada parceiro percebe a diferença.
+            Discreto no gesto. Marcante na lembrança. Sem excesso. Com intenção
           </p>
         </div>
       </section>

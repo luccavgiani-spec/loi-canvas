@@ -17,67 +17,40 @@ const About = () => {
           src={aboutUrl('andre e brisa.jpg')}
           alt=""
           className="md:hidden absolute inset-0 w-full h-full object-cover"
-          style={{
-            objectPosition: 'center bottom',
-            filter: 'saturate(0.65) brightness(0.60) contrast(1.05)',
-          }}
+          style={{ objectPosition: 'center bottom' }}
         />
         {/* Desktop: banner hero.jpg */}
         <img
           src={aboutUrl('banner hero.jpg')}
           alt=""
           className="hidden md:block absolute inset-0 w-full h-full object-cover"
-          style={{ filter: 'saturate(0.65) brightness(0.60) contrast(1.05)' }}
-        />
-        {/* Overlay — igual à hero da home page */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `
-              radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.60) 100%),
-              linear-gradient(to bottom, rgba(41,36,31,0.62) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 72%, rgba(41,36,31,0.72) 100%)
-            `,
-          }}
         />
         {/* Grain — igual à hero da home page */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ opacity: 0.04, backgroundImage: GRAIN_SVG, backgroundSize: '200px 200px' }}
         />
-        <div className="pb-10 pl-8 md:pl-16 relative z-10">
-          <span
-            style={{
-              fontFamily: "'Sackers Gothic', sans-serif",
-              fontWeight: 300,
-              fontSize: '0.7rem',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              color: '#989857',
-              display: 'block',
-              marginBottom: '1rem',
-            }}
-          >
-            SALA AROMÁTICA
-          </span>
+        <div className="pb-10 pl-8 md:pl-16 pr-8 md:pr-16 relative z-10">
           <h1
             style={{
               fontFamily: "'Wagon', sans-serif",
               fontWeight: 300,
-              fontSize: 'clamp(3.5rem, 9vw, 7rem)',
+              fontSize: 'clamp(1.75rem, 4.5vw, 3.5rem)',
               color: '#f4edd2',
-              lineHeight: 1,
+              lineHeight: 1.15,
               margin: 0,
+              maxWidth: '48rem',
             }}
           >
-            Loiê
+            a loiê sala aromática é esse gesto poético, mas também é um ateliê real — feito de tempo, matéria, escolhas e presença
           </h1>
         </div>
       </section>
 
-      {/* ─── BLOCO 2 — INTRODUÇÃO EDITORIAL ─── */}
+      {/* ─── BLOCO 2 — HISTÓRIA ─── */}
       <section style={{ background: '#fcf5e0' }}>
         <div className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-          {/* Coluna esquerda — manifesto */}
+          {/* Coluna esquerda — história */}
           <div
             className="md:sticky"
             style={{
@@ -86,11 +59,25 @@ const About = () => {
               padding: 'clamp(2rem, 6vw, 4rem)',
             }}
           >
+            <span
+              style={{
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.7rem',
+                letterSpacing: '0.2em',
+                color: '#989857',
+                display: 'block',
+                marginBottom: '2rem',
+              }}
+            >
+              história
+            </span>
+
             {[
-              'acendemos uma vela como quem abre uma porta.',
-              'uma porta pra dentro. pra memória. pra beleza que mora no silêncio.',
-              'a loiê nasceu de uma casa antiga, de um ritual secreto, de um saber que se aprende com as mãos e os sentidos.',
-              'cada aroma é uma narrativa, cada frasco é um convite a ficar mais tempo com o que importa.',
+              'a loiê nasceu em 2015, a partir de pequenos experimentos realizados pelo artista e fundador andré magalhães liza. desde o início, o gesto de acender uma vela esteve ligado ao desejo de qualificar o tempo — dentro de casa, no cotidiano, no silêncio entre as tarefas.',
+              'o ateliê tomou forma com a ocupação de uma casa antiga de família, no interior de são paulo. reativar esse espaço foi também um exercício de memória: recuperar valores, ritmos e afetos que atravessam gerações. a casa moldou a loiê tanto quanto a loiê passou a habitar a casa.',
+              'ao longo de sua trajetória, a marca foi construída em diferentes etapas e parcerias, sempre guiada pela atenção às matérias-primas, ao fazer manual e à experiência sensível do aroma. trabalhamos com ceras vegetais, óleos essenciais e processos cuidadosos, respeitando o tempo de cada criação.',
+              'hoje a loiê sala aromática segue como um ateliê autoral dedicado à criação de atmosferas — objetos que convidam à presença, ao cuidado e a uma relação mais consciente com o espaço e consigo mesmo. acreditamos que habitar o agora, com atenção e delicadeza, também é uma forma de transformar o mundo.',
             ].map((line, i) => (
               <p
                 key={i}
@@ -100,30 +87,8 @@ const About = () => {
                   fontSize: '0.85rem',
                   color: '#29241f',
                   lineHeight: 1.9,
-                  maxWidth: '24rem',
-                  marginBottom: '2rem',
-                }}
-              >
-                {line}
-              </p>
-            ))}
-
-            {[
-              'somos fogo, mas somos calma.',
-              'somos essência, mas somos presença.',
-              'somos brasileiros, feitos à mão, com técnica e alma.',
-            ].map((line, i) => (
-              <p
-                key={`italic-${i}`}
-                style={{
-                  fontFamily: "'Sackers Gothic', sans-serif",
-                  fontWeight: 300,
-                  fontStyle: 'italic',
-                  fontSize: '0.85rem',
-                  color: '#29241f',
-                  lineHeight: 1.9,
-                  maxWidth: '24rem',
-                  marginBottom: '2rem',
+                  maxWidth: '28rem',
+                  marginBottom: '1.75rem',
                 }}
               >
                 {line}
@@ -134,26 +99,29 @@ const About = () => {
               style={{
                 fontFamily: "'Sackers Gothic', sans-serif",
                 fontWeight: 300,
+                fontStyle: 'italic',
                 fontSize: '0.85rem',
                 color: '#29241f',
                 lineHeight: 1.9,
-                maxWidth: '24rem',
+                maxWidth: '28rem',
+                marginTop: '2.5rem',
                 marginBottom: '0.5rem',
               }}
             >
-              não vendemos velas.
+              por andré liza
             </p>
             <p
               style={{
                 fontFamily: "'Sackers Gothic', sans-serif",
                 fontWeight: 300,
+                fontStyle: 'italic',
                 fontSize: '0.85rem',
                 color: '#29241f',
                 lineHeight: 1.9,
-                maxWidth: '24rem',
+                maxWidth: '28rem',
               }}
             >
-              criamos atmosferas.
+              loiê sala aromática
             </p>
           </div>
 
@@ -193,13 +161,12 @@ const About = () => {
               fontWeight: 300,
               fontSize: '0.7rem',
               letterSpacing: '0.2em',
-              textTransform: 'uppercase',
               color: '#989857',
               display: 'block',
               marginBottom: '3rem',
             }}
           >
-            MANIFESTO
+            manifesto
           </span>
 
           <p
@@ -212,7 +179,32 @@ const About = () => {
               marginBottom: '1.5rem',
             }}
           >
-            a loiê nasceu de uma casa antiga. de um saber que se aprende com as mãos. de um tempo em que o perfume ainda tinha nome próprio e endereço.
+            acendemos uma vela como quem abre uma porta. uma porta pra dentro. pra memória. pra beleza que mora no silêncio.
+          </p>
+          <p
+            style={{
+              fontFamily: "'Wagon', sans-serif",
+              fontWeight: 300,
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+              color: '#f4edd2',
+              lineHeight: 1.7,
+              marginBottom: '1.5rem',
+            }}
+          >
+            a loiê nasceu de uma casa antiga, de um ritual secreto, de um saber que se aprende com as mãos e os sentidos. cada aroma é uma narrativa, cada frasco é um convite a ficar mais tempo com o que importa.
+          </p>
+          <p
+            style={{
+              fontFamily: "'Wagon', sans-serif",
+              fontWeight: 300,
+              fontStyle: 'italic',
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+              color: '#f4edd2',
+              lineHeight: 1.7,
+              marginBottom: '1.5rem',
+            }}
+          >
+            somos fogo, mas somos calma. somos essência, mas somos presença. somos brasileiros, feitos à mão, com técnica e alma.
           </p>
           <p
             style={{
@@ -223,7 +215,7 @@ const About = () => {
               lineHeight: 1.7,
             }}
           >
-            cada vela é uma afirmação silenciosa: de que beleza não precisa explicar. de que o aroma faz o que a palavra não consegue. de que existe arte no que queima.
+            não vendemos velas. criamos atmosferas.
           </p>
         </div>
       </section>
@@ -250,22 +242,22 @@ const About = () => {
         <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: '3rem' }}>
           {[
             {
-              label: 'ORIGEM',
-              titulo: 'feita à mão',
+              label: 'origem',
+              titulo: 'Feito à Mão',
               texto:
-                'cada vela começa no gesto. na escolha da cera, no cálculo do aroma, na hora certa de despejar. não há pressa no que queremos que dure.',
+                'Cada vela começa no gesto. Na escolha da composição da cera, na medida do aroma, na hora certa de derramar. Não há pressa no que queremos que dure.',
             },
             {
-              label: 'MATÉRIA',
-              titulo: 'só o essencial',
+              label: 'matéria',
+              titulo: 'Só o Essencial',
               texto:
-                'ceras vegetais de coco, arroz e palma. óleos essenciais puros. pavios de algodão. sem sintéticos, sem atalhos, sem compostos que o nariz detecta como artificiais.',
+                'Ceras vegetais de coco, arroz e palma. Composições aromáticas puras. Pavios de algodão. Sem compostos que o nariz detecta como superficiais.',
             },
             {
-              label: 'PROPÓSITO',
-              titulo: 'atmosfera como linguagem',
+              label: 'propósito',
+              titulo: 'Atmosfera como linguagem',
               texto:
-                'não acreditamos em decoração. acreditamos em presença. uma vela não enfeita o espaço — ela o define. o aroma diz o que o ambiente quer ser.',
+                'Não é decoração. É sobre presença. Uma vela não enfeita o espaço — ela o define. O aroma diz o que o ambiente é.',
             },
           ].map(({ label, titulo, texto }) => (
             <div key={label} className="pb-10 md:pb-0">
@@ -275,7 +267,6 @@ const About = () => {
                   fontWeight: 300,
                   fontSize: '0.65rem',
                   letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
                   color: '#989857',
                   display: 'block',
                   marginBottom: '1rem',
@@ -308,37 +299,6 @@ const About = () => {
               </p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* ─── BLOCO 6 — IMAGEM + CITAÇÃO ─── */}
-      <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-        {/* Coluna esquerda — imagem */}
-        <div className="aspect-square overflow-hidden">
-          <img src={aboutUrl('conceitual 3.jpg')} alt="" className="w-full h-full object-cover" />
-        </div>
-
-        {/* Coluna direita — citação */}
-        <div
-          style={{
-            background: '#29241f',
-            padding: 'clamp(3rem, 6vw, 4rem)',
-            display: 'flex',
-            alignItems: 'flex-end',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.4rem, 3vw, 1.9rem)',
-              color: '#f4edd2',
-              lineHeight: 1.5,
-            }}
-          >
-            o ritual não está na vela. está em quem a acende.
-          </p>
         </div>
       </section>
 
