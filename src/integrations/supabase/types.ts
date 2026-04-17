@@ -313,6 +313,7 @@ export type Database = {
           composition: string | null
           created_at: string | null
           description: string | null
+          details: string | null
           id: string
           is_bestseller: boolean | null
           name: string
@@ -332,6 +333,7 @@ export type Database = {
           composition?: string | null
           created_at?: string | null
           description?: string | null
+          details?: string | null
           id?: string
           is_bestseller?: boolean | null
           name: string
@@ -351,6 +353,7 @@ export type Database = {
           composition?: string | null
           created_at?: string | null
           description?: string | null
+          details?: string | null
           id?: string
           is_bestseller?: boolean | null
           name?: string
