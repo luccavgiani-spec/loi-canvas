@@ -134,7 +134,7 @@ const Collabs = () => {
     <>
       <CartDrawer />
       <Header />
-      <main ref={ref} style={{ background: '#fcf5e0', paddingTop: '8rem' }}>
+      <main ref={ref} style={{ background: '#fcf5e0', paddingTop: '8rem', textTransform: 'uppercase' }}>
         {/* ── Header da página ── */}
         <div className="text-center pb-16 px-6">
           <h1

@@ -84,7 +84,7 @@ const CollectionPage = () => {
 
   return (
     <Layout>
-      <div ref={ref}>
+      <div ref={ref} style={{ textTransform: 'uppercase' }}>
         {/* Hero */}
         <section className="relative overflow-hidden" style={{ background: '#aabbd6' }}>
           {collection.cover_image && (
