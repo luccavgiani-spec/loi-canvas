@@ -151,7 +151,7 @@ const Footer = () => {
                 { to: '/colecoes/cotidianas', label: 'Cotidianas' },
                 { to: '/colecoes/sala-ou-estar', label: 'Sala' },
                 { to: '/colecoes/refugio', label: 'Refúgio' },
-                { to: '/colecoes/botanicas-e-florais', label: 'Botânicas e Florais' },
+                { to: '/colecoes/botanicas-e-florais', label: 'Botânicas & Florais' },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
