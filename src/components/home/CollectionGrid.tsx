@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Product } from '@/types';
 import ProductCard from '@/components/shop/ProductCard';
+import ArrowLink from '@/components/ui/ArrowLink';
 
 interface Props {
   title: string;
@@ -24,8 +25,8 @@ const CollectionGrid = ({ title, subtitle, products, ctaLabel = 'Ver todos', cta
           ))}
         </div>
         <div className="text-center mt-10">
-          <Link to={ctaLink} className="text-base uppercase tracking-wider text-accent hover:underline underline-offset-4">
-            {ctaLabel} →
+          <Link to={ctaLink} className="text-accent hover:underline underline-offset-4">
+            <ArrowLink>{ctaLabel}</ArrowLink>
           </Link>
         </div>
       </div>

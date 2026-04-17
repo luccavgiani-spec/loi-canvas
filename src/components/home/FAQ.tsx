@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Link } from 'react-router-dom';
+import ArrowLink from '@/components/ui/ArrowLink';
 
 const faqs = [
   {
@@ -53,7 +54,7 @@ const FAQ = () => {
         <p className="mt-10 text-center" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.72rem', letterSpacing: '0.15em', color: 'rgba(41,36,31,0.45)' }}>
           ainda tem dúvidas?{' '}
           <Link to="/#mensagem" style={{ color: '#565600', textDecoration: 'none', borderBottom: '1px solid rgba(86,86,0,0.3)', paddingBottom: 1 }}>
-            deixe uma mensagem →
+            <ArrowLink>deixe uma mensagem</ArrowLink>
           </Link>
         </p>
       </div>

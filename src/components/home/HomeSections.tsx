@@ -6,6 +6,7 @@ import { storageUrl, collabsUrl } from '@/lib/storage';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/LazyVideo';
+import ArrowLink from '@/components/ui/ArrowLink';
 import type { Product } from '@/types';
 
 /* ── Horizontal carousel with snap scrolling ── */
@@ -367,11 +368,11 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
           {collab.description}
         </p>
       </Link>
-      <Link to={`/collabs#${collab.slug}`} className="loi-ghost group/link" style={{ fontSize: '0.65rem' }}>
-        <span className="md:hidden">ver</span>
-        <span className="hidden md:inline">ver colaboração</span>
-        <span className="loi-ghost-dash" />
-        <span className="transition-transform duration-300 group-hover/link:translate-x-1">→</span>
+      <Link to={`/collabs#${collab.slug}`}>
+        <ArrowLink>
+          <span className="md:hidden">ver</span>
+          <span className="hidden md:inline">ver colaboração</span>
+        </ArrowLink>
       </Link>
     </div>
   );
@@ -529,10 +530,8 @@ const HomeSections = () => {
             <ProductCarousel products={salaOuEstar} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/colecoes/sala-ou-estar" className="loi-ghost group">
-              <span>ver toda a coleção</span>
-              <span className="loi-ghost-dash" />
-              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            <Link to="/colecoes/sala-ou-estar">
+              <ArrowLink>ver toda a coleção</ArrowLink>
             </Link>
           </div>
         </div>
@@ -590,10 +589,8 @@ const HomeSections = () => {
             <ProductCarousel products={refugio} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/colecoes/refugio" className="loi-ghost group">
-              <span>ver toda a coleção</span>
-              <span className="loi-ghost-dash" />
-              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            <Link to="/colecoes/refugio">
+              <ArrowLink>ver toda a coleção</ArrowLink>
             </Link>
           </div>
         </div>
@@ -623,10 +620,8 @@ const HomeSections = () => {
           </div>
           <CollabCarousel />
           <div className="reveal text-center mt-10">
-            <Link to="/collabs" className="loi-ghost group">
-              <span>ver todas as colaborações</span>
-              <span className="loi-ghost-dash" />
-              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            <Link to="/collabs">
+              <ArrowLink>ver todas as colaborações</ArrowLink>
             </Link>
           </div>
         </div>
