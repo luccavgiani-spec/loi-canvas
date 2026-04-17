@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { getProductsByCollectionSlug } from '@/lib/api';
-import type { Product, Collection } from '@/types';
+import type { Product } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -13,12 +13,21 @@ const sortOptions = [
   { value: 'name_asc', label: 'A–Z' },
 ];
 
+const SECTIONS = [
+  {
+    label: 'matéria',
+    text: 'perfumaria autoral construída a partir de óleos essenciais. um estudo sobre matéria-prima e construção aromática.',
+  },
+  {
+    label: 'atmosfera',
+    text: 'aromas de difusão imediata. composições que transformam o espaço com presença e projeção.',
+  },
+];
+
 const BorrifadoresPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [collection, setCollection] = useState<Collection | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notFound, setNotFound] = useState(false);
   const [sort, setSort] = useState('default');
   const { addItem } = useCart();
   const ref = useReveal(0.15, [loading]);
@@ -26,19 +35,16 @@ const BorrifadoresPage = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    setNotFound(false);
 
-    getProductsByCollectionSlug('borrifadores')
-      .then((result) => {
-        if (!result.collection) {
-          setNotFound(true);
-          return;
-        }
-        setCollection(result.collection);
-        setProducts(result.products);
+    Promise.all([
+      getProductsByCollectionSlug('materia'),
+      getProductsByCollectionSlug('atmosfera'),
+    ])
+      .then(([materia, atmosfera]) => {
+        setProducts([...materia.products, ...atmosfera.products]);
       })
       .catch((err) => {
-        setError(err.message || 'Erro ao carregar coleção');
+        setError(err.message || 'Erro ao carregar produtos');
       })
       .finally(() => setLoading(false));
   }, []);
@@ -51,8 +57,6 @@ const BorrifadoresPage = () => {
     return result;
   }, [products, sort]);
 
-  if (notFound && !loading) return <Navigate to="/" replace />;
-
   if (error) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">
@@ -61,7 +65,7 @@ const BorrifadoresPage = () => {
     </Layout>
   );
 
-  if (loading || !collection) return (
+  if (loading) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">
         <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
@@ -73,62 +77,64 @@ const BorrifadoresPage = () => {
 
   return (
     <Layout>
-      <div ref={ref} style={{ textTransform: 'uppercase' }}>
+      <div ref={ref}>
         {/* Hero */}
         <section className="relative overflow-hidden" style={{ background: '#afc4e2' }}>
-          {collection.cover_image && (
-            <div className="absolute inset-0">
-              <img
-                src={collection.cover_image}
-                alt=""
-                className="w-full h-full object-cover"
-                style={{ opacity: 0.2, filter: 'saturate(0.5) brightness(0.6)' }}
-              />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(175,196,226,0.4) 0%, rgba(175,196,226,0.95) 100%)' }} />
-            </div>
-          )}
-
           <div className="relative z-10 max-w-[1400px] mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24">
             <div className="max-w-2xl">
-              <span
-                className="reveal-fade block mb-4"
+              <h1
+                className="reveal-fade heading-display"
                 style={{
                   fontFamily: "'Wagon', sans-serif",
-                  fontWeight: 300,
-                  fontSize: '1.1rem',
-                  color: 'rgba(41,36,31,0.4)',
-                }}
-              >
-                {collection.numeral}
-              </span>
-              <h1
-                className="reveal-fade heading-display mb-5"
-                style={{
                   fontSize: 'clamp(2.5rem, 6vw, 4rem)',
                   color: '#29241f',
                   lineHeight: 1.1,
+                  textTransform: 'none',
                 }}
               >
-                {collection.name}
+                Borrifadores
               </h1>
-              <p
-                className="reveal-fade mb-6"
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 300,
-                  fontSize: 'clamp(1rem, 2vw, 1.15rem)',
-                  color: 'rgba(41,36,31,0.65)',
-                  lineHeight: 1.8,
-                }}
-              >
-                {collection.story}
-              </p>
             </div>
           </div>
         </section>
 
-        {/* Products */}
-        <section className="py-24 md:py-40 px-6" style={{ background: '#fcf5e0' }}>
+        {/* Seções fixas: matéria / atmosfera */}
+        <section className="px-6 py-20 md:py-28" style={{ background: '#f4edd2' }}>
+          <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
+            {SECTIONS.map(({ label, text }) => (
+              <div key={label} className="reveal-fade">
+                <span
+                  className="block mb-5"
+                  style={{
+                    fontFamily: "'Sackers Gothic', sans-serif",
+                    fontWeight: 400,
+                    fontSize: '0.72rem',
+                    letterSpacing: '0.2em',
+                    color: '#565600',
+                    textTransform: 'none',
+                  }}
+                >
+                  {label}
+                </span>
+                <p
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontWeight: 300,
+                    fontSize: 'clamp(0.9rem, 1.6vw, 1.02rem)',
+                    color: 'rgba(41,36,31,0.75)',
+                    lineHeight: 2,
+                    textTransform: 'none',
+                  }}
+                >
+                  {text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Produtos */}
+        <section className="py-24 md:py-32 px-6" style={{ background: '#fcf5e0' }}>
           <div className="max-w-[1400px] mx-auto">
             {/* Sort */}
             <div className="flex justify-between items-center mb-12">
@@ -169,7 +175,7 @@ const BorrifadoresPage = () => {
             {sorted.length === 0 ? (
               <div className="min-h-[40vh] flex items-center justify-center">
                 <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
-                  Nenhum produto nesta coleção ainda.
+                  Nenhum produto disponível.
                 </p>
               </div>
             ) : (
@@ -226,25 +232,27 @@ const BorrifadoresPage = () => {
                       </button>
                     </Link>
                     <Link to={`/product/${product.slug}`} className="block">
-                      <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
+                      <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4, textTransform: 'none' }}>
                         {product.name}
                       </h3>
-                      <p
-                        style={{
-                          fontFamily: "var(--font-body)",
-                          fontWeight: 300,
-                          fontSize: '0.82rem',
-                          color: 'rgba(0,0,0,0.55)',
-                          lineHeight: 1.5,
-                          marginBottom: 8,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {product.description}
-                      </p>
+                      {product.notes && (
+                        <p
+                          style={{
+                            fontFamily: "var(--font-body)",
+                            fontWeight: 300,
+                            fontSize: '0.72rem',
+                            color: 'rgba(0,0,0,0.5)',
+                            lineHeight: 1.6,
+                            marginBottom: 8,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {product.notes}
+                        </p>
+                      )}
                       <div className="flex items-center gap-3">
                         <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
                           R$ {product.price.toFixed(2)}
