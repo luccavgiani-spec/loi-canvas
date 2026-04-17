@@ -254,23 +254,6 @@ const ProductDetail = () => {
                 )}
               </div>
 
-              {/* 1. Acorde — família olfativa */}
-              {product.accord && (
-                <p
-                  className="mb-2 break-words"
-                  style={{
-                    fontFamily: FONT_BODY,
-                    fontWeight: 300,
-                    fontSize: '0.65rem',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(0,0,0,0.5)',
-                  }}
-                >
-                  {product.accord}
-                </p>
-              )}
-
               {/* 2. Notas — óleos essenciais */}
               {product.notes && (
                 <p
