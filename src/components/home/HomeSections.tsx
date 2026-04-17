@@ -354,7 +354,7 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
         <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.45)', marginBottom: 5, lineHeight: 1.5 }}>
           {collab.category}
         </p>
-        <p style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1rem', color: '#000', marginBottom: 2, lineHeight: 1.3 }}>
+        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 400, fontSize: '0.75rem', letterSpacing: '0.12em', color: '#000', marginBottom: 2, lineHeight: 1.3 }}>
           {collab.name}
         </p>
         <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(0,0,0,0.45)', marginBottom: 8 }}>
@@ -579,8 +579,8 @@ const HomeSections = () => {
       <section className="py-16 md:py-20 px-6 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
-              Descubra Novos Aromas
+            <h2 className="reveal" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#000' }}>
+              Descubra novos aromas
             </h2>
           </div>
           <div className="reveal">
@@ -614,7 +614,7 @@ const HomeSections = () => {
             >
               collabs
             </span>
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
+            <h2 className="reveal" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#000' }}>
               Colaborações
             </h2>
           </div>
@@ -634,8 +634,8 @@ const HomeSections = () => {
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
             <span className="reveal loi-label block mb-4" style={{ color: '#29241f' }}>dúvidas</span>
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#29241f' }}>
-              Perguntas Frequentes
+            <h2 className="reveal" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#29241f' }}>
+              Perguntas frequentes
             </h2>
           </div>
           <div className="reveal space-y-0">
@@ -678,8 +678,8 @@ const HomeSections = () => {
         <div className="relative z-[1] max-w-lg mx-auto text-center">
           <span className="reveal loi-label block mb-6">exclusivo</span>
           <h2
-            className="reveal heading-display mb-4"
-            style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000', lineHeight: 1.15 }}
+            className="reveal mb-4"
+            style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#000', lineHeight: 1.5 }}
           >
             Ganhe 15% na primeira compra
           </h2>

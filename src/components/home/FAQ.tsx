@@ -36,7 +36,7 @@ const FAQ = () => {
   return (
     <section className="py-16 md:py-24 bg-background">
       <div className="container max-w-2xl">
-        <h2 className="heading-display text-3xl md:text-4xl text-center mb-10">Perguntas Frequentes</h2>
+        <h2 className="text-center mb-10" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>Perguntas frequentes</h2>
         <Accordion type="single" collapsible>
           {faqs.map((faq, i) => (
             <AccordionItem key={i} value={`faq-${i}`}>
