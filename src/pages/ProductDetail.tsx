@@ -254,10 +254,10 @@ const ProductDetail = () => {
                 )}
               </div>
 
-              {/* Família olfativa */}
+              {/* 1. Acorde — família olfativa */}
               {product.accord && (
                 <p
-                  className="mb-3 break-words"
+                  className="mb-2 break-words"
                   style={{
                     fontFamily: FONT_BODY,
                     fontWeight: 300,
@@ -271,25 +271,147 @@ const ProductDetail = () => {
                 </p>
               )}
 
-              {/* Composição — texto corrido, sem caixa */}
-              {product.composition && (
+              {/* 2. Notas — óleos essenciais */}
+              {product.notes && (
+                <p
+                  className="mb-5 break-words"
+                  style={{
+                    fontFamily: FONT_BODY,
+                    fontWeight: 300,
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(0,0,0,0.6)',
+                  }}
+                >
+                  {product.notes}
+                </p>
+              )}
+
+              {/* 3. Descrição — texto corrido */}
+              {product.description && (
                 <p
                   className="mb-6 break-words"
                   style={{
                     fontFamily: FONT_BODY,
                     fontWeight: 300,
                     fontSize: '0.75rem',
-                    letterSpacing: '0.1em',
+                    letterSpacing: '0.08em',
                     textTransform: 'uppercase',
                     color: '#000',
                     lineHeight: 1.8,
                   }}
                 >
-                  {product.composition}
+                  {product.description}
                 </p>
               )}
 
-              {/* Dropdown — Ritual de uso */}
+              {/* 4. Dropdown — Descrição sensorial */}
+              {product.details && (
+                <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
+                  <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
+                    <summary
+                      className="flex items-center justify-between py-4 cursor-pointer list-none"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.72rem',
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: '#000',
+                      }}
+                    >
+                      DESCRIÇÃO SENSORIAL
+                      <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
+                    </summary>
+                    <p
+                      className="pb-4 break-words"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
+                        color: '#000',
+                        lineHeight: 1.8,
+                      }}
+                    >
+                      {product.details}
+                    </p>
+                  </details>
+                </div>
+              )}
+
+              {/* 5. Dropdown — Uso sugerido */}
+              {product.suggested_use && (
+                <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
+                  <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
+                    <summary
+                      className="flex items-center justify-between py-4 cursor-pointer list-none"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.72rem',
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: '#000',
+                      }}
+                    >
+                      USO SUGERIDO
+                      <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
+                    </summary>
+                    <p
+                      className="pb-4 break-words"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
+                        color: '#000',
+                        lineHeight: 1.8,
+                      }}
+                    >
+                      {product.suggested_use}
+                    </p>
+                  </details>
+                </div>
+              )}
+
+              {/* 6. Dropdown — Composição & desempenho */}
+              {product.composition && (
+                <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
+                  <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
+                    <summary
+                      className="flex items-center justify-between py-4 cursor-pointer list-none"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.72rem',
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: '#000',
+                      }}
+                    >
+                      COMPOSIÇÃO & DESEMPENHO
+                      <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
+                    </summary>
+                    <p
+                      className="pb-4 break-words"
+                      style={{
+                        fontFamily: FONT_BODY,
+                        fontWeight: 300,
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
+                        color: '#000',
+                        lineHeight: 1.8,
+                      }}
+                    >
+                      {product.composition}
+                    </p>
+                  </details>
+                </div>
+              )}
+
+              {/* 7. Dropdown — Ritual de uso */}
               {product.ritual && (
                 <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
                   <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
@@ -300,6 +422,7 @@ const ProductDetail = () => {
                         fontWeight: 300,
                         fontSize: '0.72rem',
                         letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
                         color: '#000',
                       }}
                     >
@@ -311,62 +434,13 @@ const ProductDetail = () => {
                       style={{
                         fontFamily: FONT_BODY,
                         fontWeight: 300,
-                        fontSize: '0.82rem',
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
                         color: '#000',
                         lineHeight: 1.8,
                       }}
                     >
                       {product.ritual}
-                    </p>
-                  </details>
-                </div>
-              )}
-
-              {/* Manual de uso — texto corrido, entre os dois dropdowns */}
-              {product.suggested_use && (
-                <p
-                  className="my-4 break-words"
-                  style={{
-                    fontFamily: FONT_BODY,
-                    fontWeight: 300,
-                    fontSize: '0.72rem',
-                    letterSpacing: '0.08em',
-                    color: 'rgba(0,0,0,0.6)',
-                    lineHeight: 1.9,
-                  }}
-                >
-                  {product.suggested_use}
-                </p>
-              )}
-
-              {/* Dropdown — Indicação */}
-              {product.details && (
-                <div style={{ borderTop: '1px solid rgba(0,0,0,0.12)' }}>
-                  <details style={{ borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
-                    <summary
-                      className="flex items-center justify-between py-4 cursor-pointer list-none"
-                      style={{
-                        fontFamily: FONT_BODY,
-                        fontWeight: 300,
-                        fontSize: '0.72rem',
-                        letterSpacing: '0.12em',
-                        color: '#000',
-                      }}
-                    >
-                      INDICAÇÃO
-                      <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
-                    </summary>
-                    <p
-                      className="pb-4 break-words"
-                      style={{
-                        fontFamily: FONT_BODY,
-                        fontWeight: 300,
-                        fontSize: '0.82rem',
-                        color: '#000',
-                        lineHeight: 1.8,
-                      }}
-                    >
-                      {product.details}
                     </p>
                   </details>
                 </div>
