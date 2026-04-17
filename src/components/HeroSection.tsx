@@ -161,7 +161,7 @@ const HeroSection = () => {
               className="loi-label mr-2 hidden md:inline"
               style={{ color: 'rgba(244,237,210,0.3)', whiteSpace: 'nowrap' }}
             >
-              família aromática
+              composições aromáticas
             </span>
             {FAMILIES.map((fam) => {
               const isActive = activeFamily === fam.label;

@@ -55,7 +55,7 @@ const Footer = () => {
     <footer style={{ background: '#29241f' }}>
       {/* ── Olfactory family filter ── */}
       <div className="max-w-[1400px] mx-auto px-6 pt-16 pb-10">
-        <span className="loi-label block mb-6" style={{ color: 'rgba(244,237,210,0.4)' }}>família aromática</span>
+        <span className="loi-label block mb-6" style={{ color: 'rgba(244,237,210,0.4)' }}>composições aromáticas</span>
         <div className="flex flex-wrap gap-2 mb-6">
           {FAMILIES.map((fam) => {
             const isActive = activeFamily === fam.label;
