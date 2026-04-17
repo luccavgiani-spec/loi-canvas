@@ -1,11 +1,11 @@
 /** Famílias aromáticas — mapeamento estático slug → família */
 export const FAMILIES: { label: string; products: { name: string; slug: string }[] }[] = [
-  { label: 'cítricos e frescos', products: [
+  { label: 'cítricos & frescos', products: [
     { name: 'Campos', slug: 'campos' },
     { name: 'Citronela', slug: 'citronela-refugio' },
     { name: 'Pomar', slug: 'pomar' },
   ]},
-  { label: 'verdes e verbais', products: [
+  { label: 'verdes & herbais', products: [
     { name: 'Bosque', slug: 'bosque' },
     { name: 'Gin', slug: 'gin' },
     { name: 'Tabaco', slug: 'tabaco' },
@@ -22,7 +22,7 @@ export const FAMILIES: { label: string; products: { name: string; slug: string }
     { name: 'Ritual', slug: 'ritual' },
     { name: 'Toca', slug: 'toca' },
   ]},
-  { label: 'especiados e quentes', products: [
+  { label: 'especiados & quentes', products: [
     { name: 'Gin', slug: 'gin' },
     { name: 'Gabriela', slug: 'gabriela' },
     { name: 'Ícaro', slug: 'icaro' },
@@ -30,7 +30,7 @@ export const FAMILIES: { label: string; products: { name: string; slug: string }
     { name: 'Bosque', slug: 'bosque' },
     { name: 'Ritual', slug: 'ritual' },
   ]},
-  { label: 'gourmand e conforto', products: [
+  { label: 'gourmand & conforto', products: [
     { name: 'Dulce', slug: 'dulce' },
     { name: 'Caramelo', slug: 'caramelo' },
     { name: 'Gin', slug: 'gin' },

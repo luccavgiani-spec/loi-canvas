@@ -42,25 +42,25 @@ export const mockProducts: Product[] = [
   },
 
   /* ═══════════════════════════════════════════
-     II — SALA OU ESTAR  (copo 200g transparente, 1 pavio)
+     II — SALA  (copo 200g transparente, 1 pavio)
      ═══════════════════════════════════════════ */
   {
-    id: 'sal-1', slug: 'campos', name: 'Campos', description: 'Capim cidreira, litsea cubeba e cedro virgínia. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Acenda e deixe o aroma preencher o ambiente.', care_instructions: 'Mantenha em local ventilado.', price: 172.20, images: [imgCampos, imgCamposImg, imgCamposImg2, imgCamposUlt], collection: 'Sala ou Estar', tags: ['herbal', 'fresco'], badge: 'new', rating_avg: 4.7, rating_count: 22, is_bestseller: true, created_at: '2025-06-01'
+    id: 'sal-1', slug: 'campos', name: 'Campos', description: 'Capim cidreira, litsea cubeba e cedro virgínia. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Acenda e deixe o aroma preencher o ambiente.', care_instructions: 'Mantenha em local ventilado.', price: 172.20, images: [imgCampos, imgCamposImg, imgCamposImg2, imgCamposUlt], collection: 'Sala', tags: ['herbal', 'fresco'], badge: 'new', rating_avg: 4.7, rating_count: 22, is_bestseller: true, created_at: '2025-06-01'
   },
   {
-    id: 'sal-2', slug: 'icaro', name: 'Ícaro', description: 'Notas solares de bergamota, neroli e almíscar branco. Uma fragrância luminosa e elevada, criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Perfeita para escritórios e salas de estar.', care_instructions: 'Evite exposição direta ao sol.', price: 172.20, images: [imgIcaro, imgIcaroUlt], collection: 'Sala ou Estar', tags: ['cítrico', 'solar'], rating_avg: 4.6, rating_count: 18, is_bestseller: true, created_at: '2025-06-01'
+    id: 'sal-2', slug: 'icaro', name: 'Ícaro', description: 'Notas solares de bergamota, neroli e almíscar branco. Uma fragrância luminosa e elevada, criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Perfeita para escritórios e salas de estar.', care_instructions: 'Evite exposição direta ao sol.', price: 172.20, images: [imgIcaro, imgIcaroUlt], collection: 'Sala', tags: ['cítrico', 'solar'], rating_avg: 4.6, rating_count: 18, is_bestseller: true, created_at: '2025-06-01'
   },
   {
-    id: 'sal-3', slug: 'pomar', name: 'Pomar', description: 'Frutas maduras, folhas verdes e madeira de macieira. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Perfeita para criar atmosferas vibrantes.', care_instructions: 'Não deixe sem supervisão.', price: 182.60, images: [imgPomar, imgPomarImg, imgPomarImg2, imgPomarImg3, imgPomarVid, imgPomarUlt], collection: 'Sala ou Estar', tags: ['frutado', 'verde'], rating_avg: 4.7, rating_count: 20, is_bestseller: true, created_at: '2025-06-01'
+    id: 'sal-3', slug: 'pomar', name: 'Pomar', description: 'Frutas maduras, folhas verdes e madeira de macieira. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Perfeita para criar atmosferas vibrantes.', care_instructions: 'Não deixe sem supervisão.', price: 182.60, images: [imgPomar, imgPomarImg, imgPomarImg2, imgPomarImg3, imgPomarVid, imgPomarUlt], collection: 'Sala', tags: ['frutado', 'verde'], rating_avg: 4.7, rating_count: 20, is_bestseller: true, created_at: '2025-06-01'
   },
   {
-    id: 'sal-4', slug: 'dulce', name: 'Dulce', description: 'Doçura delicada de baunilha, leite de coco e um toque sutil de flor de sal. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Acenda em ambientes aconchegantes.', care_instructions: 'Mantenha longe de crianças e pets.', price: 182.60, images: [imgDulce, imgDulceUlt], collection: 'Sala ou Estar', tags: ['doce', 'gourmand'], rating_avg: 4.9, rating_count: 27, is_bestseller: true, created_at: '2025-06-01'
+    id: 'sal-4', slug: 'dulce', name: 'Dulce', description: 'Doçura delicada de baunilha, leite de coco e um toque sutil de flor de sal. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Acenda em ambientes aconchegantes.', care_instructions: 'Mantenha longe de crianças e pets.', price: 182.60, images: [imgDulce, imgDulceUlt], collection: 'Sala', tags: ['doce', 'gourmand'], rating_avg: 4.9, rating_count: 27, is_bestseller: true, created_at: '2025-06-01'
   },
   {
-    id: 'sal-5', slug: 'estela', name: 'Estela', description: 'Elegância floral de jasmim, peônia e sândalo. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Ideal para quartos e espaços íntimos.', care_instructions: 'Mantenha o pavio centralizado.', price: 182.60, images: [imgEstela, imgEstelaImg, imgEstelaVid, imgEstelaUlt], collection: 'Sala ou Estar', tags: ['floral', 'sofisticado'], rating_avg: 4.8, rating_count: 14, is_bestseller: true, created_at: '2025-06-01'
+    id: 'sal-5', slug: 'estela', name: 'Estela', description: 'Elegância floral de jasmim, peônia e sândalo. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Ideal para quartos e espaços íntimos.', care_instructions: 'Mantenha o pavio centralizado.', price: 182.60, images: [imgEstela, imgEstelaImg, imgEstelaVid, imgEstelaUlt], collection: 'Sala', tags: ['floral', 'sofisticado'], rating_avg: 4.8, rating_count: 14, is_bestseller: true, created_at: '2025-06-01'
   },
   {
-    id: 'sal-6', slug: 'gin', name: 'Gin', description: 'Blend refrescante de zimbro, limão siciliano e canela. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Ideal para receber convidados.', care_instructions: 'Armazene em local fresco e seco.', price: 182.60, images: [imgGin, imgGinUlt], collection: 'Sala ou Estar', tags: ['fresco', 'especiado'], rating_avg: 4.8, rating_count: 31, is_bestseller: true, created_at: '2025-06-01'
+    id: 'sal-6', slug: 'gin', name: 'Gin', description: 'Blend refrescante de zimbro, limão siciliano e canela. Criação autoral com óleos essenciais puros.', details: 'Copo de vidro transparente de 200g. Um pavio de algodão. Cera de soja 100% natural. Duração aprox. 45h.', how_to_use: 'Ideal para receber convidados.', care_instructions: 'Armazene em local fresco e seco.', price: 182.60, images: [imgGin, imgGinUlt], collection: 'Sala', tags: ['fresco', 'especiado'], rating_avg: 4.8, rating_count: 31, is_bestseller: true, created_at: '2025-06-01'
   },
 
   /* ═══════════════════════════════════════════
@@ -83,22 +83,22 @@ export const mockProducts: Product[] = [
   },
 
   /* ═══════════════════════════════════════════
-     IV — BOTÂNICAS E FLORAIS  (copo 400g, 2 pavios, R$ 332)
+     IV — BOTÂNICAS & FLORAIS  (copo 400g, 2 pavios, R$ 332)
      ═══════════════════════════════════════════ */
   {
-    id: 'bot-1', slug: 'tabaco', name: 'Tabaco', description: 'Folhas de tabaco curadas, baunilha escura e couro. Um aroma exclusivo e envolvente para queimas longas.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Acenda os dois pavios simultaneamente para uma queima uniforme.', care_instructions: 'Mantenha longe de correntes de ar. Não queime por mais de 4 horas seguidas.', price: 332, images: [imgRitual, imgRitualUlt], collection: 'Botânicas e Florais', tags: ['amadeirado', 'intenso'], badge: 'limited', rating_avg: 5.0, rating_count: 5, is_bestseller: false, created_at: '2025-06-01'
+    id: 'bot-1', slug: 'tabaco', name: 'Tabaco', description: 'Folhas de tabaco curadas, baunilha escura e couro. Um aroma exclusivo e envolvente para queimas longas.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Acenda os dois pavios simultaneamente para uma queima uniforme.', care_instructions: 'Mantenha longe de correntes de ar. Não queime por mais de 4 horas seguidas.', price: 332, images: [imgRitual, imgRitualUlt], collection: 'Botânicas & Florais', tags: ['amadeirado', 'intenso'], badge: 'limited', rating_avg: 5.0, rating_count: 5, is_bestseller: false, created_at: '2025-06-01'
   },
   {
-    id: 'bot-2', slug: 'gardenia', name: 'Gardênia', description: 'A opulência da gardênia em plena floração, com toques de jasmim e musk. Feminina e sofisticada.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Perfeita para ambientes espaçosos.', care_instructions: 'Armazene com tampa para preservar a fragrância.', price: 332, images: [imgEstela, imgEstelaImg, imgEstelaUlt], collection: 'Botânicas e Florais', tags: ['floral', 'sofisticado'], badge: 'limited', rating_avg: 4.9, rating_count: 7, is_bestseller: false, created_at: '2025-06-01'
+    id: 'bot-2', slug: 'gardenia', name: 'Gardênia', description: 'A opulência da gardênia em plena floração, com toques de jasmim e musk. Feminina e sofisticada.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Perfeita para ambientes espaçosos.', care_instructions: 'Armazene com tampa para preservar a fragrância.', price: 332, images: [imgEstela, imgEstelaImg, imgEstelaUlt], collection: 'Botânicas & Florais', tags: ['floral', 'sofisticado'], badge: 'limited', rating_avg: 4.9, rating_count: 7, is_bestseller: false, created_at: '2025-06-01'
   },
   {
-    id: 'bot-3', slug: 'gabriela', name: 'Gabriela', description: 'Cravo, canela e especiarias tropicais numa composição botânica quente e marcante.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Ideal para criar atmosferas acolhedoras e envolventes.', care_instructions: 'Não deixe sem supervisão.', price: 332, images: [imgDulce, imgDulceUlt], collection: 'Botânicas e Florais', tags: ['especiado', 'tropical'], badge: 'limited', rating_avg: 4.8, rating_count: 4, is_bestseller: false, created_at: '2025-06-01'
+    id: 'bot-3', slug: 'gabriela', name: 'Gabriela', description: 'Cravo, canela e especiarias tropicais numa composição botânica quente e marcante.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Ideal para criar atmosferas acolhedoras e envolventes.', care_instructions: 'Não deixe sem supervisão.', price: 332, images: [imgDulce, imgDulceUlt], collection: 'Botânicas & Florais', tags: ['especiado', 'tropical'], badge: 'limited', rating_avg: 4.8, rating_count: 4, is_bestseller: false, created_at: '2025-06-01'
   },
   {
-    id: 'bot-4', slug: 'margarida', name: 'Margarida', description: 'Frescor delicado de margaridas do campo, folhas verdes e orvalho matinal. Simplicidade elegante.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Perfeita para ambientes claros e arejados.', care_instructions: 'Mantenha em local ventilado.', price: 332, images: [imgPomarImg, imgPomarImg2, imgPomarUlt], collection: 'Botânicas e Florais', tags: ['floral', 'fresco'], badge: 'limited', rating_avg: 4.7, rating_count: 3, is_bestseller: false, created_at: '2025-06-01'
+    id: 'bot-4', slug: 'margarida', name: 'Margarida', description: 'Frescor delicado de margaridas do campo, folhas verdes e orvalho matinal. Simplicidade elegante.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Perfeita para ambientes claros e arejados.', care_instructions: 'Mantenha em local ventilado.', price: 332, images: [imgPomarImg, imgPomarImg2, imgPomarUlt], collection: 'Botânicas & Florais', tags: ['floral', 'fresco'], badge: 'limited', rating_avg: 4.7, rating_count: 3, is_bestseller: false, created_at: '2025-06-01'
   },
   {
-    id: 'bot-5', slug: 'toca', name: 'Toca', description: 'Musgo, terra úmida e raízes aromáticas. Uma imersão botânica profunda e envolvente.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Ideal para momentos de introspecção e relaxamento.', care_instructions: 'Armazene com tampa em local fresco.', price: 332, images: [imgBosque, imgBosqueVid, imgBosqueUlt], collection: 'Botânicas e Florais', tags: ['terroso', 'botânico'], badge: 'limited', rating_avg: 5.0, rating_count: 6, is_bestseller: false, created_at: '2025-06-01'
+    id: 'bot-5', slug: 'toca', name: 'Toca', description: 'Musgo, terra úmida e raízes aromáticas. Uma imersão botânica profunda e envolvente.', details: 'Copo de 400g. Dois pavios de algodão. Cera de soja 100% natural. Duração aprox. 70h.', how_to_use: 'Ideal para momentos de introspecção e relaxamento.', care_instructions: 'Armazene com tampa em local fresco.', price: 332, images: [imgBosque, imgBosqueVid, imgBosqueUlt], collection: 'Botânicas & Florais', tags: ['terroso', 'botânico'], badge: 'limited', rating_avg: 5.0, rating_count: 6, is_bestseller: false, created_at: '2025-06-01'
   },
 ];
 
@@ -165,7 +165,7 @@ export const mockCollections: Collection[] = [
     is_active: true, sort_order: 0, created_at: '2025-06-01',
   },
   {
-    id: 'col2', slug: 'sala-ou-estar', name: 'Sala ou Estar',
+    id: 'col2', slug: 'sala-ou-estar', name: 'Sala',
     description: 'Copo transparente de 200g, um pavio. Criações autorais com óleos essenciais puros.',
     cover_image: imgPomar,
     numeral: 'II',
@@ -185,7 +185,7 @@ export const mockCollections: Collection[] = [
     is_active: true, sort_order: 2, created_at: '2025-06-01',
   },
   {
-    id: 'col4', slug: 'botanicas-e-florais', name: 'Botânicas e Florais',
+    id: 'col4', slug: 'botanicas-e-florais', name: 'Botânicas & Florais',
     description: 'Copo de 400g, dois pavios. Aromas exclusivos para queimas longas e envolventes.',
     cover_image: imgEstela,
     numeral: 'IV',

@@ -124,7 +124,7 @@ const ProductDetail = () => {
             {/* FIX: min-w-0 impede que o grid item expanda além da coluna */}
             <div className="min-w-0">
 
-              {/* Nav família aromática — exibe apenas a primeira família, linha única */}
+              {/* Nav composições aromáticas — exibe apenas a primeira família, linha única */}
               {productFamilies.length > 0 && (
                 <div className="flex items-baseline mb-5" style={{ flexWrap: 'nowrap', overflowX: 'auto', gap: '0.75rem' }}>
                   <span

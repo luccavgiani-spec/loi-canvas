@@ -6,12 +6,12 @@ import GlareHover from '@/components/ui/GlareHover';
 
 /* ── Olfactory families data ── */
 const FAMILIES = [
-  { label: 'cítricos e frescos', products: [
+  { label: 'cítricos & frescos', products: [
     { name: 'Campos', slug: 'campos' },
     { name: 'Citronela', slug: 'citronela-refugio' },
     { name: 'Pomar', slug: 'pomar' },
   ]},
-  { label: 'verdes e verbais', products: [
+  { label: 'verdes & herbais', products: [
     { name: 'Bosque', slug: 'bosque' },
     { name: 'Gin', slug: 'gin' },
     { name: 'Tabaco', slug: 'tabaco' },
@@ -28,7 +28,7 @@ const FAMILIES = [
     { name: 'Ritual', slug: 'ritual' },
     { name: 'Toca', slug: 'toca' },
   ]},
-  { label: 'especiados e quentes', products: [
+  { label: 'especiados & quentes', products: [
     { name: 'Gin', slug: 'gin' },
     { name: 'Gabriela', slug: 'gabriela' },
     { name: 'Ícaro', slug: 'icaro' },
@@ -36,7 +36,7 @@ const FAMILIES = [
     { name: 'Bosque', slug: 'bosque' },
     { name: 'Ritual', slug: 'ritual' },
   ]},
-  { label: 'gourmand e conforto', products: [
+  { label: 'gourmand & conforto', products: [
     { name: 'Dulce', slug: 'dulce' },
     { name: 'Caramelo', slug: 'caramelo' },
     { name: 'Gin', slug: 'gin' },
@@ -55,7 +55,7 @@ const Footer = () => {
     <footer style={{ background: '#29241f' }}>
       {/* ── Olfactory family filter ── */}
       <div className="max-w-[1400px] mx-auto px-6 pt-16 pb-10">
-        <span className="loi-label block mb-6" style={{ color: 'rgba(244,237,210,0.4)' }}>família aromática</span>
+        <span className="loi-label block mb-6" style={{ color: 'rgba(244,237,210,0.4)' }}>composições aromáticas</span>
         <div className="flex flex-wrap gap-2 mb-6">
           {FAMILIES.map((fam) => {
             const isActive = activeFamily === fam.label;
@@ -144,14 +144,14 @@ const Footer = () => {
 
           {/* Shop */}
           <div>
-            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>coleção</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>coleção</h4>
             <ul className="space-y-3">
               {[
                 { to: '/colecoes', label: 'Todas as Coleções' },
                 { to: '/colecoes/cotidianas', label: 'Cotidianas' },
                 { to: '/colecoes/sala-ou-estar', label: 'Sala' },
                 { to: '/colecoes/refugio', label: 'Refúgio' },
-                { to: '/colecoes/botanicas-e-florais', label: 'Botânicas e Florais' },
+                { to: '/colecoes/botanicas-e-florais', label: 'Botânicas & Florais' },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
@@ -175,7 +175,7 @@ const Footer = () => {
 
           {/* About */}
           <div>
-            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>sobre</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>sobre</h4>
             <ul className="space-y-3">
               {[
                 { to: '/sobre', label: 'Nossa História' },
@@ -205,7 +205,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>contato</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>contato</h4>
             <ul className="space-y-3">
               <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 loie.aromatica@gmail.com
@@ -245,7 +245,6 @@ const Footer = () => {
           </div>
           {/* Mensagem — desktop only (grid column) */}
           <div id="mensagem" className="hidden md:block">
-            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>deixe uma mensagem</h4>
             <MensagemForm dark />
           </div>
         </div>

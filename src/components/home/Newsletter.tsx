@@ -34,7 +34,7 @@ const Newsletter = () => {
   return (
     <section className="py-16 md:py-24 bg-secondary">
       <div className="container max-w-lg text-center">
-        <h2 className="heading-display text-3xl md:text-4xl mb-3">Ganhe 15% de desconto</h2>
+        <h2 className="mb-3" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>Ganhe 15% de desconto</h2>
         <p className="text-muted-foreground text-base mb-8">
           Cadastre-se e receba um cupom exclusivo de 15% na sua primeira compra.
         </p>
