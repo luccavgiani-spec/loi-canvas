@@ -263,10 +263,11 @@ const CollectionPage = () => {
                           style={{
                             fontFamily: "var(--font-body)",
                             fontWeight: 300,
-                            fontSize: '0.72rem',
-                            color: 'rgba(0,0,0,0.5)',
+                            fontSize: '0.75rem',
+                            color: 'rgba(0,0,0,0.7)',
                             lineHeight: 1.6,
                             marginBottom: 8,
+                            textTransform: 'lowercase',
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
