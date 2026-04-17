@@ -245,7 +245,6 @@ const Footer = () => {
           </div>
           {/* Mensagem — desktop only (grid column) */}
           <div id="mensagem" className="hidden md:block">
-            <h4 style={{ fontFamily: FONT_HEADING, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>deixe uma mensagem</h4>
             <MensagemForm dark />
           </div>
         </div>
