@@ -194,6 +194,15 @@ export const mockCollections: Collection[] = [
     price_label: 'a partir de R$ 332',
     is_active: true, sort_order: 3, created_at: '2025-06-01',
   },
+  {
+    id: 'col-borrifadores', slug: 'borrifadores', name: 'Borrifadores',
+    description: 'Sprays de ambiente com composições aromáticas autorais.',
+    numeral: undefined,
+    detail: undefined,
+    story: undefined,
+    price_label: undefined,
+    is_active: false, sort_order: 99, created_at: '2025-06-01',
+  },
 ];
 
 export const mockCollabs: Collab[] = [

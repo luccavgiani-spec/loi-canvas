@@ -30,6 +30,10 @@ const faqs = [
     q: 'Como armazenar a vela quando não estiver em uso?',
     a: 'guarde em local fresco, seco e afastado da luz solar direta. evite superfícies que absorvam calor, como peitoris de janela em dias quentes.',
   },
+  {
+    q: 'por que o aroma não se comporta igual em todos os ambientes?',
+    a: `A percepção de uma composição aromática no ambiente depende de fatores físicos e de uso — não se trata apenas da fragrância em si, mas de como ela se difunde e se mantém no espaço.\n\ntamanho do ambiente\nA escala do espaço influencia diretamente a intensidade percebida. Ambientes maiores diluem mais rapidamente o aroma, exigindo maior carga ou reforço de aplicação. Ambientes menores concentram, o que pede moderação para evitar saturação.\n\ncirculação de ar\nA movimentação do ar acelera a dispersão das partículas aromáticas. Locais com janelas abertas, ventilação constante ou ar-condicionado tendem a reduzir a duração do aroma. Ambientes fechados favorecem maior permanência.\n\nforma de uso\nCada produto atua de maneira diferente:\n- velas aromáticas: a liberação ocorre pelo aquecimento da cera, promovendo difusão gradual e contínua enquanto acesa.\n- sprays de ambiente: liberam partículas no ar de forma imediata, com efeito mais rápido e duração mais curta.\n\nposicionamento\nA localização do produto interfere na distribuição do aroma. Pontos de circulação favorecem a propagação. Superfícies muito isoladas tendem a limitar o alcance.`,
+  },
 ];
 
 const FAQ = () => {

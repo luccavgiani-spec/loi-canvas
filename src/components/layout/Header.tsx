@@ -16,8 +16,8 @@ const NAV_SECTIONS = [
   {
     label: 'borrifadores',
     items: [
-      { num: 'i',  label: 'matéria 150ml',             desc: 'perfumaria pura e autoral',    to: '/colecoes' },
-      { num: 'ii', label: 'atmosfera 200ml',            desc: 'aromas de projeção imediata', to: '/colecoes' },
+      { num: 'i',  label: 'matéria 150ml',             desc: 'perfumaria pura e autoral',    to: '/borrifadores' },
+      { num: 'ii', label: 'atmosfera 200ml',            desc: 'aromas de projeção imediata', to: '/borrifadores' },
     ],
   },
   {
