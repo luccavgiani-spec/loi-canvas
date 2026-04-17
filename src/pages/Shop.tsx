@@ -143,6 +143,7 @@ const ProductCarousel = ({
               <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
                 {product.name}
               </h3>
+              {product.notes && (
               <p
               style={{
                 fontFamily: "var(--font-body)",
@@ -157,8 +158,9 @@ const ProductCarousel = ({
                 overflow: 'hidden'
               }}>
 
-                {product.description}
+                {product.notes}
               </p>
+              )}
               <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
                 R$ {product.price.toFixed(2)}
               </span>

@@ -240,7 +240,10 @@ const ProductFocusBanner = memo(({
               marginBottom: '1.5rem',
             }}
           >
-            {product.description}
+            {(() => {
+              const text = product.details ?? product.description ?? '';
+              return text.length > 120 ? `${text.slice(0, 120).trimEnd()}…` : text;
+            })()}
           </p>
           <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.85rem', color: '#29241f', marginBottom: '1.5rem' }}>
             R$ {product.price.toFixed(2)}
