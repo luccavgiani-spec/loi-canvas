@@ -131,20 +131,20 @@ const Footer = () => {
             />
             <p
               style={{
-                fontFamily: "'Wagon', sans-serif",
-                fontWeight: 200,
-                fontSize: '0.95rem',
+                fontFamily: FONT_BODY,
+                fontWeight: 300,
+                fontSize: '0.85rem',
                 color: 'rgba(244,237,210,0.4)',
                 lineHeight: 1.7,
               }}
             >
-              A loiê é uma marca brasileira de velas aromáticas feita com óleos essenciais e estética autoral.
+              a loiê é uma marca brasileira de velas aromáticas feita com óleos essenciais e estética autoral.
             </p>
           </div>
 
           {/* Shop */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>coleção</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>Coleção</h4>
             <ul className="space-y-3">
               {[
                 { to: '/colecoes', label: 'Todas as Coleções' },
@@ -175,7 +175,7 @@ const Footer = () => {
 
           {/* About */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>sobre</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>Sobre</h4>
             <ul className="space-y-3">
               {[
                 { to: '/sobre', label: 'Nossa História' },
@@ -205,7 +205,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', textTransform: 'uppercase' as const, fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>contato</h4>
+            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>Contato</h4>
             <ul className="space-y-3">
               <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
                 loie.aromatica@gmail.com
@@ -280,8 +280,7 @@ const Footer = () => {
         </div>
 
         {/* ── Brand signature ── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', marginTop: '1.2rem' }}>
-          <img src="/hero/SIMBOLO_t.png" alt="" width={18} height={18} loading="lazy" style={{ opacity: 0.15 }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1.2rem' }}>
           <span style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(244,237,210,0.2)' }}>
             somos brasileiros, feitos à mão, com técnica e com alma
           </span>
