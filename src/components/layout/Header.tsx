@@ -250,7 +250,7 @@ const Header = () => {
             className={`hidden md:inline ${linkClass}`}
             style={{ textDecoration: 'none' }}
           >
-            festas
+            mais
           </Link>
           <Link
             to="/sobre"
@@ -392,7 +392,7 @@ const Header = () => {
                 className="block py-2.5"
                 style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
               >
-                festas
+                mais
               </Link>
             </li>
             <li>

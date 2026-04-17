@@ -55,22 +55,10 @@ const HeroSection = () => {
           style={{
             opacity: i === current ? 1 : 0,
             transition: 'opacity 1.2s ease',
-            filter: 'saturate(0.65) brightness(0.60) contrast(1.05)',
           }}
           loading={i === 0 ? 'eager' : 'lazy'}
         />
       ))}
-
-      {/* ── overlay ── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse 65% 70% at 50% 50%, rgba(41,36,31,0.05) 0%, rgba(41,36,31,0.60) 100%),
-            linear-gradient(to bottom, rgba(41,36,31,0.62) 0%, rgba(41,36,31,0.00) 28%, rgba(41,36,31,0.00) 72%, rgba(41,36,31,0.72) 100%)
-          `,
-        }}
-      />
 
       {/* ── grain ── */}
       <div
@@ -99,20 +87,6 @@ const HeroSection = () => {
             width: '100%',
           }}
         >
-          <p
-            className="hero-fadeUp mt-8 px-8 sm:px-0"
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
-              color: 'rgba(244,237,210,0.6)',
-              lineHeight: 1.7,
-              animationDelay: '0.85s',
-            }}
-          >
-            Acendemos uma vela como quem abre uma porta.
-          </p>
-
           <div className="flex items-center gap-4 sm:gap-8 mt-10 px-6 sm:px-0">
             <a
               href="/colecoes"
@@ -128,8 +102,6 @@ const HeroSection = () => {
               style={{ animationDelay: '1.1s' }}
             >
               <span>nossa história</span>
-              <span className="hero-btn-ghost-dash" />
-              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>
           </div>
         </div>

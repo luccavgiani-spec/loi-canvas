@@ -8,10 +8,6 @@ const SLIDES = [
     bg: 'linear-gradient(160deg, #29241f 0%, #565600 100%)',
   },
   {
-    phrase: 'acendemos uma vela como quem abre uma porta',
-    bg: 'linear-gradient(160deg, #3d3d00 0%, #29241f 100%)',
-  },
-  {
     phrase: 'natural com presença estética',
     bg: 'linear-gradient(160deg, #29241f 0%, #726f09 100%)',
   },
