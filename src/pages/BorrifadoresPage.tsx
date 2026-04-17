@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { getProductsByCollectionSlug } from '@/lib/api';
-import type { Product } from '@/types';
+import type { Product, Collection } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -13,21 +13,12 @@ const sortOptions = [
   { value: 'name_asc', label: 'A–Z' },
 ];
 
-const SECTIONS = [
-  {
-    label: 'matéria',
-    text: 'perfumaria autoral construída a partir de óleos essenciais. um estudo sobre matéria-prima e construção aromática.',
-  },
-  {
-    label: 'atmosfera',
-    text: 'aromas de difusão imediata. composições que transformam o espaço com presença e projeção.',
-  },
-];
-
 const BorrifadoresPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [collection, setCollection] = useState<Collection | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [sort, setSort] = useState('default');
   const { addItem } = useCart();
   const ref = useReveal(0.15, [loading]);
@@ -35,16 +26,19 @@ const BorrifadoresPage = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
+    setNotFound(false);
 
-    Promise.all([
-      getProductsByCollectionSlug('materia'),
-      getProductsByCollectionSlug('atmosfera'),
-    ])
-      .then(([materia, atmosfera]) => {
-        setProducts([...materia.products, ...atmosfera.products]);
+    getProductsByCollectionSlug('borrifadores')
+      .then((result) => {
+        if (!result.collection) {
+          setNotFound(true);
+          return;
+        }
+        setCollection(result.collection);
+        setProducts(result.products);
       })
       .catch((err) => {
-        setError(err.message || 'Erro ao carregar produtos');
+        setError(err.message || 'Erro ao carregar coleção');
       })
       .finally(() => setLoading(false));
   }, []);
@@ -57,6 +51,8 @@ const BorrifadoresPage = () => {
     return result;
   }, [products, sort]);
 
+  if (notFound && !loading) return <Navigate to="/" replace />;
+
   if (error) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">
@@ -65,7 +61,7 @@ const BorrifadoresPage = () => {
     </Layout>
   );
 
-  if (loading) return (
+  if (loading || !collection) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">
         <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
@@ -98,43 +94,8 @@ const BorrifadoresPage = () => {
           </div>
         </section>
 
-        {/* Seções fixas: matéria / atmosfera */}
-        <section className="px-6 py-20 md:py-28" style={{ background: '#f4edd2' }}>
-          <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
-            {SECTIONS.map(({ label, text }) => (
-              <div key={label} className="reveal-fade">
-                <span
-                  className="block mb-5"
-                  style={{
-                    fontFamily: "'Sackers Gothic', sans-serif",
-                    fontWeight: 400,
-                    fontSize: '0.72rem',
-                    letterSpacing: '0.2em',
-                    color: '#565600',
-                    textTransform: 'none',
-                  }}
-                >
-                  {label}
-                </span>
-                <p
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 300,
-                    fontSize: 'clamp(0.9rem, 1.6vw, 1.02rem)',
-                    color: 'rgba(41,36,31,0.75)',
-                    lineHeight: 2,
-                    textTransform: 'none',
-                  }}
-                >
-                  {text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* Produtos */}
-        <section className="py-24 md:py-32 px-6" style={{ background: '#fcf5e0' }}>
+        <section className="py-24 md:py-40 px-6" style={{ background: '#fcf5e0' }}>
           <div className="max-w-[1400px] mx-auto">
             {/* Sort */}
             <div className="flex justify-between items-center mb-12">
@@ -175,7 +136,7 @@ const BorrifadoresPage = () => {
             {sorted.length === 0 ? (
               <div className="min-h-[40vh] flex items-center justify-center">
                 <p style={{ fontFamily: "var(--font-body)", fontWeight: 300, color: 'rgba(0,0,0,0.5)' }}>
-                  Nenhum produto disponível.
+                  Nenhum produto nesta coleção ainda.
                 </p>
               </div>
             ) : (
