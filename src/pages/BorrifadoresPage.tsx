@@ -48,17 +48,6 @@ const sortOptions = [
   { value: 'name_asc', label: 'A–Z' },
 ];
 
-const SECTIONS = [
-  {
-    label: 'matéria',
-    text: 'perfumaria autoral construída a partir de óleos essenciais. um estudo sobre matéria-prima e construção aromática.',
-  },
-  {
-    label: 'atmosfera',
-    text: 'aromas de difusão imediata. composições que transformam o espaço com presença e projeção.',
-  },
-];
-
 const BorrifadoresPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,41 +137,6 @@ const BorrifadoresPage = () => {
                 Borrifadores
               </h1>
             </div>
-          </div>
-        </section>
-
-        {/* Seções fixas: matéria / atmosfera */}
-        <section className="px-6 py-20 md:py-28" style={{ background: '#f4edd2' }}>
-          <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
-            {SECTIONS.map(({ label, text }) => (
-              <div key={label} className="reveal-fade">
-                <span
-                  className="block mb-5"
-                  style={{
-                    fontFamily: "'Sackers Gothic', sans-serif",
-                    fontWeight: 400,
-                    fontSize: '0.72rem',
-                    letterSpacing: '0.2em',
-                    color: '#565600',
-                    textTransform: 'none',
-                  }}
-                >
-                  {label}
-                </span>
-                <p
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 300,
-                    fontSize: 'clamp(0.9rem, 1.6vw, 1.02rem)',
-                    color: 'rgba(41,36,31,0.75)',
-                    lineHeight: 2,
-                    textTransform: 'none',
-                  }}
-                >
-                  {text}
-                </p>
-              </div>
-            ))}
           </div>
         </section>
 
