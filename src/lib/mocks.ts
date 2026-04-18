@@ -2,33 +2,33 @@ import type { Product, Review, Order, Customer, KPIs, SalesTimeseriesPoint, TopP
 import { storageUrl } from '@/lib/storage';
 
 // Reuse available bucket images
-const imgCampos = storageUrl('loie_vela_campos_principal.JPG');
-const imgCamposImg = storageUrl('loie_vela_campos_imagem.JPG');
-const imgCamposImg2 = storageUrl('loie_vela_campos_imagem_2.JPG');
-const imgCamposUlt = storageUrl('loie_vela_campos_ultima.JPG');
-const imgIcaro = storageUrl('loie_vela_icaro_principal.JPG');
-const imgIcaroUlt = storageUrl('loie_vela_icaro_ultima.JPG');
-const imgEstela = storageUrl('loie_vela_estela_principal.JPG');
-const imgEstelaImg = storageUrl('loie_vela_estela_imagem.JPG');
+const imgCampos = storageUrl('campos-sala.jpg');
+const imgCamposImg = storageUrl('campos-embalagem.jpg');
+const imgCamposImg2 = storageUrl('campos-cotidiana.jpg');
+const imgCamposUlt = storageUrl('campos-embalagem.jpg');
+const imgIcaro = storageUrl('icaro-sala.jpg');
+const imgIcaroUlt = storageUrl('icaro-embalagem.jpg');
+const imgEstela = storageUrl('estela-sala.jpg');
+const imgEstelaImg = storageUrl('estela-embalagem.jpg');
 const imgEstelaVid = storageUrl('loie_vela_estela (1).mp4');
-const imgEstelaUlt = storageUrl('loie_vela_estela_ultima.JPG');
-const imgGin = storageUrl('loie_vela_gin_canela_principal.jpg');
-const imgGinUlt = storageUrl('loie_vela_gin_ultima.JPG');
-const imgPomar = storageUrl('loie_vela_pomar_principal.JPG');
-const imgPomarImg = storageUrl('loie_vela_pomar_imagem.JPG');
-const imgPomarImg2 = storageUrl('loie_vela_pomar_imagem_2.JPG');
-const imgPomarImg3 = storageUrl('loie_vela_pomar_imagem_3.JPG');
-const imgPomarVid = storageUrl('loie_vela_pomar.mp4');
-const imgPomarUlt = storageUrl('loie_vela_pomar_ultima.JPG');
-const imgDulce = storageUrl('loie_vela_DULCE_imagem.JPG');
-const imgDulceUlt = storageUrl('loie_vela_dulce_ultima.JPG');
-const imgBosque = storageUrl('loie_vela_BOSQUE_imagem.JPG');
+const imgEstelaUlt = storageUrl('estela-embalagem.jpg');
+const imgGin = storageUrl('gin-sala.jpg');
+const imgGinUlt = storageUrl('gin-embalagem.jpg');
+const imgPomar = storageUrl('pomar-sala.jpg');
+const imgPomarImg = storageUrl('pomar-embalagem.jpg');
+const imgPomarImg2 = storageUrl('pomar-embalagem.jpg');
+const imgPomarImg3 = storageUrl('pomar-embalagem.jpg');
+const imgPomarVid = storageUrl('Cartao_Postal_Loie.mp4');
+const imgPomarUlt = storageUrl('pomar-embalagem.jpg');
+const imgDulce = storageUrl('dulce-embalagem.jpg');
+const imgDulceUlt = storageUrl('dulce-embalagem.jpg');
+const imgBosque = storageUrl('bosque-ambar.jpg');
 const imgBosqueVid = storageUrl('loie_vela_bosque_compress (1).mp4');
-const imgBosqueUlt = storageUrl('loie_vela_bosque_ultima.JPG');
-const imgCaramelo = storageUrl('loie_vela_CARAMELO_imagem.JPG');
-const imgCarameloUlt = storageUrl('loie_vela_caramelo_ultima.JPG');
-const imgRitual = storageUrl('loie_vela_RITUAL_imagem.JPG');
-const imgRitualUlt = storageUrl('loie_vela_ritual_ultima.JPG');
+const imgBosqueUlt = storageUrl('bosque-embalagem.jpg');
+const imgCaramelo = storageUrl('caramelo-ambar.jpg');
+const imgCarameloUlt = storageUrl('caramelo-embalagem.jpg');
+const imgRitual = storageUrl('ritual-ambar.jpg');
+const imgRitualUlt = storageUrl('ritual-embalagem.jpg');
 
 export const mockProducts: Product[] = [
   /* ═══════════════════════════════════════════
