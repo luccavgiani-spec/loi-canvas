@@ -8,7 +8,7 @@ DECLARE
   pid uuid;
 BEGIN
 
-  -- campos (Sala ou Estar) — 3 reviews
+  -- campos (Sala) — 3 reviews
   SELECT id INTO pid FROM public.products WHERE slug = 'campos' LIMIT 1;
   IF pid IS NOT NULL THEN
     INSERT INTO public.reviews (author_name, rating, body, product_id, approved, created_at)
