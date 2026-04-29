@@ -377,6 +377,7 @@ export type Database = {
         Row: {
           accord: string | null
           asset_folder: string | null
+          bestseller_sort_order: number
           burn_hours: number
           collection_id: string | null
           composition: string | null
@@ -401,6 +402,7 @@ export type Database = {
         Insert: {
           accord?: string | null
           asset_folder?: string | null
+          bestseller_sort_order?: number
           burn_hours: number
           collection_id?: string | null
           composition?: string | null
@@ -425,6 +427,7 @@ export type Database = {
         Update: {
           accord?: string | null
           asset_folder?: string | null
+          bestseller_sort_order?: number
           burn_hours?: number
           collection_id?: string | null
           composition?: string | null
