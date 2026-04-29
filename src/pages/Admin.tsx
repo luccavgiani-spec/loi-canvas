@@ -29,7 +29,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send, GripVertical, ArrowUpDown } from 'lucide-react';
+import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send, GripVertical, ArrowUpDown, Eye, Star, Check } from 'lucide-react';
+import OrderDetailModal from '@/components/admin/OrderDetailModal';
 import {
   DndContext,
   closestCenter,
@@ -350,6 +351,7 @@ function OrdersTab() {
   const [shipTarget, setShipTarget] = useState<string | null>(null);
   const [trackingInput, setTrackingInput] = useState('');
   const [shipping, setShipping] = useState(false);
+  const [detailOrderId, setDetailOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     getAdminOrders({ status: status || undefined }).then(list => {
@@ -423,6 +425,7 @@ function OrdersTab() {
               <th className={thCls}>Data</th>
               <th className={thCls}>Código de Rastreio</th>
               <th className={thCls}>Ação</th>
+              <th className={thCls}>Detalhes</th>
             </tr>
           </thead>
           <tbody>
@@ -464,12 +467,24 @@ function OrdersTab() {
                     )}
                   </div>
                 </td>
+                <td className={tdCls}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs h-8 gap-1"
+                    onClick={() => setDetailOrderId(o.id)}
+                  >
+                    <Eye size={12} /> Ver
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
         {orders.length === 0 && <EmptyState label="pedido" />}
       </div>
+
+      <OrderDetailModal orderId={detailOrderId} onClose={() => setDetailOrderId(null)} />
 
       <Modal open={!!shipTarget} onClose={closeShip} title="Confirmar envio">
         <div className="space-y-4">
