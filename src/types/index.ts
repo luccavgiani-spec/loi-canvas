@@ -149,6 +149,8 @@ export interface Collab {
   name: string;
   caption?: string;
   description?: string;
+  category?: string;
+  year?: string;
   images: string[];
   is_active: boolean;
   sort_order: number;

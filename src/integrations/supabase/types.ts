@@ -38,6 +38,48 @@ export type Database = {
         }
         Relationships: []
       }
+      collabs: {
+        Row: {
+          caption: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          images: string[]
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          year: string | null
+        }
+        Insert: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[]
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          year?: string | null
+        }
+        Update: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[]
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          year?: string | null
+        }
+        Relationships: []
+      }
       collections: {
         Row: {
           cover_image: string | null
