@@ -1,8 +1,16 @@
 // v2 - schema corrigido
 import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
 import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
+import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections, mockCollabs } from '@/lib/mocks';
 import { supabase } from '@/integrations/supabase/client';
+
+export type AdminProductRow = Tables<'products'> & {
+  product_images: Tables<'product_images'>[];
+  collections: Pick<Tables<'collections'>, 'id' | 'name' | 'slug'> | null;
+};
+
+export type AdminCollectionRow = Tables<'collections'>;
 
 async function fetchApi<T>(path: string, options?: RequestInit, fallback?: T): Promise<T> {
   try {
@@ -411,14 +419,92 @@ export const getAdminCustomers = async (): Promise<Customer[]> => {
   }
 };
 
-export const createAdminProduct = (data: Partial<Product>) =>
-  fetchApi<Product>('/admin/products', { method: 'POST', body: JSON.stringify(data) });
+export const getAdminProducts = async (): Promise<AdminProductRow[]> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, product_images(*), collections(id, name, slug)')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as AdminProductRow[];
+};
 
-export const updateAdminProduct = (id: string, data: Partial<Product>) =>
-  fetchApi<Product>(`/admin/products/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const createAdminProduct = async (
+  input: TablesInsert<'products'>,
+): Promise<Tables<'products'>> => {
+  const { data, error } = await supabase
+    .from('products')
+    .insert(input)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
 
-export const deleteAdminProduct = (id: string) =>
-  fetchApi<void>(`/admin/products/${id}`, { method: 'DELETE' });
+export const updateAdminProduct = async (
+  id: string,
+  input: TablesUpdate<'products'>,
+): Promise<Tables<'products'>> => {
+  const { data, error } = await supabase
+    .from('products')
+    .update(input)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const deleteAdminProduct = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if (error) throw error;
+};
+
+const PRODUCT_IMAGE_BUCKET = 'produtos';
+// Public URL for files in the produtos bucket (matches mapDbProduct/fileToUrl).
+export const productImagePublicUrl = (filename: string): string =>
+  `${SUPABASE_STORAGE_URL}/${encodeURIComponent(filename)}`;
+
+export const uploadProductImage = async (
+  productId: string,
+  file: File,
+): Promise<string> => {
+  const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+  const filename = `${productId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(PRODUCT_IMAGE_BUCKET)
+    .upload(filename, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+  if (error) throw error;
+  return filename;
+};
+
+export const insertProductImage = async (
+  product_id: string,
+  filename: string,
+  sort_order: number,
+): Promise<Tables<'product_images'>> => {
+  const { data, error } = await supabase
+    .from('product_images')
+    .insert({ product_id, filename, sort_order })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const deleteProductImage = async (
+  imageId: string,
+  filename: string,
+): Promise<void> => {
+  const { error: storageErr } = await supabase.storage
+    .from(PRODUCT_IMAGE_BUCKET)
+    .remove([filename]);
+  if (storageErr) throw storageErr;
+  const { error: dbErr } = await supabase
+    .from('product_images')
+    .delete()
+    .eq('id', imageId);
+  if (dbErr) throw dbErr;
+};
 
 export const getAdminNewsletter = async (): Promise<NewsletterSubscriber[]> => {
   try {
@@ -480,18 +566,57 @@ export const updateAdminCoupon = (id: string, data: Partial<Coupon>) =>
 export const deleteAdminCoupon = (id: string) =>
   fetchApi<void>(`/admin/coupons/${id}`, { method: 'DELETE' });
 
-// Collections Admin
-export const getAdminCollections = () =>
-  fetchApi<Collection[]>('/admin/collections', undefined, mockCollections);
+// Collections Admin — Supabase direct (admin sees all, including is_active=false)
+export const getAdminCollections = async (): Promise<AdminCollectionRow[]> => {
+  const { data, error } = await supabase
+    .from('collections')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+};
 
-export const createAdminCollection = (data: Partial<Collection>) =>
-  fetchApi<Collection>('/admin/collections', { method: 'POST', body: JSON.stringify(data) });
+export const createAdminCollection = async (
+  input: TablesInsert<'collections'>,
+): Promise<AdminCollectionRow> => {
+  const { data, error } = await supabase
+    .from('collections')
+    .insert(input)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
 
-export const updateAdminCollection = (id: string, data: Partial<Collection>) =>
-  fetchApi<Collection>(`/admin/collections/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const updateAdminCollection = async (
+  id: string,
+  input: TablesUpdate<'collections'>,
+): Promise<AdminCollectionRow> => {
+  const { data, error } = await supabase
+    .from('collections')
+    .update(input)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
 
-export const deleteAdminCollection = (id: string) =>
-  fetchApi<void>(`/admin/collections/${id}`, { method: 'DELETE' });
+export const deleteAdminCollection = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('collections').delete().eq('id', id);
+  if (error) throw error;
+};
+
+// Collection cover_image lives in the same 'produtos' bucket under a 'collections/' prefix.
+export const uploadCollectionCover = async (file: File): Promise<string> => {
+  const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+  const filename = `collections/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(PRODUCT_IMAGE_BUCKET)
+    .upload(filename, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+  if (error) throw error;
+  return productImagePublicUrl(filename);
+};
 
 // Collabs
 export const getAdminCollabs = () =>
