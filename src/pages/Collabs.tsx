@@ -93,8 +93,10 @@ const CollabBlock = ({ collab, reverse }: { collab: Collab; reverse: boolean }) 
 );
 
 const Collabs = () => {
-  const ref = useReveal();
   const [collabs, setCollabs] = useState<Collab[]>([]);
+  // Re-scan reveal targets when collabs chega async (senao as sections
+  // .reveal recem-renderizadas nao recebem .revealed e ficam invisiveis).
+  const ref = useReveal(0.15, [collabs]);
 
   useEffect(() => {
     getCollabs()
