@@ -711,6 +711,7 @@ function ProductForm({
     collection_id: product?.collection_id ?? '',
     visible: product?.visible ?? true,
     is_bestseller: Boolean(product?.is_bestseller),
+    stock_quantity: product?.stock_quantity ?? 0,
   });
   const [existingImages, setExistingImages] = useState<Tables<'product_images'>[]>(
     (product?.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order),
@@ -755,6 +756,7 @@ function ProductForm({
       accord: form.accord || null,
       visible: form.visible,
       is_bestseller: Boolean(form.is_bestseller),
+      stock_quantity: Number(form.stock_quantity) || 0,
     };
     onSave({ insert, newFiles, removedImageIds });
   };
@@ -824,7 +826,7 @@ function ProductForm({
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ritual</label>
         <textarea value={form.ritual} onChange={e => setForm(f => ({ ...f, ritual: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
       </div>
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-6 flex-wrap">
         <div className="flex items-center gap-2">
           <Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} />
           <label className="text-sm">Visível</label>
@@ -832,6 +834,17 @@ function ProductForm({
         <div className="flex items-center gap-2">
           <Switch checked={form.is_bestseller} onCheckedChange={v => setForm(f => ({ ...f, is_bestseller: v }))} />
           <label className="text-sm">Bestseller</label>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-muted-foreground uppercase tracking-wider">Estoque</label>
+          <Input
+            type="number"
+            min="0"
+            step="1"
+            className="w-24"
+            value={form.stock_quantity}
+            onChange={e => setForm(f => ({ ...f, stock_quantity: Number(e.target.value) }))}
+          />
         </div>
       </div>
 
