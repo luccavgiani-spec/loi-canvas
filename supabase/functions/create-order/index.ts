@@ -8,7 +8,7 @@ serve(async (req) => {
   }
 
   try {
-    const { items, customer } = await req.json();
+    const { items, customer, is_pickup } = await req.json();
 
     if (!items?.length || !customer?.name || !customer?.email) {
       return new Response(
@@ -24,7 +24,10 @@ serve(async (req) => {
       0,
     );
     const FREE_SHIPPING_THRESHOLD = 299;
-    const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 19.9;
+    const isPickup = Boolean(is_pickup);
+    const shippingCost = isPickup
+      ? 0
+      : (subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 19.9);
     const total = subtotal + shippingCost;
 
     // Upsert customer
@@ -45,6 +48,7 @@ serve(async (req) => {
         shipping_cost: shippingCost,
         total,
         status: 'pending',
+        is_pickup: isPickup,
       })
       .select('id')
       .single();

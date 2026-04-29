@@ -307,7 +307,7 @@ export const quoteShipping = (data: { items: { product_id: string; quantity: num
   fetchApi<ShippingQuote>('/cart/quote-shipping', { method: 'POST', body: JSON.stringify(data) }, { shipping_cost: 19.9, free_shipping_threshold: 299, is_free: false });
 
 // Orders (via Supabase Edge Function)
-export const createOrder = (data: { items: { product_id: string; quantity: number; price: number }[]; customer: { name: string; email: string; phone: string } }) =>
+export const createOrder = (data: { items: { product_id: string; quantity: number; price: number }[]; customer: { name: string; email: string; phone: string }; is_pickup?: boolean }) =>
   callEdgeFunction<{ order_id: string; total: number }>('create-order', data);
 
 // Mercado Pago (via Supabase Edge Function)
