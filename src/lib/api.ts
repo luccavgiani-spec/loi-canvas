@@ -1,6 +1,6 @@
 // v2 - schema corrigido
 import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
-import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
+import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, CouponValidation, CartItem, Collection, Collab } from '@/types';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections } from '@/lib/mocks';
 import { supabase } from '@/integrations/supabase/client';
@@ -322,8 +322,13 @@ export const quoteShipping = (data: { items: { product_id: string; quantity: num
   fetchApi<ShippingQuote>('/cart/quote-shipping', { method: 'POST', body: JSON.stringify(data) }, { shipping_cost: 19.9, free_shipping_threshold: 299, is_free: false });
 
 // Orders (via Supabase Edge Function)
-export const createOrder = (data: { items: { product_id: string; quantity: number; price: number }[]; customer: { name: string; email: string; phone: string }; is_pickup?: boolean }) =>
-  callEdgeFunction<{ order_id: string; total: number }>('create-order', data);
+export const createOrder = (data: {
+  items: { product_id: string; quantity: number; price: number }[];
+  customer: { name: string; email: string; phone: string };
+  is_pickup?: boolean;
+  coupon_code?: string;
+}) =>
+  callEdgeFunction<{ order_id: string; total: number; discount?: number }>('create-order', data);
 
 // Mercado Pago (via Supabase Edge Function)
 export const createPaymentPreference = (data: { order_id: string }) =>
@@ -610,26 +615,30 @@ export const getAdminNewsletter = async (): Promise<NewsletterSubscriber[]> => {
   }
 };
 
+function mapDbCoupon(row: Tables<'coupons'>): Coupon {
+  return {
+    id: row.id,
+    code: row.code,
+    type: (row.type as 'percent' | 'fixed'),
+    value: Number(row.value),
+    is_active: row.is_active ?? true,
+    current_uses: row.current_uses ?? 0,
+    max_uses: row.max_uses,
+    valid_from: row.valid_from,
+    valid_until: row.valid_until,
+    min_order_value: row.min_order_value !== null ? Number(row.min_order_value) : null,
+    collection_id: row.collection_id,
+    created_at: row.created_at ?? '',
+  };
+}
+
 export const getAdminCoupons = async (): Promise<Coupon[]> => {
-  try {
-    const { data, error } = await supabase
-      .from('coupons')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return (data || []).map((row: any) => ({
-      id: row.id,
-      code: row.code,
-      discount_percent: row.type === 'percent' ? Number(row.value) : 0,
-      is_active: row.is_active ?? true,
-      uses: 0,
-      max_uses: undefined,
-      created_at: row.created_at,
-    }));
-  } catch (err) {
-    console.warn('[getAdminCoupons] Supabase query failed, using mock fallback:', err);
-    return mockCoupons;
-  }
+  const { data, error } = await supabase
+    .from('coupons')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapDbCoupon);
 };
 
 export const updateOrderTracking = (order_id: string, tracking_code: string) =>
@@ -641,15 +650,101 @@ export const sendTrackingEmail = (order_id: string, tracking_code: string) =>
 export const sendCampaign = (subject: string, html_content: string) =>
   callEdgeFunction<{ count: number }>('send-campaign', { subject, html_content });
 
-// Coupons
-export const createAdminCoupon = (data: Partial<Coupon>) =>
-  fetchApi<Coupon>('/admin/coupons', { method: 'POST', body: JSON.stringify(data) });
+// Coupons — admin CRUD via Supabase (RLS-gated, admin_users only).
+export const createAdminCoupon = async (input: TablesInsert<'coupons'>): Promise<Coupon> => {
+  const { data, error } = await supabase
+    .from('coupons')
+    .insert(input)
+    .select()
+    .single();
+  if (error) throw error;
+  return mapDbCoupon(data);
+};
 
-export const updateAdminCoupon = (id: string, data: Partial<Coupon>) =>
-  fetchApi<Coupon>(`/admin/coupons/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const updateAdminCoupon = async (
+  id: string,
+  input: TablesUpdate<'coupons'>,
+): Promise<Coupon> => {
+  const { data, error } = await supabase
+    .from('coupons')
+    .update(input)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return mapDbCoupon(data);
+};
 
-export const deleteAdminCoupon = (id: string) =>
-  fetchApi<void>(`/admin/coupons/${id}`, { method: 'DELETE' });
+export const deleteAdminCoupon = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('coupons').delete().eq('id', id);
+  if (error) throw error;
+};
+
+// Public — valida cupom digitado pelo cliente no checkout.
+// Lê via anon key; RLS já filtra cupons inativos / fora de janela.
+// Para cupom restrito a coleção, desconto incide só sobre subtotal dos
+// itens elegíveis (regra C definida com Lucca).
+export const validateCoupon = async (
+  code: string,
+  cartItems: CartItem[],
+  subtotal: number,
+): Promise<CouponValidation> => {
+  const trimmed = code.trim().toUpperCase();
+  if (!trimmed) return { valid: false, reason: 'Código vazio' };
+
+  const { data, error } = await supabase
+    .from('coupons')
+    .select('*, collections(name)')
+    .eq('code', trimmed)
+    .maybeSingle();
+
+  if (error) return { valid: false, reason: 'Erro ao validar cupom' };
+  if (!data) return { valid: false, reason: 'Cupom inválido ou expirado' };
+
+  const coupon = mapDbCoupon(data);
+  const collectionName = (data as { collections?: { name: string } | null }).collections?.name;
+
+  if (coupon.min_order_value !== null && subtotal < coupon.min_order_value) {
+    return {
+      valid: false,
+      reason: `Pedido mínimo de R$ ${coupon.min_order_value.toFixed(2)} para usar este cupom`,
+    };
+  }
+
+  if (coupon.max_uses !== null && coupon.current_uses >= coupon.max_uses) {
+    return { valid: false, reason: 'Cupom esgotado' };
+  }
+
+  // Base sobre a qual o desconto incide. Se cupom for restrito a coleção,
+  // soma apenas itens daquela coleção.
+  let eligibleBase = subtotal;
+  if (coupon.collection_id) {
+    eligibleBase = cartItems.reduce((sum, item) => {
+      if (item.product.collection_id === coupon.collection_id) {
+        return sum + item.product.price * item.quantity;
+      }
+      return sum;
+    }, 0);
+    if (eligibleBase <= 0) {
+      return {
+        valid: false,
+        reason: collectionName
+          ? `Cupom válido apenas para a coleção ${collectionName}`
+          : 'Cupom válido apenas para uma coleção específica',
+      };
+    }
+  }
+
+  const discount = coupon.type === 'percent'
+    ? Math.min(eligibleBase, eligibleBase * (coupon.value / 100))
+    : Math.min(eligibleBase, coupon.value);
+
+  return {
+    valid: true,
+    discount: Math.round(discount * 100) / 100,
+    coupon,
+  };
+};
 
 // Collections Admin — Supabase direct (admin sees all, including is_active=false)
 export const getAdminCollections = async (): Promise<AdminCollectionRow[]> => {

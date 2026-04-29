@@ -128,32 +128,55 @@ export type Database = {
       coupons: {
         Row: {
           code: string
+          collection_id: string | null
           created_at: string | null
-          expires_at: string | null
+          current_uses: number
           id: string
           is_active: boolean | null
+          max_uses: number | null
+          min_order_value: number | null
           type: string
+          valid_from: string | null
+          valid_until: string | null
           value: number
         }
         Insert: {
           code: string
+          collection_id?: string | null
           created_at?: string | null
-          expires_at?: string | null
+          current_uses?: number
           id?: string
           is_active?: boolean | null
+          max_uses?: number | null
+          min_order_value?: number | null
           type: string
+          valid_from?: string | null
+          valid_until?: string | null
           value: number
         }
         Update: {
           code?: string
+          collection_id?: string | null
           created_at?: string | null
-          expires_at?: string | null
+          current_uses?: number
           id?: string
           is_active?: boolean | null
+          max_uses?: number | null
+          min_order_value?: number | null
           type?: string
+          valid_from?: string | null
+          valid_until?: string | null
           value?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "coupons_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customers: {
         Row: {
@@ -293,24 +316,6 @@ export type Database = {
           total?: number
           tracking_code?: string | null
           tracking_email_sent_at?: string | null
-        }
-        Relationships: []
-      }
-      settings: {
-        Row: {
-          key: string
-          updated_at: string
-          value: Json
-        }
-        Insert: {
-          key: string
-          updated_at?: string
-          value: Json
-        }
-        Update: {
-          key?: string
-          updated_at?: string
-          value?: Json
         }
         Relationships: []
       }
@@ -502,6 +507,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
       }
       shipping_rules: {
         Row: {

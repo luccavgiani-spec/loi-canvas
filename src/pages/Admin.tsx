@@ -112,21 +112,28 @@ function ImageUploader({
   images,
   onChange,
   uploadFn,
+  onBusyChange,
 }: {
   images: string[];
   onChange: (imgs: string[]) => void;
   uploadFn?: (file: File) => Promise<string>;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const { toast } = useToast();
+
+  const updateBusy = (next: boolean) => {
+    setBusy(next);
+    onBusyChange?.(next);
+  };
 
   const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     e.target.value = '';
     if (uploadFn) {
-      setBusy(true);
+      updateBusy(true);
       const accumulated: string[] = [...images];
       try {
         for (const file of Array.from(files)) {
@@ -138,7 +145,7 @@ function ImageUploader({
         console.error('[ImageUploader] upload failed', err);
         toast({ title: 'Falha no upload da mídia.', variant: 'destructive' });
       } finally {
-        setBusy(false);
+        updateBusy(false);
       }
       return;
     }
@@ -1579,6 +1586,7 @@ function CollabsTab() {
 }
 
 function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSave: (data: Partial<Collab>) => void; onCancel: () => void }) {
+  const { toast } = useToast();
   const [form, setForm] = useState({
     name: collab?.name || '',
     slug: collab?.slug || '',
@@ -1590,11 +1598,16 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
     is_active: collab?.is_active ?? true,
     sort_order: collab?.sort_order ?? 0,
   });
+  const [uploading, setUploading] = useState(false);
 
   const autoSlug = (name: string) => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (uploading) {
+      toast({ title: 'Aguarde o upload terminar antes de salvar.', variant: 'destructive' });
+      return;
+    }
     onSave({ ...form });
   };
 
@@ -1632,7 +1645,11 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
           images={form.images}
           onChange={imgs => setForm(f => ({ ...f, images: imgs }))}
           uploadFn={uploadCollabMedia}
+          onBusyChange={setUploading}
         />
+        {uploading && (
+          <p className="text-[10px] text-amber-700 mt-1">Aguarde — fazendo upload das mídias…</p>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">
@@ -1647,7 +1664,9 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
         )}
       </div>
       <div className="flex gap-2 pt-2">
-        <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{collab ? 'Salvar' : 'Criar'}</Button>
+        <Button type="submit" disabled={uploading} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+          {uploading ? 'Enviando mídias…' : (collab ? 'Salvar' : 'Criar')}
+        </Button>
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
       </div>
     </form>
@@ -1655,48 +1674,128 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
 }
 
 /* ═══════════ COUPONS ═══════════ */
+type CouponFormPayload = {
+  code: string;
+  type: 'percent' | 'fixed';
+  value: number;
+  is_active: boolean;
+  valid_from: string | null;
+  valid_until: string | null;
+  max_uses: number | null;
+  min_order_value: number | null;
+  collection_id: string | null;
+};
+
+function formatDiscount(c: Coupon): string {
+  return c.type === 'percent'
+    ? `${c.value}%`
+    : `R$ ${c.value.toFixed(2)}`;
+}
+
+function formatValidity(c: Coupon): string {
+  if (!c.valid_until) return 'Sem expiração';
+  return new Date(c.valid_until).toLocaleDateString('pt-BR');
+}
+
+function formatUses(c: Coupon): string {
+  if (c.max_uses == null) return `${c.current_uses}`;
+  return `${c.current_uses}/${c.max_uses}`;
+}
+
+// datetime-local quer 'YYYY-MM-DDTHH:mm' (sem timezone, sem segundos).
+function toDateTimeLocal(iso: string | null): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fromDateTimeLocal(local: string): string | null {
+  if (!local) return null;
+  return new Date(local).toISOString();
+}
+
 function CouponsTab() {
   const { toast } = useToast();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [collections, setCollections] = useState<AdminCollectionRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Coupon | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  useEffect(() => { getAdminCoupons().then(setCoupons); }, []);
+  useEffect(() => {
+    Promise.all([getAdminCoupons(), getAdminCollections()])
+      .then(([cs, cols]) => {
+        setCoupons(cs);
+        setCollections(cols);
+      })
+      .catch(err => {
+        console.error('[CouponsTab] load failed', err);
+        toast({ title: 'Erro ao carregar cupons.', variant: 'destructive' });
+      })
+      .finally(() => setLoading(false));
+  }, [toast]);
+
+  const collectionName = (id: string | null) =>
+    id ? collections.find(c => c.id === id)?.name ?? '—' : 'Todas';
 
   const openNew = () => { setEditing(null); setModalOpen(true); };
   const openEdit = (c: Coupon) => { setEditing(c); setModalOpen(true); };
 
+  // Toggle is_active otimista com rollback em erro.
   const handleToggleActive = async (coupon: Coupon) => {
-    const updated = { ...coupon, is_active: !coupon.is_active };
-    try { await updateAdminCoupon(coupon.id, { is_active: updated.is_active }); } catch { /* mock */ }
-    setCoupons(prev => prev.map(c => c.id === coupon.id ? updated : c));
-    toast({ title: updated.is_active ? 'Cupom ativado.' : 'Cupom desativado.' });
+    const next = !coupon.is_active;
+    setCoupons(prev => prev.map(c => c.id === coupon.id ? { ...c, is_active: next } : c));
+    try {
+      await updateAdminCoupon(coupon.id, { is_active: next });
+      toast({ title: next ? 'Cupom ativado.' : 'Cupom desativado.' });
+    } catch (err) {
+      console.error('[CouponsTab] toggle failed', err);
+      setCoupons(prev => prev.map(c => c.id === coupon.id ? { ...c, is_active: coupon.is_active } : c));
+      toast({ title: 'Erro ao alterar status do cupom.', variant: 'destructive' });
+    }
   };
 
   const handleDelete = async (id: string) => {
-    try { await deleteAdminCoupon(id); } catch { /* mock */ }
-    setCoupons(prev => prev.filter(c => c.id !== id));
-    setDeleteTarget(null);
-    toast({ title: 'Cupom excluído com sucesso.' });
+    try {
+      await deleteAdminCoupon(id);
+      setCoupons(prev => prev.filter(c => c.id !== id));
+      setDeleteTarget(null);
+      toast({ title: 'Cupom excluído com sucesso.' });
+    } catch (err) {
+      console.error('[CouponsTab] delete failed', err);
+      toast({ title: 'Erro ao excluir cupom.', variant: 'destructive' });
+    }
   };
 
-  const handleSave = async (data: Partial<Coupon>) => {
+  const handleSave = async (data: CouponFormPayload) => {
     try {
       if (editing) {
-        try { await updateAdminCoupon(editing.id, data); } catch { /* mock */ }
-        setCoupons(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Coupon : c));
+        const updated = await updateAdminCoupon(editing.id, data);
+        setCoupons(prev => prev.map(c => (c.id === editing.id ? updated : c)));
       } else {
-        const newC = { ...data, id: `cp-${Date.now()}`, uses: 0, created_at: new Date().toISOString().split('T')[0] } as Coupon;
-        try { await createAdminCoupon(data); } catch { /* mock */ }
-        setCoupons(prev => [...prev, newC]);
+        const created = await createAdminCoupon(data);
+        setCoupons(prev => [created, ...prev]);
       }
       setModalOpen(false);
       toast({ title: editing ? 'Cupom atualizado com sucesso.' : 'Cupom criado com sucesso.' });
-    } catch {
-      toast({ title: 'Erro ao salvar cupom.', variant: 'destructive' });
+    } catch (err) {
+      console.error('[CouponsTab] save failed', err);
+      const msg = err instanceof Error ? err.message : 'Erro ao salvar cupom.';
+      toast({ title: msg, variant: 'destructive' });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-40" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -1711,10 +1810,12 @@ function CouponsTab() {
             <thead>
               <tr className="border-b border-border">
                 <th className={thCls}>Código</th>
-                <th className={thCls}>Desconto</th>
+                <th className={thCls}>Tipo</th>
+                <th className={thCls}>Valor</th>
+                <th className={thCls}>Validade</th>
                 <th className={thCls}>Usos</th>
-                <th className={thCls}>Máx. Usos</th>
-                <th className={thCls}>Status</th>
+                <th className={thCls}>Coleção</th>
+                <th className={thCls}>Ativo</th>
                 <th className={thCls}>Ações</th>
               </tr>
             </thead>
@@ -1722,16 +1823,21 @@ function CouponsTab() {
               {coupons.map(c => (
                 <tr key={c.id} className="border-b border-border">
                   <td className={`${tdCls} font-mono`}>{c.code}</td>
-                  <td className={tdCls}>{c.discount_percent}%</td>
-                  <td className={tdCls}>{c.uses}</td>
-                  <td className={tdCls}>{c.max_uses ?? '—'}</td>
+                  <td className={tdCls}>{c.type === 'percent' ? 'Percentual' : 'Valor fixo'}</td>
+                  <td className={tdCls}>{formatDiscount(c)}</td>
+                  <td className={tdCls}>{formatValidity(c)}</td>
+                  <td className={tdCls}>{formatUses(c)}</td>
+                  <td className={tdCls}>{collectionName(c.collection_id)}</td>
                   <td className={tdCls}>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${c.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} mr-2`}>
+                      {c.is_active ? 'Ativo' : 'Inativo'}
+                    </span>
                     <Switch checked={c.is_active} onCheckedChange={() => handleToggleActive(c)} />
                   </td>
                   <td className={tdCls}>
                     <div className="flex gap-2">
-                      <button onClick={() => openEdit(c)} className="text-accent hover:text-accent/80"><Pencil size={14} /></button>
-                      <button onClick={() => setDeleteTarget(c.id)} className="text-destructive hover:text-destructive/80"><Trash2 size={14} /></button>
+                      <button onClick={() => openEdit(c)} className="text-accent hover:text-accent/80" title="Editar"><Pencil size={14} /></button>
+                      <button onClick={() => setDeleteTarget(c.id)} className="text-destructive hover:text-destructive/80" title="Excluir"><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -1742,7 +1848,12 @@ function CouponsTab() {
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Cupom' : 'Novo Cupom'}>
-        <CouponForm coupon={editing} onSave={handleSave} onCancel={() => setModalOpen(false)} />
+        <CouponForm
+          coupon={editing}
+          collections={collections}
+          onSave={handleSave}
+          onCancel={() => setModalOpen(false)}
+        />
       </Modal>
 
       <ConfirmDeleteDialog
@@ -1756,44 +1867,187 @@ function CouponsTab() {
   );
 }
 
-function CouponForm({ coupon, onSave, onCancel }: { coupon: Coupon | null; onSave: (data: Partial<Coupon>) => void; onCancel: () => void }) {
+function CouponForm({
+  coupon,
+  collections,
+  onSave,
+  onCancel,
+}: {
+  coupon: Coupon | null;
+  collections: AdminCollectionRow[];
+  onSave: (data: CouponFormPayload) => void;
+  onCancel: () => void;
+}) {
   const [form, setForm] = useState({
-    code: coupon?.code || '',
-    discount_percent: coupon?.discount_percent || 0,
+    code: coupon?.code ?? '',
+    type: (coupon?.type ?? 'percent') as 'percent' | 'fixed',
+    value: coupon?.value ?? 0,
     is_active: coupon?.is_active ?? true,
-    max_uses: coupon?.max_uses ?? '',
+    valid_from: toDateTimeLocal(coupon?.valid_from ?? null),
+    valid_until: toDateTimeLocal(coupon?.valid_until ?? null),
+    max_uses: coupon?.max_uses == null ? '' : String(coupon.max_uses),
+    min_order_value: coupon?.min_order_value == null ? '' : String(coupon.min_order_value),
+    collection_id: coupon?.collection_id ?? '',
   });
+  const [error, setError] = useState<string | null>(null);
+
+  const sanitizeCode = (raw: string) =>
+    raw.toUpperCase().replace(/[^A-Z0-9_]/g, '').slice(0, 32);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    const code = sanitizeCode(form.code);
+    if (!code) { setError('Código é obrigatório (apenas A-Z, 0-9 e _).'); return; }
+
+    const value = Number(form.value);
+    if (!Number.isFinite(value) || value <= 0) { setError('Valor do desconto deve ser maior que zero.'); return; }
+    if (form.type === 'percent' && value > 100) { setError('Desconto percentual não pode passar de 100%.'); return; }
+
+    const max_uses = form.max_uses === '' ? null : Number(form.max_uses);
+    if (max_uses !== null && (!Number.isFinite(max_uses) || max_uses < 0)) {
+      setError('Máx. usos deve ser um inteiro >= 0.'); return;
+    }
+
+    const min_order_value = form.min_order_value === '' ? null : Number(form.min_order_value);
+    if (min_order_value !== null && (!Number.isFinite(min_order_value) || min_order_value < 0)) {
+      setError('Pedido mínimo deve ser >= 0.'); return;
+    }
+
+    const valid_from = fromDateTimeLocal(form.valid_from);
+    const valid_until = fromDateTimeLocal(form.valid_until);
+    if (valid_from && valid_until && new Date(valid_until) <= new Date(valid_from)) {
+      setError('Validade final deve ser maior que a inicial.'); return;
+    }
+
     onSave({
-      code: form.code.toUpperCase(),
-      discount_percent: Number(form.discount_percent),
+      code,
+      type: form.type,
+      value,
       is_active: form.is_active,
-      max_uses: form.max_uses !== '' ? Number(form.max_uses) : undefined,
+      valid_from,
+      valid_until,
+      max_uses,
+      min_order_value,
+      collection_id: form.collection_id || null,
     });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded p-2">
+          {error}
+        </div>
+      )}
+
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Código</label>
-        <Input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="ex: LOIE15" required />
+        <Input
+          value={form.code}
+          onChange={e => setForm(f => ({ ...f, code: sanitizeCode(e.target.value) }))}
+          placeholder="ex: LOIE15"
+          className="font-mono"
+          required
+        />
+        <p className="text-[10px] text-muted-foreground mt-1">A-Z, 0-9 e _ apenas. UPPERCASE automático.</p>
       </div>
+
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Desconto (%)</label>
-          <Input type="number" min="1" max="100" value={form.discount_percent} onChange={e => setForm(f => ({ ...f, discount_percent: Number(e.target.value) }))} required />
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Tipo</label>
+          <select
+            value={form.type}
+            onChange={e => setForm(f => ({ ...f, type: e.target.value as 'percent' | 'fixed' }))}
+            className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent"
+          >
+            <option value="percent">Percentual (%)</option>
+            <option value="fixed">Valor fixo (R$)</option>
+          </select>
         </div>
         <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Máx. usos (opcional)</label>
-          <Input type="number" min="0" value={form.max_uses} onChange={e => setForm(f => ({ ...f, max_uses: e.target.value === '' ? '' : Number(e.target.value) }))} placeholder="Ilimitado" />
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">
+            Valor {form.type === 'percent' ? '(%)' : '(R$)'}
+          </label>
+          <Input
+            type="number"
+            min="0"
+            step={form.type === 'percent' ? '1' : '0.01'}
+            max={form.type === 'percent' ? '100' : undefined}
+            value={form.value}
+            onChange={e => setForm(f => ({ ...f, value: Number(e.target.value) }))}
+            required
+          />
         </div>
       </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Válido a partir de (opcional)</label>
+          <Input
+            type="datetime-local"
+            value={form.valid_from}
+            onChange={e => setForm(f => ({ ...f, valid_from: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Válido até (opcional)</label>
+          <Input
+            type="datetime-local"
+            value={form.valid_until}
+            onChange={e => setForm(f => ({ ...f, valid_until: e.target.value }))}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Máx. usos (opcional)</label>
+          <Input
+            type="number"
+            min="0"
+            step="1"
+            value={form.max_uses}
+            onChange={e => setForm(f => ({ ...f, max_uses: e.target.value }))}
+            placeholder="Ilimitado"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Pedido mínimo R$ (opcional)</label>
+          <Input
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.min_order_value}
+            onChange={e => setForm(f => ({ ...f, min_order_value: e.target.value }))}
+            placeholder="Sem mínimo"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Coleção (opcional)</label>
+        <select
+          value={form.collection_id}
+          onChange={e => setForm(f => ({ ...f, collection_id: e.target.value }))}
+          className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent"
+        >
+          <option value="">Todas as coleções</option>
+          {collections.map(c => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
+        <p className="text-[10px] text-muted-foreground mt-1">
+          Se selecionado, desconto vale apenas para itens dessa coleção.
+        </p>
+      </div>
+
       <div className="flex items-center gap-2">
         <Switch checked={form.is_active} onCheckedChange={v => setForm(f => ({ ...f, is_active: v }))} />
         <label className="text-sm">Ativo</label>
       </div>
+
       <div className="flex gap-2 pt-2">
         <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{coupon ? 'Salvar' : 'Criar'}</Button>
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
