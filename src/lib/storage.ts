@@ -1,4 +1,6 @@
 // Supabase Storage public URL builder
+import { supabase } from '@/integrations/supabase/client';
+
 const SUPABASE_URL = "https://xigituxddrtsqhmrmsvy.supabase.co";
 const BUCKET = "produtos";
 const BANNER_BUCKET = "banner";
@@ -29,6 +31,16 @@ const COLLABS_BUCKET = "collabs";
 
 export function collabsUrl(filename: string): string {
   return `${SUPABASE_URL}/storage/v1/object/public/${COLLABS_BUCKET}/${encodeURIComponent(filename)}?cache-control=${encodeURIComponent(CACHE_CONTROL)}`;
+}
+
+export async function uploadCollabMedia(file: File): Promise<string> {
+  const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+  const filename = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(COLLABS_BUCKET)
+    .upload(filename, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+  if (error) throw error;
+  return collabsUrl(filename);
 }
 
 /** Return the first non-video image from a list, useful as poster for <video> */

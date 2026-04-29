@@ -14,6 +14,7 @@ import {
   getAdminMensagens,
 } from '@/lib/api';
 import type { AdminProductRow, AdminCollectionRow } from '@/lib/api';
+import { uploadCollabMedia } from '@/lib/storage';
 import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Collab } from '@/types';
 import type { TablesInsert, TablesUpdate, Tables } from '@/integrations/supabase/types';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -89,12 +90,40 @@ function Modal({ open, onClose, title, children }: { open: boolean; onClose: () 
 }
 
 /* ─────────── Image Upload UI ─────────── */
-function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs: string[]) => void }) {
+function ImageUploader({
+  images,
+  onChange,
+  uploadFn,
+}: {
+  images: string[];
+  onChange: (imgs: string[]) => void;
+  uploadFn?: (file: File) => Promise<string>;
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const { toast } = useToast();
 
-  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
+    e.target.value = '';
+    if (uploadFn) {
+      setBusy(true);
+      const accumulated: string[] = [...images];
+      try {
+        for (const file of Array.from(files)) {
+          const url = await uploadFn(file);
+          accumulated.push(url);
+          onChange([...accumulated]);
+        }
+      } catch (err) {
+        console.error('[ImageUploader] upload failed', err);
+        toast({ title: 'Falha no upload da mídia.', variant: 'destructive' });
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     Array.from(files).forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -104,7 +133,6 @@ function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs
       };
       reader.readAsDataURL(file);
     });
-    e.target.value = '';
   };
 
   const handleUrlAdd = () => {
@@ -137,8 +165,8 @@ function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs
       </div>
       <div className="flex gap-2">
         <input ref={fileRef} type="file" accept="image/*,video/mp4" multiple className="hidden" onChange={handleFiles} />
-        <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} className="text-xs gap-1">
-          <Upload size={12} /> Upload
+        <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => fileRef.current?.click()} className="text-xs gap-1">
+          <Upload size={12} /> {busy ? 'Enviando…' : 'Upload'}
         </Button>
         <Button type="button" variant="outline" size="sm" onClick={handleUrlAdd} className="text-xs gap-1">
           <ImageIcon size={12} /> URL
@@ -1129,31 +1157,46 @@ function CollabsTab() {
   const [editing, setEditing] = useState<Collab | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  useEffect(() => { getAdminCollabs().then(setCollabs); }, []);
+  useEffect(() => {
+    getAdminCollabs()
+      .then(setCollabs)
+      .catch(err => {
+        console.error('[CollabsTab] load failed', err);
+        toast({ title: 'Erro ao carregar collabs.', variant: 'destructive' });
+      });
+  }, [toast]);
 
   const openNew = () => { setEditing(null); setModalOpen(true); };
   const openEdit = (c: Collab) => { setEditing(c); setModalOpen(true); };
 
   const handleDelete = async (id: string) => {
-    try { await deleteAdminCollab(id); } catch { /* mock */ }
-    setCollabs(prev => prev.filter(c => c.id !== id));
-    setDeleteTarget(null);
-    toast({ title: 'Collab excluída com sucesso.' });
+    try {
+      await deleteAdminCollab(id);
+      setCollabs(prev => prev.filter(c => c.id !== id));
+      setDeleteTarget(null);
+      toast({ title: 'Collab excluída com sucesso.' });
+    } catch (err) {
+      console.error('[CollabsTab] delete failed', err);
+      toast({ title: 'Erro ao excluir collab.', variant: 'destructive' });
+    }
   };
 
   const handleSave = async (data: Partial<Collab>) => {
     try {
       if (editing) {
-        try { await updateAdminCollab(editing.id, data); } catch { /* mock */ }
-        setCollabs(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Collab : c));
+        const updated = await updateAdminCollab(editing.id, data);
+        setCollabs(prev => prev.map(c => (c.id === editing.id ? updated : c)));
       } else {
-        const newC = { ...data, id: `cb-${Date.now()}`, is_active: true, sort_order: collabs.length, created_at: new Date().toISOString().split('T')[0] } as Collab;
-        try { await createAdminCollab(data); } catch { /* mock */ }
-        setCollabs(prev => [...prev, newC]);
+        const created = await createAdminCollab({
+          ...data,
+          sort_order: data.sort_order ?? collabs.length,
+        });
+        setCollabs(prev => [...prev, created]);
       }
       setModalOpen(false);
       toast({ title: editing ? 'Collab atualizada com sucesso.' : 'Collab criada com sucesso.' });
-    } catch {
+    } catch (err) {
+      console.error('[CollabsTab] save failed', err);
       toast({ title: 'Erro ao salvar collab.', variant: 'destructive' });
     }
   };
@@ -1223,6 +1266,8 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
     slug: collab?.slug || '',
     caption: collab?.caption || '',
     description: collab?.description || '',
+    category: collab?.category || '',
+    year: collab?.year || '',
     images: collab?.images || [] as string[],
     is_active: collab?.is_active ?? true,
     sort_order: collab?.sort_order ?? 0,
@@ -1245,6 +1290,16 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Slug</label>
         <Input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} required />
       </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Categoria</label>
+          <Input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="ex: kit de imprensa" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ano</label>
+          <Input value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} placeholder="ex: 2023" />
+        </div>
+      </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Legenda curta</label>
         <Input value={form.caption} onChange={e => setForm(f => ({ ...f, caption: e.target.value }))} placeholder="ex: Vasos artesanais × Loiê" />
@@ -1255,7 +1310,11 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
       </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Mídias (imagens / vídeos)</label>
-        <ImageUploader images={form.images} onChange={imgs => setForm(f => ({ ...f, images: imgs }))} />
+        <ImageUploader
+          images={form.images}
+          onChange={imgs => setForm(f => ({ ...f, images: imgs }))}
+          uploadFn={uploadCollabMedia}
+        />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">
