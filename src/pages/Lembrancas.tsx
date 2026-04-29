@@ -190,6 +190,7 @@ const Lembrancas = () => {
               fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
               color: '#29241f',
               lineHeight: 1.6,
+              textAlign: 'right',
             }}
           >
             Uma vela que leva o nome deles. Que traduz o dia em que disseram sim
@@ -217,6 +218,7 @@ const Lembrancas = () => {
               fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
               color: '#f4edd2',
               lineHeight: 1.6,
+              textAlign: 'right',
             }}
           >
             Para quem não some depois da festa
@@ -268,6 +270,7 @@ const Lembrancas = () => {
               fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
               color: '#29241f',
               lineHeight: 1.6,
+              textAlign: 'right',
             }}
           >
             Discreto no gesto. Marcante na lembrança. Sem excesso. Com intenção
