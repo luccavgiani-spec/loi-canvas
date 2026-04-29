@@ -129,12 +129,6 @@ const HeroSection = () => {
         <div className="max-w-[1400px] mx-auto px-6 md:px-[5rem] py-3">
           {/* family buttons row */}
           <div className="flex flex-nowrap md:flex-wrap items-center gap-2 aromatic-bar">
-            <span
-              className="loi-label mr-2 hidden md:inline"
-              style={{ color: 'rgba(244,237,210,0.3)', whiteSpace: 'nowrap' }}
-            >
-              composições aromáticas
-            </span>
             {FAMILIES.map((fam) => {
               const isActive = activeFamily === fam.label;
               return (
