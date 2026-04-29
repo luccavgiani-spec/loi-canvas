@@ -1362,9 +1362,6 @@ function CollectionProductsOrder({ collectionId, onClose }: { collectionId: stri
 }
 
 /* ═══════════ BESTSELLER ORDER (drag-and-drop) ═══════════ */
-// TODO(home): a secao publica que renderiza esses bestsellers (componente
-// BestsellersSection.tsx) foi desreferenciada da home no Bloco G1.5.
-// Quando a home re-incluir, a ordem definida aqui passa a refletir.
 function BestsellerProductsOrder({ products, onSaved }: { products: AdminProductRow[]; onSaved: () => void }) {
   const { toast } = useToast();
   const [items, setItems] = useState<OrderItem[]>([]);
