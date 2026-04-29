@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useSetting } from '@/hooks/useSetting';
+import { DEFAULT_SHIPPING_FLAT_RATE } from '@/config';
 
 const CHAR  = '#29241f';
 const OLIVA = '#565600';
+
+const formatBRL = (amount: number) =>
+  `R$ ${amount.toFixed(2).replace('.', ',')}`;
 
 const LABEL: React.CSSProperties = {
   fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
@@ -25,10 +30,11 @@ const INPUT: React.CSSProperties = {
   boxSizing: 'border-box' as const,
 };
 
-function getShippingInfo(cep: string): string {
+function getShippingInfo(cep: string, amount: number): string {
   const digit = parseInt(cep[0], 10);
-  if (digit <= 5) return 'Entrega estimada: 7 a 12 dias úteis — R$ 15,00';
-  return 'Entrega estimada: 10 a 15 dias úteis — R$ 15,00';
+  const price = formatBRL(amount);
+  if (digit <= 5) return `Entrega estimada: 7 a 12 dias úteis — ${price}`;
+  return `Entrega estimada: 10 a 15 dias úteis — ${price}`;
 }
 
 type Status = 'idle' | 'loading' | 'ready' | 'error';
@@ -37,6 +43,10 @@ const ShippingCalculator = () => {
   const [cep, setCep] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [shippingMessage, setShippingMessage] = useState('');
+  const { amount: shippingFlatRate } = useSetting<{ amount: number }>(
+    'shipping_flat_rate',
+    { amount: DEFAULT_SHIPPING_FLAT_RATE },
+  );
 
   const handleCepChange = (raw: string) => {
     const digits = raw.replace(/\D/g, '').slice(0, 8);
@@ -59,7 +69,7 @@ const ShippingCalculator = () => {
             if (data.erro) {
               setStatus('error');
             } else {
-              setShippingMessage(getShippingInfo(digits));
+              setShippingMessage(getShippingInfo(digits, shippingFlatRate));
               setStatus('ready');
             }
           }, delay);
@@ -67,7 +77,7 @@ const ShippingCalculator = () => {
         .catch(() => {
           setTimeout(() => {
             // If ViaCEP is unreachable, still show shipping (CEP format was valid)
-            setShippingMessage(getShippingInfo(digits));
+            setShippingMessage(getShippingInfo(digits, shippingFlatRate));
             setStatus('ready');
           }, delay);
         });
