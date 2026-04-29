@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getOrderById, getRelatedProducts, getProducts } from '@/lib/api';
+import { getPublicOrderConfirmation, getProducts, type PublicOrderConfirmation } from '@/lib/api';
 import { useCart } from '@/contexts/CartContext';
 import { Loader2, Package } from 'lucide-react';
 import type { Product } from '@/types';
@@ -10,14 +10,6 @@ const CHAR = '#29241f';
 const OLIVA = '#565600';
 const CREME = '#f4edd2';
 const CREME_LIGHT = '#fcf5e0';
-
-const SUPABASE_STORAGE_URL =
-  'https://xigituxddrtsqhmrmsvy.supabase.co/storage/v1/object/public/produtos';
-
-function buildThumbUrl(assetFolder: string | null | undefined): string {
-  if (!assetFolder || typeof assetFolder !== 'string') return '';
-  return `${SUPABASE_STORAGE_URL}/${assetFolder}_principal.JPG`;
-}
 
 const LABEL: React.CSSProperties = {
   fontFamily: "'Sackers Gothic', 'Wagon', sans-serif",
@@ -34,7 +26,7 @@ const OrderConfirmation = () => {
 
   const orderId = searchParams.get('order_id');
 
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<PublicOrderConfirmation | null>(null);
   const [loading, setLoading] = useState(true);
   const [related, setRelated] = useState<Product[]>([]);
 
@@ -48,30 +40,12 @@ const OrderConfirmation = () => {
 
     const load = async () => {
       try {
-        const data = await getOrderById(orderId);
-        if (!data || cancelled) {
-          if (!cancelled) navigate('/', { replace: true });
-          return;
-        }
+        const data = await getPublicOrderConfirmation(orderId);
+        if (cancelled) return;
         setOrder(data);
 
-        // Fetch related products
-        const items = data.order_items || [];
-        const firstProduct = items[0]?.product;
-        let recs: Product[] = [];
-
-        if (firstProduct) {
-          recs = await getRelatedProducts(items[0].product_id);
-        }
-
-        // Fallback: get general products excluding order items
-        if (recs.length === 0) {
-          const all = await getProducts();
-          const orderProductIds = new Set(items.map((i: any) => i.product_id));
-          recs = all.filter(p => !orderProductIds.has(p.id)).slice(0, 4);
-        }
-
-        if (!cancelled) setRelated(recs.slice(0, 4));
+        const all = await getProducts();
+        if (!cancelled) setRelated(all.slice(0, 4));
       } catch {
         if (!cancelled) navigate('/', { replace: true });
       } finally {
@@ -95,8 +69,8 @@ const OrderConfirmation = () => {
 
   if (!order) return null;
 
-  const items = order.order_items || [];
-  const orderTotal = Number(order.total) || items.reduce((s: number, i: any) => s + Number(i.unit_price) * Number(i.qty), 0);
+  const items = order.items;
+  const orderTotal = Number(order.total) || items.reduce((s, i) => s + i.unit_price * i.quantity, 0);
 
   return (
     <Layout>
@@ -166,55 +140,40 @@ const OrderConfirmation = () => {
             <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>seu pedido</span>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {items.map((item: any, idx: number) => {
-                const product = item.product;
-                const thumb = buildThumbUrl(product?.asset_folder);
-                const qty = Number(item.qty);
-                const unitPrice = Number(item.unit_price);
-                return (
-                  <div key={idx} style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                    {thumb ? (
-                      <img
-                        src={thumb}
-                        alt={product?.name || ''}
-                        style={{ width: 56, height: 56, objectFit: 'cover', filter: 'saturate(0.6)', background: CREME }}
-                      />
-                    ) : (
-                      <div style={{ width: 56, height: 56, background: CREME }} />
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        fontFamily: "'Wagon', sans-serif",
-                        fontSize: '1rem',
-                        color: CHAR,
-                        margin: 0,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}>
-                        {product?.name || 'Produto'}
-                      </p>
-                      <p style={{
-                        fontFamily: "'Sackers Gothic', sans-serif",
-                        fontWeight: 300,
-                        fontSize: '0.7rem',
-                        color: `${CHAR}55`,
-                        margin: '2px 0 0',
-                      }}>
-                        {qty} × R$ {unitPrice.toFixed(2)}
-                      </p>
-                    </div>
-                    <span style={{
+              {items.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{
                       fontFamily: "'Wagon', sans-serif",
-                      fontSize: '0.95rem',
+                      fontSize: '1rem',
                       color: CHAR,
+                      margin: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
                     }}>
-                      R$ {(qty * unitPrice).toFixed(2)}
-                    </span>
+                      {item.product_name}
+                    </p>
+                    <p style={{
+                      fontFamily: "'Sackers Gothic', sans-serif",
+                      fontWeight: 300,
+                      fontSize: '0.7rem',
+                      color: `${CHAR}55`,
+                      margin: '2px 0 0',
+                    }}>
+                      {item.quantity} × R$ {item.unit_price.toFixed(2)}
+                    </p>
                   </div>
-                );
-              })}
+                  <span style={{
+                    fontFamily: "'Wagon', sans-serif",
+                    fontSize: '0.95rem',
+                    color: CHAR,
+                    whiteSpace: 'nowrap',
+                  }}>
+                    R$ {(item.quantity * item.unit_price).toFixed(2)}
+                  </span>
+                </div>
+              ))}
             </div>
 
             <div style={{ borderTop: `1px solid ${CHAR}14`, marginTop: 20, paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -236,58 +195,96 @@ const OrderConfirmation = () => {
             </div>
           </section>
 
-          {/* ── Section 3: Delivery ── */}
+          {/* ── Section 3: Delivery / Pickup ── */}
           <section style={{
             background: CREME,
             padding: 28,
             marginBottom: 40,
           }}>
-            <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>entrega estimada</span>
+            <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>
+              {order.is_pickup ? 'retirada na loja' : 'entrega estimada'}
+            </span>
 
             <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 16 }}>
               <Package size={20} style={{ color: OLIVA, flexShrink: 0, marginTop: 2 }} />
               <div>
-                <p style={{
-                  fontFamily: "'Wagon', sans-serif",
-                  fontSize: '1rem',
-                  color: CHAR,
-                  margin: '0 0 8px',
-                  lineHeight: 1.5,
-                }}>
-                  <strong>5 a 10 dias úteis</strong> após a confirmação do pagamento
-                </p>
-                <p style={{
-                  fontFamily: "'Wagon', sans-serif",
-                  fontSize: '0.9rem',
-                  color: `${CHAR}77`,
-                  margin: '0 0 12px',
-                  lineHeight: 1.6,
-                }}>
-                  seu código de rastreio será enviado para o e-mail cadastrado assim que seu pedido for postado. fique de olho na sua caixa de entrada.
-                </p>
-                <a
-                  href="https://rastreamento.correios.com.br"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    fontFamily: "'Wagon', sans-serif",
-                    fontSize: '0.85rem',
-                    color: OLIVA,
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '3px',
-                  }}
-                >
-                  Acompanhe pelo site oficial dos Correios
-                </a>
-                <p style={{
-                  fontFamily: "'Wagon', sans-serif",
-                  fontSize: '0.8rem',
-                  color: `${CHAR}55`,
-                  margin: '8px 0 0',
-                  lineHeight: 1.5,
-                }}>
-                  Ou acesse a seção 'Meus Pedidos' em nosso site quando disponível.
-                </p>
+                {order.is_pickup ? (
+                  <>
+                    <p style={{
+                      fontFamily: "'Wagon', sans-serif",
+                      fontSize: '1rem',
+                      color: CHAR,
+                      margin: '0 0 8px',
+                      lineHeight: 1.5,
+                    }}>
+                      <strong>até 5 dias úteis</strong> para retirada após confirmação do pagamento
+                    </p>
+                    {order.pickup_address && (
+                      <p style={{
+                        fontFamily: "'Wagon', sans-serif",
+                        fontSize: '0.9rem',
+                        color: `${CHAR}99`,
+                        margin: '0 0 12px',
+                        lineHeight: 1.6,
+                      }}>
+                        endereço para retirada: {order.pickup_address}
+                      </p>
+                    )}
+                    <p style={{
+                      fontFamily: "'Wagon', sans-serif",
+                      fontSize: '0.9rem',
+                      color: `${CHAR}77`,
+                      margin: 0,
+                      lineHeight: 1.6,
+                    }}>
+                      avisaremos por e-mail assim que estiver disponível para retirada.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p style={{
+                      fontFamily: "'Wagon', sans-serif",
+                      fontSize: '1rem',
+                      color: CHAR,
+                      margin: '0 0 8px',
+                      lineHeight: 1.5,
+                    }}>
+                      <strong>5 a 10 dias úteis</strong> após a confirmação do pagamento
+                    </p>
+                    <p style={{
+                      fontFamily: "'Wagon', sans-serif",
+                      fontSize: '0.9rem',
+                      color: `${CHAR}77`,
+                      margin: '0 0 12px',
+                      lineHeight: 1.6,
+                    }}>
+                      seu código de rastreio será enviado para o e-mail cadastrado assim que seu pedido for postado. fique de olho na sua caixa de entrada.
+                    </p>
+                    <a
+                      href="https://rastreamento.correios.com.br"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        fontFamily: "'Wagon', sans-serif",
+                        fontSize: '0.85rem',
+                        color: OLIVA,
+                        textDecoration: 'underline',
+                        textUnderlineOffset: '3px',
+                      }}
+                    >
+                      Acompanhe pelo site oficial dos Correios
+                    </a>
+                    <p style={{
+                      fontFamily: "'Wagon', sans-serif",
+                      fontSize: '0.8rem',
+                      color: `${CHAR}55`,
+                      margin: '8px 0 0',
+                      lineHeight: 1.5,
+                    }}>
+                      Ou acesse a seção 'Meus Pedidos' em nosso site quando disponível.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </section>

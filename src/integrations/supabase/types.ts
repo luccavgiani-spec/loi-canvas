@@ -38,6 +38,48 @@ export type Database = {
         }
         Relationships: []
       }
+      collabs: {
+        Row: {
+          caption: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          images: string[]
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          year: string | null
+        }
+        Insert: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[]
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          year?: string | null
+        }
+        Update: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[]
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          year?: string | null
+        }
+        Relationships: []
+      }
       collections: {
         Row: {
           cover_image: string | null
@@ -208,6 +250,7 @@ export type Database = {
           customer_phone: string | null
           discount: number | null
           id: string
+          is_pickup: boolean
           mp_payment_id: string | null
           mp_preference_id: string | null
           shipping_cost: number | null
@@ -224,6 +267,7 @@ export type Database = {
           customer_phone?: string | null
           discount?: number | null
           id?: string
+          is_pickup?: boolean
           mp_payment_id?: string | null
           mp_preference_id?: string | null
           shipping_cost?: number | null
@@ -240,6 +284,7 @@ export type Database = {
           customer_phone?: string | null
           discount?: number | null
           id?: string
+          is_pickup?: boolean
           mp_payment_id?: string | null
           mp_preference_id?: string | null
           shipping_cost?: number | null
@@ -248,6 +293,24 @@ export type Database = {
           total?: number
           tracking_code?: string | null
           tracking_email_sent_at?: string | null
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
@@ -314,6 +377,7 @@ export type Database = {
         Row: {
           accord: string | null
           asset_folder: string | null
+          bestseller_sort_order: number
           burn_hours: number
           collection_id: string | null
           composition: string | null
@@ -328,7 +392,9 @@ export type Database = {
           ritual: string | null
           sku: string
           slug: string
+          sort_order: number
           status: string | null
+          stock_quantity: number
           suggested_use: string | null
           visible: boolean
           weight_g: number
@@ -336,6 +402,7 @@ export type Database = {
         Insert: {
           accord?: string | null
           asset_folder?: string | null
+          bestseller_sort_order?: number
           burn_hours: number
           collection_id?: string | null
           composition?: string | null
@@ -350,7 +417,9 @@ export type Database = {
           ritual?: string | null
           sku: string
           slug: string
+          sort_order?: number
           status?: string | null
+          stock_quantity?: number
           suggested_use?: string | null
           visible?: boolean
           weight_g: number
@@ -358,6 +427,7 @@ export type Database = {
         Update: {
           accord?: string | null
           asset_folder?: string | null
+          bestseller_sort_order?: number
           burn_hours?: number
           collection_id?: string | null
           composition?: string | null
@@ -372,7 +442,9 @@ export type Database = {
           ritual?: string | null
           sku?: string
           slug?: string
+          sort_order?: number
           status?: string | null
+          stock_quantity?: number
           suggested_use?: string | null
           visible?: boolean
           weight_g?: number

@@ -2,7 +2,7 @@
 import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
 import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
-import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections, mockCollabs } from '@/lib/mocks';
+import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections } from '@/lib/mocks';
 import { supabase } from '@/integrations/supabase/client';
 
 export type AdminProductRow = Tables<'products'> & {
@@ -72,6 +72,7 @@ function mapDbProduct(row: any): Product {
     notes: row.notes ?? '',
     ritual: row.ritual ?? '',
     is_bestseller: row.is_bestseller ?? false,
+    stock_quantity: row.stock_quantity ?? 0,
     images: (row.product_images as { filename: string; sort_order: number }[] | null | undefined ?? [])
       .slice()
       .sort((a, b) => a.sort_order - b.sort_order)
@@ -173,6 +174,7 @@ export const getProductsByCollectionSlug = async (collectionSlug: string): Promi
       .from('products')
       .select('*, collections(name, slug), product_images(filename, sort_order)')
       .eq('collection_id', colRow.id)
+      .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
 
     console.log('[LOIÊ] collection query:', collectionSlug, data?.length, error);
@@ -208,9 +210,24 @@ export const getBestsellerProducts = async (): Promise<Product[]> => {
     .select('*, collections(name, slug), product_images(filename, sort_order)')
     .eq('is_bestseller', true)
     .eq('visible', true)
+    .order('bestseller_sort_order', { ascending: true })
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []).map(mapDbProduct);
+};
+
+// Admin — atualiza bestseller_sort_order de N produtos em batch
+// (usado pela sub-aba "Ordem dos Bestsellers" em ProductsTab).
+export const updateBestsellerSortOrder = async (
+  ordered: { id: string; bestseller_sort_order: number }[],
+): Promise<void> => {
+  const results = await Promise.all(
+    ordered.map(({ id, bestseller_sort_order }) =>
+      supabase.from('products').update({ bestseller_sort_order }).eq('id', id),
+    ),
+  );
+  const firstError = results.find(r => r.error)?.error;
+  if (firstError) throw firstError;
 };
 
 // Collections (query Supabase directly, mock fallback)
@@ -305,7 +322,7 @@ export const quoteShipping = (data: { items: { product_id: string; quantity: num
   fetchApi<ShippingQuote>('/cart/quote-shipping', { method: 'POST', body: JSON.stringify(data) }, { shipping_cost: 19.9, free_shipping_threshold: 299, is_free: false });
 
 // Orders (via Supabase Edge Function)
-export const createOrder = (data: { items: { product_id: string; quantity: number; price: number }[]; customer: { name: string; email: string; phone: string } }) =>
+export const createOrder = (data: { items: { product_id: string; quantity: number; price: number }[]; customer: { name: string; email: string; phone: string }; is_pickup?: boolean }) =>
   callEdgeFunction<{ order_id: string; total: number }>('create-order', data);
 
 // Mercado Pago (via Supabase Edge Function)
@@ -328,7 +345,34 @@ export const processPayment = (data: {
     mp_payment_id: string;
   }>('mp-process-payment', data);
 
-// Order by ID (for confirmation page)
+// Public confirmation page payload (sem PII / sem product_id).
+// Pesa numa edge function `get-order-public` para que orders/order_items
+// possam ter RLS hardened sem quebrar /pedido-confirmado.
+export type PublicOrderConfirmation = {
+  id: string;
+  status: string;
+  total: number;
+  shipping_cost: number;
+  is_pickup: boolean;
+  created_at: string;
+  items: { product_name: string; quantity: number; unit_price: number }[];
+  pickup_address: string | null;
+};
+
+export const getPublicOrderConfirmation = async (
+  orderId: string,
+): Promise<PublicOrderConfirmation> => {
+  const { data, error } = await supabase.functions.invoke<PublicOrderConfirmation>(
+    'get-order-public',
+    { body: { order_id: orderId } },
+  );
+  if (error) throw error;
+  if (!data) throw new Error('Pedido não encontrado');
+  return data;
+};
+
+// Order by ID (admin / fallback). Public confirmation page deve usar
+// getPublicOrderConfirmation acima.
 export const getOrderById = async (orderId: string) => {
   // Fetch order + items (no FK from order_items.product_id → products)
   const { data: order, error } = await supabase
@@ -439,6 +483,34 @@ export const getAdminProducts = async (): Promise<AdminProductRow[]> => {
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []) as AdminProductRow[];
+};
+
+// Admin — produtos de uma coleção, ordenados por sort_order para o drag-and-drop
+export const getAdminProductsByCollection = async (
+  collectionId: string,
+): Promise<AdminProductRow[]> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, product_images(*), collections(id, name, slug)')
+    .eq('collection_id', collectionId)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as AdminProductRow[];
+};
+
+// Persiste a ordem dos produtos em uma coleção. Best-effort: cada update
+// roda em paralelo; se algum falhar, o caller decide como reagir.
+export const updateProductsSortOrder = async (
+  ordered: { id: string; sort_order: number }[],
+): Promise<void> => {
+  const results = await Promise.all(
+    ordered.map(({ id, sort_order }) =>
+      supabase.from('products').update({ sort_order }).eq('id', id),
+    ),
+  );
+  const firstError = results.find(r => r.error)?.error;
+  if (firstError) throw firstError;
 };
 
 export const createAdminProduct = async (
@@ -632,17 +704,98 @@ export const uploadCollectionCover = async (file: File): Promise<string> => {
 };
 
 // Collabs
-export const getAdminCollabs = () =>
-  fetchApi<Collab[]>('/admin/collabs', undefined, mockCollabs);
+function mapDbCollab(row: Tables<'collabs'>): Collab {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    caption: row.caption ?? undefined,
+    description: row.description ?? undefined,
+    category: row.category ?? undefined,
+    year: row.year ?? undefined,
+    images: row.images ?? [],
+    is_active: row.is_active,
+    sort_order: row.sort_order,
+    created_at: row.created_at,
+  };
+}
 
-export const createAdminCollab = (data: Partial<Collab>) =>
-  fetchApi<Collab>('/admin/collabs', { method: 'POST', body: JSON.stringify(data) });
+function collabToDbInsert(data: Partial<Collab>): TablesInsert<'collabs'> {
+  if (!data.slug) throw new Error('slug is required');
+  if (!data.name) throw new Error('name is required');
+  return {
+    slug: data.slug,
+    name: data.name,
+    caption: data.caption ?? null,
+    description: data.description ?? null,
+    category: data.category ?? null,
+    year: data.year ?? null,
+    images: data.images ?? [],
+    is_active: data.is_active ?? true,
+    sort_order: data.sort_order ?? 0,
+  };
+}
 
-export const updateAdminCollab = (id: string, data: Partial<Collab>) =>
-  fetchApi<Collab>(`/admin/collabs/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+function collabToDbUpdate(data: Partial<Collab>): TablesUpdate<'collabs'> {
+  const out: TablesUpdate<'collabs'> = {};
+  if (data.slug !== undefined) out.slug = data.slug;
+  if (data.name !== undefined) out.name = data.name;
+  if (data.caption !== undefined) out.caption = data.caption || null;
+  if (data.description !== undefined) out.description = data.description || null;
+  if (data.category !== undefined) out.category = data.category || null;
+  if (data.year !== undefined) out.year = data.year || null;
+  if (data.images !== undefined) out.images = data.images;
+  if (data.is_active !== undefined) out.is_active = data.is_active;
+  if (data.sort_order !== undefined) out.sort_order = data.sort_order;
+  return out;
+}
 
-export const deleteAdminCollab = (id: string) =>
-  fetchApi<void>(`/admin/collabs/${id}`, { method: 'DELETE' });
+// Public — only active collabs, ordered by sort_order
+export const getCollabs = async (): Promise<Collab[]> => {
+  const { data, error } = await supabase
+    .from('collabs')
+    .select('*')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map(mapDbCollab);
+};
+
+// Admin — returns all collabs
+export const getAdminCollabs = async (): Promise<Collab[]> => {
+  const { data, error } = await supabase
+    .from('collabs')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map(mapDbCollab);
+};
+
+export const createAdminCollab = async (data: Partial<Collab>): Promise<Collab> => {
+  const { data: row, error } = await supabase
+    .from('collabs')
+    .insert(collabToDbInsert(data))
+    .select()
+    .single();
+  if (error) throw error;
+  return mapDbCollab(row);
+};
+
+export const updateAdminCollab = async (id: string, data: Partial<Collab>): Promise<Collab> => {
+  const { data: row, error } = await supabase
+    .from('collabs')
+    .update(collabToDbUpdate(data))
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return mapDbCollab(row);
+};
+
+export const deleteAdminCollab = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('collabs').delete().eq('id', id);
+  if (error) throw error;
+};
 
 // Email — ship order and send tracking email
 export const shipOrder = (orderId: string, trackingCode: string): Promise<{ ok: boolean }> =>

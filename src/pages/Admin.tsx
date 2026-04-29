@@ -3,7 +3,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   getAdminKPIs, getAdminSalesTimeseries, getAdminTopProducts, getAdminOrders, getAdminCustomers,
   getAdminNewsletter, getAdminCoupons, getAdminCollections, getAdminCollabs,
-  getAdminProducts,
+  getAdminProducts, getAdminProductsByCollection, updateProductsSortOrder,
+  updateBestsellerSortOrder,
   createAdminProduct, updateAdminProduct, deleteAdminProduct,
   uploadProductImage, insertProductImage, deleteProductImage, productImagePublicUrl,
   createAdminCollection, updateAdminCollection, deleteAdminCollection,
@@ -14,6 +15,7 @@ import {
   getAdminMensagens,
 } from '@/lib/api';
 import type { AdminProductRow, AdminCollectionRow } from '@/lib/api';
+import { uploadCollabMedia } from '@/lib/storage';
 import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Collab } from '@/types';
 import type { TablesInsert, TablesUpdate, Tables } from '@/integrations/supabase/types';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -27,7 +29,24 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send } from 'lucide-react';
+import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send, GripVertical, ArrowUpDown } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { VideoPlayer } from '@/components/ui/VideoPlayer';
 
 /* ─────────── Shared styles ─────────── */
@@ -89,12 +108,40 @@ function Modal({ open, onClose, title, children }: { open: boolean; onClose: () 
 }
 
 /* ─────────── Image Upload UI ─────────── */
-function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs: string[]) => void }) {
+function ImageUploader({
+  images,
+  onChange,
+  uploadFn,
+}: {
+  images: string[];
+  onChange: (imgs: string[]) => void;
+  uploadFn?: (file: File) => Promise<string>;
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const { toast } = useToast();
 
-  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
+    e.target.value = '';
+    if (uploadFn) {
+      setBusy(true);
+      const accumulated: string[] = [...images];
+      try {
+        for (const file of Array.from(files)) {
+          const url = await uploadFn(file);
+          accumulated.push(url);
+          onChange([...accumulated]);
+        }
+      } catch (err) {
+        console.error('[ImageUploader] upload failed', err);
+        toast({ title: 'Falha no upload da mídia.', variant: 'destructive' });
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     Array.from(files).forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -104,7 +151,6 @@ function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs
       };
       reader.readAsDataURL(file);
     });
-    e.target.value = '';
   };
 
   const handleUrlAdd = () => {
@@ -137,8 +183,8 @@ function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs
       </div>
       <div className="flex gap-2">
         <input ref={fileRef} type="file" accept="image/*,video/mp4" multiple className="hidden" onChange={handleFiles} />
-        <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} className="text-xs gap-1">
-          <Upload size={12} /> Upload
+        <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => fileRef.current?.click()} className="text-xs gap-1">
+          <Upload size={12} /> {busy ? 'Enviando…' : 'Upload'}
         </Button>
         <Button type="button" variant="outline" size="sm" onClick={handleUrlAdd} className="text-xs gap-1">
           <ImageIcon size={12} /> URL
@@ -477,6 +523,7 @@ type ProductFormPayload = {
 
 function ProductsTab() {
   const { toast } = useToast();
+  const [subTab, setSubTab] = useState<'list' | 'bestseller-order'>('list');
   const [products, setProducts] = useState<AdminProductRow[]>([]);
   const [collections, setCollections] = useState<AdminCollectionRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -561,6 +608,27 @@ function ProductsTab() {
 
   return (
     <div>
+      <div className="flex gap-1 mb-4 border-b border-border">
+        <button
+          type="button"
+          onClick={() => setSubTab('list')}
+          className={`px-3 py-2 text-xs font-medium transition-colors ${subTab === 'list' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Lista
+        </button>
+        <button
+          type="button"
+          onClick={() => setSubTab('bestseller-order')}
+          className={`px-3 py-2 text-xs font-medium transition-colors ${subTab === 'bestseller-order' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Ordem dos Bestsellers
+        </button>
+      </div>
+
+      {subTab === 'bestseller-order' ? (
+        <BestsellerProductsOrder products={products} onSaved={() => void reload()} />
+      ) : (
+      <>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-medium">Produtos ({products.length})</h3>
         <Button size="sm" onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1"><Plus size={14} /> Novo Produto</Button>
@@ -631,6 +699,8 @@ function ProductsTab() {
         description="Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita."
         onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
       />
+      </>
+      )}
     </div>
   );
 }
@@ -666,6 +736,7 @@ function ProductForm({
     collection_id: product?.collection_id ?? '',
     visible: product?.visible ?? true,
     is_bestseller: Boolean(product?.is_bestseller),
+    stock_quantity: product?.stock_quantity ?? 0,
   });
   const [existingImages, setExistingImages] = useState<Tables<'product_images'>[]>(
     (product?.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order),
@@ -710,6 +781,7 @@ function ProductForm({
       accord: form.accord || null,
       visible: form.visible,
       is_bestseller: Boolean(form.is_bestseller),
+      stock_quantity: Number(form.stock_quantity) || 0,
     };
     onSave({ insert, newFiles, removedImageIds });
   };
@@ -779,7 +851,7 @@ function ProductForm({
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ritual</label>
         <textarea value={form.ritual} onChange={e => setForm(f => ({ ...f, ritual: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
       </div>
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-6 flex-wrap">
         <div className="flex items-center gap-2">
           <Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} />
           <label className="text-sm">Visível</label>
@@ -787,6 +859,17 @@ function ProductForm({
         <div className="flex items-center gap-2">
           <Switch checked={form.is_bestseller} onCheckedChange={v => setForm(f => ({ ...f, is_bestseller: v }))} />
           <label className="text-sm">Bestseller</label>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-muted-foreground uppercase tracking-wider">Estoque</label>
+          <Input
+            type="number"
+            min="0"
+            step="1"
+            className="w-24"
+            value={form.stock_quantity}
+            onChange={e => setForm(f => ({ ...f, stock_quantity: Number(e.target.value) }))}
+          />
         </div>
       </div>
 
@@ -862,6 +945,7 @@ function CollectionsTab() {
   const [editing, setEditing] = useState<AdminCollectionRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminCollectionRow | null>(null);
   const [saving, setSaving] = useState(false);
+  const [orderTarget, setOrderTarget] = useState<AdminCollectionRow | null>(null);
 
   const reload = async () => {
     setLoading(true);
@@ -952,12 +1036,26 @@ function CollectionsTab() {
               </div>
               <div className="flex gap-2 mt-3 pt-3 border-t border-border">
                 <button onClick={() => openEdit(c)} className="text-xs text-accent hover:underline flex items-center gap-1"><Pencil size={12} /> Editar</button>
+                <button onClick={() => setOrderTarget(c)} className="text-xs text-accent hover:underline flex items-center gap-1"><ArrowUpDown size={12} /> Ordenar produtos</button>
                 <button onClick={() => setDeleteTarget(c)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <Modal
+        open={!!orderTarget}
+        onClose={() => setOrderTarget(null)}
+        title={orderTarget ? `Ordenar produtos — ${orderTarget.name}` : 'Ordenar produtos'}
+      >
+        {orderTarget && (
+          <CollectionProductsOrder
+            collectionId={orderTarget.id}
+            onClose={() => setOrderTarget(null)}
+          />
+        )}
+      </Modal>
 
       <Modal open={modalOpen} onClose={() => !saving && setModalOpen(false)} title={editing ? 'Editar Coleção' : 'Nova Coleção'}>
         <CollectionForm
@@ -1121,6 +1219,247 @@ function CollectionForm({
   );
 }
 
+/* ═══════════ COLLECTION PRODUCTS ORDER (drag-and-drop) ═══════════ */
+type OrderItem = { id: string; name: string; sku: string; thumbnail: string | null };
+
+function SortableProductRow({ item }: { item: OrderItem }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 p-2 border border-border rounded bg-card"
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+        aria-label="Arrastar"
+      >
+        <GripVertical size={16} />
+      </button>
+      <div className="w-10 h-10 flex-shrink-0 rounded overflow-hidden bg-muted">
+        {item.thumbnail ? (
+          <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
+        ) : null}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm truncate">{item.name}</p>
+        <p className="text-xs text-muted-foreground font-mono truncate">{item.sku}</p>
+      </div>
+    </div>
+  );
+}
+
+function CollectionProductsOrder({ collectionId, onClose }: { collectionId: string; onClose: () => void }) {
+  const { toast } = useToast();
+  const [items, setItems] = useState<OrderItem[]>([]);
+  const [originalIds, setOriginalIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    getAdminProductsByCollection(collectionId)
+      .then(rows => {
+        if (cancelled) return;
+        const mapped: OrderItem[] = rows.map(r => {
+          const firstImg = (r.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order)[0];
+          return {
+            id: r.id,
+            name: r.name,
+            sku: r.sku ?? '',
+            thumbnail: firstImg ? productImagePublicUrl(firstImg.filename) : null,
+          };
+        });
+        setItems(mapped);
+        setOriginalIds(mapped.map(m => m.id));
+      })
+      .catch(err => {
+        console.error('[CollectionProductsOrder] load failed', err);
+        toast({ title: 'Erro ao carregar produtos da coleção.', variant: 'destructive' });
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [collectionId, toast]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setItems(prev => {
+      const oldIndex = prev.findIndex(p => p.id === active.id);
+      const newIndex = prev.findIndex(p => p.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  };
+
+  const dirty = items.some((it, idx) => originalIds[idx] !== it.id);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const ordered = items.map((it, idx) => ({ id: it.id, sort_order: idx }));
+      await updateProductsSortOrder(ordered);
+      setOriginalIds(items.map(i => i.id));
+      toast({ title: 'Ordem salva com sucesso.' });
+      onClose();
+    } catch (err) {
+      console.error('[CollectionProductsOrder] save failed', err);
+      toast({ title: 'Erro ao salvar ordem. Alguns produtos podem não ter sido atualizados.', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14" />)}</div>;
+  }
+
+  if (items.length === 0) {
+    return <p className="text-sm text-muted-foreground py-4">Nenhum produto vinculado a esta coleção.</p>;
+  }
+
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground mb-3">
+        Arraste para reordenar. A ordem definida aqui aparece na página pública da coleção.
+      </p>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+            {items.map(item => <SortableProductRow key={item.id} item={item} />)}
+          </div>
+        </SortableContext>
+      </DndContext>
+      <div className="flex gap-2 pt-4 mt-4 border-t border-border">
+        <Button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !dirty}
+          className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          {saving ? 'Salvando…' : 'Salvar ordem'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════ BESTSELLER ORDER (drag-and-drop) ═══════════ */
+function BestsellerProductsOrder({ products, onSaved }: { products: AdminProductRow[]; onSaved: () => void }) {
+  const { toast } = useToast();
+  const [items, setItems] = useState<OrderItem[]>([]);
+  const [originalIds, setOriginalIds] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  useEffect(() => {
+    const bestsellers = products
+      .filter(p => p.is_bestseller)
+      .slice()
+      .sort((a, b) => {
+        const ao = a.bestseller_sort_order ?? 0;
+        const bo = b.bestseller_sort_order ?? 0;
+        if (ao !== bo) return ao - bo;
+        // Tie-break: created_at desc (mantem o default antigo)
+        return (b.created_at ?? '').localeCompare(a.created_at ?? '');
+      });
+    const mapped: OrderItem[] = bestsellers.map(p => {
+      const firstImg = (p.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order)[0];
+      return {
+        id: p.id,
+        name: p.name,
+        sku: p.sku ?? '',
+        thumbnail: firstImg ? productImagePublicUrl(firstImg.filename) : null,
+      };
+    });
+    setItems(mapped);
+    setOriginalIds(mapped.map(m => m.id));
+  }, [products]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setItems(prev => {
+      const oldIndex = prev.findIndex(p => p.id === active.id);
+      const newIndex = prev.findIndex(p => p.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  };
+
+  const dirty = items.some((it, idx) => originalIds[idx] !== it.id);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const ordered = items.map((it, idx) => ({ id: it.id, bestseller_sort_order: idx }));
+      await updateBestsellerSortOrder(ordered);
+      setOriginalIds(items.map(i => i.id));
+      toast({ title: 'Ordem dos bestsellers salva.' });
+      onSaved();
+    } catch (err) {
+      console.error('[BestsellerProductsOrder] save failed', err);
+      toast({ title: 'Erro ao salvar ordem. Alguns produtos podem não ter sido atualizados.', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (items.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground py-4">
+        Nenhum produto marcado como bestseller. Marque a flag "Bestseller" em algum produto para começar.
+      </p>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground mb-3">
+        Arraste para reordenar os {items.length} bestsellers. A ordem é usada por <code>getBestsellerProducts</code>.
+      </p>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+            {items.map(item => <SortableProductRow key={item.id} item={item} />)}
+          </div>
+        </SortableContext>
+      </DndContext>
+      <div className="flex gap-2 pt-4 mt-4 border-t border-border">
+        <Button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !dirty}
+          className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          {saving ? 'Salvando…' : 'Salvar ordem'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════ COLLABS ═══════════ */
 function CollabsTab() {
   const { toast } = useToast();
@@ -1129,31 +1468,53 @@ function CollabsTab() {
   const [editing, setEditing] = useState<Collab | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  useEffect(() => { getAdminCollabs().then(setCollabs); }, []);
+  useEffect(() => {
+    getAdminCollabs()
+      .then(setCollabs)
+      .catch(err => {
+        console.error('[CollabsTab] load failed', err);
+        toast({ title: 'Erro ao carregar collabs.', variant: 'destructive' });
+      });
+  }, [toast]);
 
   const openNew = () => { setEditing(null); setModalOpen(true); };
   const openEdit = (c: Collab) => { setEditing(c); setModalOpen(true); };
 
   const handleDelete = async (id: string) => {
-    try { await deleteAdminCollab(id); } catch { /* mock */ }
-    setCollabs(prev => prev.filter(c => c.id !== id));
-    setDeleteTarget(null);
-    toast({ title: 'Collab excluída com sucesso.' });
+    try {
+      await deleteAdminCollab(id);
+      setCollabs(prev => prev.filter(c => c.id !== id));
+      setDeleteTarget(null);
+      toast({ title: 'Collab excluída com sucesso.' });
+    } catch (err) {
+      console.error('[CollabsTab] delete failed', err);
+      toast({ title: 'Erro ao excluir collab.', variant: 'destructive' });
+    }
   };
 
   const handleSave = async (data: Partial<Collab>) => {
     try {
       if (editing) {
-        try { await updateAdminCollab(editing.id, data); } catch { /* mock */ }
-        setCollabs(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Collab : c));
+        const updated = await updateAdminCollab(editing.id, data);
+        setCollabs(prev => prev.map(c => (c.id === editing.id ? updated : c)));
       } else {
-        const newC = { ...data, id: `cb-${Date.now()}`, is_active: true, sort_order: collabs.length, created_at: new Date().toISOString().split('T')[0] } as Collab;
-        try { await createAdminCollab(data); } catch { /* mock */ }
-        setCollabs(prev => [...prev, newC]);
+        // Sempre adiciona ao fim. Inserir manualmente em uma posição
+        // intermediaria duplicaria sort_order de alguma collab existente
+        // e quebrava a renderizacao da home (chave React duplicada).
+        // Reordenacao posterior via edicao explicita do campo Ordem.
+        const nextSortOrder = collabs.length === 0
+          ? 0
+          : Math.max(...collabs.map(c => c.sort_order)) + 1;
+        const created = await createAdminCollab({
+          ...data,
+          sort_order: nextSortOrder,
+        });
+        setCollabs(prev => [...prev, created]);
       }
       setModalOpen(false);
       toast({ title: editing ? 'Collab atualizada com sucesso.' : 'Collab criada com sucesso.' });
-    } catch {
+    } catch (err) {
+      console.error('[CollabsTab] save failed', err);
       toast({ title: 'Erro ao salvar collab.', variant: 'destructive' });
     }
   };
@@ -1223,6 +1584,8 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
     slug: collab?.slug || '',
     caption: collab?.caption || '',
     description: collab?.description || '',
+    category: collab?.category || '',
+    year: collab?.year || '',
     images: collab?.images || [] as string[],
     is_active: collab?.is_active ?? true,
     sort_order: collab?.sort_order ?? 0,
@@ -1245,6 +1608,16 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Slug</label>
         <Input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} required />
       </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Categoria</label>
+          <Input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="ex: kit de imprensa" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ano</label>
+          <Input value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} placeholder="ex: 2023" />
+        </div>
+      </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Legenda curta</label>
         <Input value={form.caption} onChange={e => setForm(f => ({ ...f, caption: e.target.value }))} placeholder="ex: Vasos artesanais × Loiê" />
@@ -1255,17 +1628,23 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
       </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Mídias (imagens / vídeos)</label>
-        <ImageUploader images={form.images} onChange={imgs => setForm(f => ({ ...f, images: imgs }))} />
+        <ImageUploader
+          images={form.images}
+          onChange={imgs => setForm(f => ({ ...f, images: imgs }))}
+          uploadFn={uploadCollabMedia}
+        />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">
           <Switch checked={form.is_active} onCheckedChange={v => setForm(f => ({ ...f, is_active: v }))} />
           <label className="text-sm">Ativa</label>
         </div>
-        <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ordem</label>
-          <Input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
-        </div>
+        {collab && (
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ordem</label>
+            <Input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
+          </div>
+        )}
       </div>
       <div className="flex gap-2 pt-2">
         <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{collab ? 'Salvar' : 'Criar'}</Button>

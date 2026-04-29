@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
-import { createOrder, processPayment } from '@/lib/api';
+import { createOrder, processPayment, getPublicOrderConfirmation } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 import {
   MP_PUBLIC_KEY,
   DEFAULT_FREE_SHIPPING_THRESHOLD,
@@ -33,6 +34,20 @@ const customerSchema = z.object({
   neighborhood: z.string().trim().min(1, 'Bairro obrigatório'),
   city:         z.string().trim().min(1, 'Cidade obrigatória'),
   state:        z.string().trim().min(1, 'Estado obrigatório'),
+});
+
+// Schema reduzido para retirada na loja: dispensa endereço.
+const pickupCustomerSchema = z.object({
+  firstName: z.string().trim().min(1, 'Nome obrigatório').max(100),
+  lastName:  z.string().trim().min(1, 'Sobrenome obrigatório').max(100),
+  email:     z.string().trim().email('E-mail inválido').max(255),
+  phone:     z.string().trim().min(10, 'Telefone inválido').max(20),
+  cep:          z.string().default(''),
+  street:       z.string().default(''),
+  number:       z.string().default(''),
+  neighborhood: z.string().default(''),
+  city:         z.string().default(''),
+  state:        z.string().default(''),
 });
 
 type CheckoutStep = 'form' | 'payment' | 'processing' | 'success' | 'error';
@@ -461,6 +476,7 @@ const CardForm = ({
 const Checkout = () => {
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [step, setStep] = useState<CheckoutStep>('form');
   const [form, setForm] = useState({
     firstName: '', lastName: '',
@@ -483,6 +499,51 @@ const Checkout = () => {
     return () => window.removeEventListener('resize', handler);
   }, []);
 
+  // Polling pos-pagamento Pix: chama get-order-public a cada 3s ate
+  // status='paid' (mp-webhook atualiza). Timeout 5 min. Card aprovado
+  // ja redireciona direto em handleCardSuccess; cartao 'em analise' nao
+  // entra aqui (vai para tela de erro).
+  useEffect(() => {
+    if (!pixData || !orderId) return;
+
+    let cancelled = false;
+    const startedAt = Date.now();
+    const TIMEOUT_MS = 5 * 60 * 1000;
+    let timedOut = false;
+
+    const interval = setInterval(async () => {
+      if (cancelled) return;
+      if (Date.now() - startedAt > TIMEOUT_MS) {
+        timedOut = true;
+        clearInterval(interval);
+        toast({
+          title: 'Pagamento ainda não confirmado.',
+          description: 'Verifique seu email ou recarregue a página em alguns instantes.',
+        });
+        return;
+      }
+      try {
+        const order = await getPublicOrderConfirmation(orderId);
+        if (cancelled) return;
+        if (order.status === 'paid') {
+          clearInterval(interval);
+          clear();
+          navigate(`/pedido-confirmado?order_id=${orderId}`);
+        }
+      } catch (err) {
+        // Falha transitoria — proximo tick tenta de novo. Sem toast spam.
+        console.warn('[checkout polling] tick failed', err);
+      }
+    }, 3000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      // Apenas evita warning de unused — sinaliza intencao do flag.
+      void timedOut;
+    };
+  }, [pixData, orderId, clear, navigate, toast]);
+
   const { amount: freeShippingThreshold } = useSetting<{ amount: number }>(
     'free_shipping_threshold',
     { amount: DEFAULT_FREE_SHIPPING_THRESHOLD },
@@ -491,16 +552,25 @@ const Checkout = () => {
     'shipping_flat_rate',
     { amount: DEFAULT_SHIPPING_FLAT_RATE },
   );
-  const shipping = subtotal >= freeShippingThreshold ? 0 : shippingFlatRate;
+  const { address: pickupAddress } = useSetting<{ address: string }>(
+    'pickup_address',
+    { address: '(endereço a definir)' },
+  );
+  const [isPickup, setIsPickup] = useState(false);
+  const shipping = isPickup
+    ? 0
+    : (subtotal >= freeShippingThreshold ? 0 : shippingFlatRate);
   const total = subtotal + shipping;
 
-  const isFormComplete = !!(
-    form.firstName.trim() && form.lastName.trim() &&
-    form.email.trim() && form.phone.trim() &&
-    form.cep.replace(/\D/g, '').length >= 8 &&
-    form.street.trim() && form.number.trim() &&
-    form.neighborhood.trim() && form.city.trim() && form.state.trim()
-  );
+  const isFormComplete = isPickup
+    ? !!(form.firstName.trim() && form.lastName.trim() && form.email.trim() && form.phone.trim())
+    : !!(
+        form.firstName.trim() && form.lastName.trim() &&
+        form.email.trim() && form.phone.trim() &&
+        form.cep.replace(/\D/g, '').length >= 8 &&
+        form.street.trim() && form.number.trim() &&
+        form.neighborhood.trim() && form.city.trim() && form.state.trim()
+      );
 
   const handleCepChange = (raw: string) => {
     const digits = raw.replace(/\D/g, '').slice(0, 8);
@@ -547,7 +617,8 @@ const Checkout = () => {
   };
 
   const handleContinueToPayment = async () => {
-    const result = customerSchema.safeParse(form);
+    const schema = isPickup ? pickupCustomerSchema : customerSchema;
+    const result = schema.safeParse(form);
     if (!result.success) {
       const errs: Record<string, string> = {};
       result.error.errors.forEach(e => { errs[e.path[0] as string] = e.message; });
@@ -564,6 +635,7 @@ const Checkout = () => {
       }));
       const orderRes = await createOrder({
         items: orderItems,
+        is_pickup: isPickup,
         customer: {
           name: `${result.data.firstName} ${result.data.lastName}`,
           email: result.data.email,
@@ -712,7 +784,9 @@ const Checkout = () => {
           <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>R$ {subtotal.toFixed(2)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>Frete</span>
+          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>
+            {isPickup ? 'Retirada na loja' : 'Frete'}
+          </span>
           <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000000' }}>
             {shipping === 0 ? 'Grátis' : `R$ ${shipping.toFixed(2)}`}
           </span>
@@ -782,7 +856,42 @@ const Checkout = () => {
 
               <div style={{ height: 1, background: `${CHAR}11` }} />
 
+              {/* ── Retirada na loja ── */}
+              <section>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 12,
+                    cursor: 'pointer',
+                    padding: 16,
+                    border: `1px solid ${CHAR}22`,
+                    borderRadius: 4,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isPickup}
+                    onChange={e => setIsPickup(e.target.checked)}
+                    style={{ marginTop: 4, flexShrink: 0 }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: '#000', marginBottom: 4 }}>
+                      retirar na loja (R$ 0,00 · até 5 dias úteis)
+                    </div>
+                    {isPickup && (
+                      <div style={{ fontFamily: "'Wagon', sans-serif", fontSize: '0.95rem', color: `${CHAR}aa`, lineHeight: 1.5 }}>
+                        endereço para retirada: {pickupAddress}
+                      </div>
+                    )}
+                  </div>
+                </label>
+              </section>
+
+              {!isPickup && <div style={{ height: 1, background: `${CHAR}11` }} />}
+
               {/* ── Endereço de entrega ── */}
+              {!isPickup && (
               <section>
                 <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>endereço de entrega</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -847,6 +956,7 @@ const Checkout = () => {
 
                 </div>
               </section>
+              )}
 
               <div style={{ height: 1, background: `${CHAR}11` }} />
 

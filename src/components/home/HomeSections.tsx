@@ -1,14 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
-import { getProducts } from '@/lib/api';
-import { storageUrl, collabsUrl } from '@/lib/storage';
+import { getProducts, getCollabs, getBestsellerProducts } from '@/lib/api';
+import { storageUrl } from '@/lib/storage';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/LazyVideo';
 import ArrowLink from '@/components/ui/ArrowLink';
-import BestsellersSection from '@/components/home/BestsellersSection';
-import type { Product } from '@/types';
+import type { Product, Collab } from '@/types';
 
 /* ── Horizontal carousel with snap scrolling ── */
 const ProductCarousel = memo(({
@@ -262,50 +261,7 @@ const ProductFocusBanner = memo(({
 ProductFocusBanner.displayName = 'ProductFocusBanner';
 
 /* ── Collabs grid item with lazy rotating images ── */
-const COLLAB_ITEMS = [
-  {
-    slug: 'natura',
-    category: 'kit de imprensa',
-    name: 'Natura',
-    year: '2022',
-    description: 'oito velas aromáticas criadas como extensão sensorial para o kit de imprensa do lançamento de produtos de cuidado corporal da natura.',
-    images: [collabsUrl('natura.jpeg')],
-  },
-  {
-    slug: 'salon-line',
-    category: 'kit de imprensa',
-    name: 'Salon Line',
-    year: '2021',
-    description: 'velas pensadas como gesto de acolhimento e atmosfera de autocuidado para o kit dos embaixadores da salon line no "reencontrinho".',
-    images: [collabsUrl('salon_line (1).jpeg'), collabsUrl('salon_line (2).jpeg'), collabsUrl('salon_line (3).jpeg')],
-  },
-  {
-    slug: 'malu-muhamad',
-    category: 'desenvolvidos em colaboração',
-    name: 'Malu Muhamad',
-    year: '2022',
-    description: 'vasos produzidos em pequenos lotes em colaboração com a ceramista malu muhamad, pensados com atenção à forma, à matéria e ao gesto manual.',
-    images: [collabsUrl('malu (1).jpeg'), collabsUrl('malu (2).jpeg'), collabsUrl('malu (3).jpeg'), collabsUrl('malu (4).jpeg')],
-  },
-  {
-    slug: 'neco-cunha',
-    category: 'desenvolvidos em colaboração',
-    name: 'Neco Cunha',
-    year: '2023',
-    description: 'porta-velas em marchetaria com madeiras nobres, criados em colaboração com o artista regional neco cunha.',
-    images: [collabsUrl('neco (1).jpeg'), collabsUrl('neco (2).jpeg'), collabsUrl('neco (3).jpeg'), collabsUrl('neco (4).jpeg')],
-  },
-  {
-    slug: 'canal-concept',
-    category: 'kit de imprensa',
-    name: 'Canal Concept',
-    year: '2023',
-    description: 'vela aromática desenvolvida para evento da canal concept, distribuída entre colaboradores, clientes e parceiros.',
-    images: [collabsUrl('concept.jpeg')],
-  },
-];
-
-const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
+const CollabCard = memo(({ collab }: { collab: Collab }) => {
   const [currentImage, setCurrentImage] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -325,7 +281,7 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
 
   /* Rotate images only when visible */
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible || collab.images.length === 0) return;
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % collab.images.length);
     }, 3000);
@@ -356,18 +312,24 @@ const CollabCard = memo(({ collab }: { collab: typeof COLLAB_ITEMS[0] }) => {
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)' }}
           />
         </div>
-        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.45)', marginBottom: 5, lineHeight: 1.5 }}>
-          {collab.category}
-        </p>
+        {collab.category && (
+          <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(0,0,0,0.45)', marginBottom: 5, lineHeight: 1.5 }}>
+            {collab.category}
+          </p>
+        )}
         <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 400, fontSize: '0.75rem', letterSpacing: '0.12em', color: '#000', marginBottom: 2, lineHeight: 1.3 }}>
           {collab.name}
         </p>
-        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(0,0,0,0.45)', marginBottom: 8 }}>
-          {collab.year}
-        </p>
-        <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.05em', color: 'rgba(0,0,0,0.55)', lineHeight: 1.7, marginBottom: 12, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-          {collab.description}
-        </p>
+        {collab.year && (
+          <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(0,0,0,0.45)', marginBottom: 8 }}>
+            {collab.year}
+          </p>
+        )}
+        {collab.description && (
+          <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.05em', color: 'rgba(0,0,0,0.55)', lineHeight: 1.7, marginBottom: 12, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            {collab.description}
+          </p>
+        )}
       </Link>
       <Link to={`/collabs#${collab.slug}`}>
         <ArrowLink>
@@ -383,15 +345,23 @@ CollabCard.displayName = 'CollabCard';
 
 /* ── Circular collab carousel – button-driven, no scrollbar ── */
 const CLONE_COUNT = 3; // clones appended for seamless loop (SHOW - 1)
-const COLLAB_EXTENDED = [...COLLAB_ITEMS, ...COLLAB_ITEMS.slice(0, CLONE_COUNT)];
 
 const CollabCarousel = memo(() => {
-  const N = COLLAB_ITEMS.length;
+  const [items, setItems] = useState<Collab[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const posRef = useRef(0);
   const lockRef = useRef(false);
   const [cardWidth, setCardWidth] = useState<number | null>(null);
+
+  useEffect(() => {
+    getCollabs()
+      .then(setItems)
+      .catch(err => console.error('[CollabCarousel] load failed', err));
+  }, []);
+
+  const N = items.length;
+  const extended = N > 0 ? [...items, ...items.slice(0, Math.min(CLONE_COUNT, N))] : [];
 
   useEffect(() => {
     const compute = () => {
@@ -415,7 +385,7 @@ const CollabCarousel = memo(() => {
   }, []);
 
   const advance = useCallback(() => {
-    if (lockRef.current || cardWidth === null) return;
+    if (lockRef.current || cardWidth === null || N === 0) return;
     lockRef.current = true;
     const track = trackRef.current;
     if (!track) { lockRef.current = false; return; }
@@ -440,12 +410,14 @@ const CollabCarousel = memo(() => {
     }
   }, [cardWidth, N]);
 
+  if (N === 0) return null;
+
   return (
     <div style={{ position: 'relative' }}>
       {/* overflow:hidden lives here so the button is never clipped */}
       <div ref={containerRef} style={{ overflow: 'hidden' }}>
         <div ref={trackRef} style={{ display: 'flex', gap: '1.5rem' }}>
-          {COLLAB_EXTENDED.map((collab, i) => (
+          {extended.map((collab, i) => (
             <div
               key={`${collab.slug}-${i}`}
               style={{ flexShrink: 0, width: cardWidth !== null ? cardWidth : 'calc(25% - 1.125rem)' }}
@@ -473,6 +445,7 @@ CollabCarousel.displayName = 'CollabCarousel';
 const HomeSections = () => {
   const { addItem } = useCart();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [bestsellers, setBestsellers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const ref = useReveal(0.15, [loading]);
 
@@ -482,12 +455,12 @@ const HomeSections = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const salaOuEstar = allProducts
-    .filter((p) =>
-      p.collection?.toLowerCase().includes('sala') ||
-      p.collection_slug === 'sala-ou-estar'
-    )
-    .slice(0, 6);
+  useEffect(() => {
+    getBestsellerProducts()
+      .then(setBestsellers)
+      .catch(err => console.error('[HomeSections] bestsellers load failed', err));
+  }, []);
+
   const refugio = allProducts
     .filter((p) =>
       p.collection?.toLowerCase().includes('ref') ||
@@ -507,10 +480,8 @@ const HomeSections = () => {
         }}
       />
 
-      {/* ── Bestsellers — produtos com flag is_bestseller ── */}
-      <BestsellersSection />
-
-      {/* ── 1. Mais pedidas — Carousel ── */}
+      {/* ── 1. Mais pedidas — Carousel (consome is_bestseller + bestseller_sort_order) ── */}
+      {bestsellers.length > 0 && (
       <section className="py-16 px-6 md:py-0 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
@@ -531,15 +502,11 @@ const HomeSections = () => {
             </h2>
           </div>
           <div className="reveal">
-            <ProductCarousel products={salaOuEstar} addItem={addItem} />
-          </div>
-          <div className="reveal text-center mt-10">
-            <Link to="/colecoes/sala-ou-estar">
-              <ArrowLink>ver toda a coleção</ArrowLink>
-            </Link>
+            <ProductCarousel products={bestsellers} addItem={addItem} />
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Separador cream → cream (sutil) ── */}
       <div style={{ height: 'clamp(40px, 6vw, 80px)', background: '#f4edd2' }} />
