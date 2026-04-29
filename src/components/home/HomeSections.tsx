@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
-import { getProducts, getCollabs } from '@/lib/api';
+import { getProducts, getCollabs, getBestsellerProducts } from '@/lib/api';
 import { storageUrl } from '@/lib/storage';
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -445,6 +445,7 @@ CollabCarousel.displayName = 'CollabCarousel';
 const HomeSections = () => {
   const { addItem } = useCart();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [bestsellers, setBestsellers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const ref = useReveal(0.15, [loading]);
 
@@ -454,12 +455,12 @@ const HomeSections = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const salaOuEstar = allProducts
-    .filter((p) =>
-      p.collection?.toLowerCase().includes('sala') ||
-      p.collection_slug === 'sala-ou-estar'
-    )
-    .slice(0, 6);
+  useEffect(() => {
+    getBestsellerProducts()
+      .then(setBestsellers)
+      .catch(err => console.error('[HomeSections] bestsellers load failed', err));
+  }, []);
+
   const refugio = allProducts
     .filter((p) =>
       p.collection?.toLowerCase().includes('ref') ||
@@ -479,7 +480,8 @@ const HomeSections = () => {
         }}
       />
 
-      {/* ── 1. Mais pedidas — Carousel ── */}
+      {/* ── 1. Mais pedidas — Carousel (consome is_bestseller + bestseller_sort_order) ── */}
+      {bestsellers.length > 0 && (
       <section className="py-16 px-6 md:py-0 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
@@ -500,15 +502,11 @@ const HomeSections = () => {
             </h2>
           </div>
           <div className="reveal">
-            <ProductCarousel products={salaOuEstar} addItem={addItem} />
-          </div>
-          <div className="reveal text-center mt-10">
-            <Link to="/colecoes/sala-ou-estar">
-              <ArrowLink>ver toda a coleção</ArrowLink>
-            </Link>
+            <ProductCarousel products={bestsellers} addItem={addItem} />
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Separador cream → cream (sutil) ── */}
       <div style={{ height: 'clamp(40px, 6vw, 80px)', background: '#f4edd2' }} />
