@@ -250,6 +250,7 @@ export type Database = {
           customer_phone: string | null
           discount: number | null
           id: string
+          is_pickup: boolean
           mp_payment_id: string | null
           mp_preference_id: string | null
           shipping_cost: number | null
@@ -266,6 +267,7 @@ export type Database = {
           customer_phone?: string | null
           discount?: number | null
           id?: string
+          is_pickup?: boolean
           mp_payment_id?: string | null
           mp_preference_id?: string | null
           shipping_cost?: number | null
@@ -282,6 +284,7 @@ export type Database = {
           customer_phone?: string | null
           discount?: number | null
           id?: string
+          is_pickup?: boolean
           mp_payment_id?: string | null
           mp_preference_id?: string | null
           shipping_cost?: number | null
@@ -290,6 +293,24 @@ export type Database = {
           total?: number
           tracking_code?: string | null
           tracking_email_sent_at?: string | null
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
