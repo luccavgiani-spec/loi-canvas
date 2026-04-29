@@ -664,7 +664,6 @@ function ProductForm({
     weight_g: product?.weight_g ?? 0,
     burn_hours: product?.burn_hours ?? 0,
     collection_id: product?.collection_id ?? '',
-    status: product?.status ?? '',
     visible: product?.visible ?? true,
     is_bestseller: product?.is_bestseller ?? false,
   });
@@ -709,7 +708,6 @@ function ProductForm({
       notes: form.notes || null,
       ritual: form.ritual || null,
       accord: form.accord || null,
-      status: form.status || null,
       visible: form.visible,
       is_bestseller: form.is_bestseller,
     };
@@ -750,18 +748,12 @@ function ProductForm({
           <Input type="number" min="0" step="1" value={form.burn_hours} onChange={e => setForm(f => ({ ...f, burn_hours: Number(e.target.value) }))} required />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Coleção</label>
-          <select value={form.collection_id} onChange={e => setForm(f => ({ ...f, collection_id: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent">
-            <option value="">Sem coleção</option>
-            {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Status</label>
-          <Input value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))} placeholder="ex: active, draft" />
-        </div>
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Coleção</label>
+        <select value={form.collection_id} onChange={e => setForm(f => ({ ...f, collection_id: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent">
+          <option value="">Sem coleção</option>
+          {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
       </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Acorde</label>
