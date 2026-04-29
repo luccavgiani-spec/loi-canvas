@@ -173,6 +173,7 @@ export const getProductsByCollectionSlug = async (collectionSlug: string): Promi
       .from('products')
       .select('*, collections(name, slug), product_images(filename, sort_order)')
       .eq('collection_id', colRow.id)
+      .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
 
     console.log('[LOIÊ] collection query:', collectionSlug, data?.length, error);
@@ -439,6 +440,34 @@ export const getAdminProducts = async (): Promise<AdminProductRow[]> => {
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []) as AdminProductRow[];
+};
+
+// Admin — produtos de uma coleção, ordenados por sort_order para o drag-and-drop
+export const getAdminProductsByCollection = async (
+  collectionId: string,
+): Promise<AdminProductRow[]> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, product_images(*), collections(id, name, slug)')
+    .eq('collection_id', collectionId)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as AdminProductRow[];
+};
+
+// Persiste a ordem dos produtos em uma coleção. Best-effort: cada update
+// roda em paralelo; se algum falhar, o caller decide como reagir.
+export const updateProductsSortOrder = async (
+  ordered: { id: string; sort_order: number }[],
+): Promise<void> => {
+  const results = await Promise.all(
+    ordered.map(({ id, sort_order }) =>
+      supabase.from('products').update({ sort_order }).eq('id', id),
+    ),
+  );
+  const firstError = results.find(r => r.error)?.error;
+  if (firstError) throw firstError;
 };
 
 export const createAdminProduct = async (

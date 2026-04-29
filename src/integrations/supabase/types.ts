@@ -370,6 +370,7 @@ export type Database = {
           ritual: string | null
           sku: string
           slug: string
+          sort_order: number
           status: string | null
           suggested_use: string | null
           visible: boolean
@@ -392,6 +393,7 @@ export type Database = {
           ritual?: string | null
           sku: string
           slug: string
+          sort_order?: number
           status?: string | null
           suggested_use?: string | null
           visible?: boolean
@@ -414,6 +416,7 @@ export type Database = {
           ritual?: string | null
           sku?: string
           slug?: string
+          sort_order?: number
           status?: string | null
           suggested_use?: string | null
           visible?: boolean
