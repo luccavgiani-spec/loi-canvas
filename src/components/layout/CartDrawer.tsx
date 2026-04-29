@@ -2,16 +2,21 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { useCart } from '@/contexts/CartContext';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { FREE_SHIPPING_THRESHOLD } from '@/config';
+import { DEFAULT_FREE_SHIPPING_THRESHOLD } from '@/config';
 import { getProducts } from '@/lib/api';
 import { useState, useEffect } from 'react';
 import type { Product } from '@/types';
+import { useSetting } from '@/hooks/useSetting';
 
 const CartDrawer = () => {
   const { items, isOpen, setIsOpen, removeItem, updateQty, subtotal } = useCart();
   const navigate = useNavigate();
-  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-  const progress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+  const { amount: freeShippingThreshold } = useSetting<{ amount: number }>(
+    'free_shipping_threshold',
+    { amount: DEFAULT_FREE_SHIPPING_THRESHOLD },
+  );
+  const remaining = Math.max(0, freeShippingThreshold - subtotal);
+  const progress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
 
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   useEffect(() => {

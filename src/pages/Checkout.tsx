@@ -4,10 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
 import { createOrder, processPayment } from '@/lib/api';
-import { MP_PUBLIC_KEY, FREE_SHIPPING_THRESHOLD, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
+import {
+  MP_PUBLIC_KEY,
+  DEFAULT_FREE_SHIPPING_THRESHOLD,
+  DEFAULT_SHIPPING_FLAT_RATE,
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+} from '@/config';
 import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
 import { getShippingInfo } from '@/components/ShippingCalculator';
+import { useSetting } from '@/hooks/useSetting';
 
 declare global {
   interface Window {
@@ -476,7 +483,15 @@ const Checkout = () => {
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 15;
+  const { amount: freeShippingThreshold } = useSetting<{ amount: number }>(
+    'free_shipping_threshold',
+    { amount: DEFAULT_FREE_SHIPPING_THRESHOLD },
+  );
+  const { amount: shippingFlatRate } = useSetting<{ amount: number }>(
+    'shipping_flat_rate',
+    { amount: DEFAULT_SHIPPING_FLAT_RATE },
+  );
+  const shipping = subtotal >= freeShippingThreshold ? 0 : shippingFlatRate;
   const total = subtotal + shipping;
 
   const isFormComplete = !!(
@@ -514,14 +529,14 @@ const Checkout = () => {
               state:        data.uf          || f.state,
             }));
             setTimeout(() => {
-              setShippingMessage(getShippingInfo(digits));
+              setShippingMessage(getShippingInfo(digits, shippingFlatRate));
               setShippingStatus('ready');
             }, delay);
           }
         })
         .catch(() => {
           setTimeout(() => {
-            setShippingMessage(getShippingInfo(digits));
+            setShippingMessage(getShippingInfo(digits, shippingFlatRate));
             setShippingStatus('ready');
           }, delay);
         });
