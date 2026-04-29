@@ -210,9 +210,24 @@ export const getBestsellerProducts = async (): Promise<Product[]> => {
     .select('*, collections(name, slug), product_images(filename, sort_order)')
     .eq('is_bestseller', true)
     .eq('visible', true)
+    .order('bestseller_sort_order', { ascending: true })
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []).map(mapDbProduct);
+};
+
+// Admin — atualiza bestseller_sort_order de N produtos em batch
+// (usado pela sub-aba "Ordem dos Bestsellers" em ProductsTab).
+export const updateBestsellerSortOrder = async (
+  ordered: { id: string; bestseller_sort_order: number }[],
+): Promise<void> => {
+  const results = await Promise.all(
+    ordered.map(({ id, bestseller_sort_order }) =>
+      supabase.from('products').update({ bestseller_sort_order }).eq('id', id),
+    ),
+  );
+  const firstError = results.find(r => r.error)?.error;
+  if (firstError) throw firstError;
 };
 
 // Collections (query Supabase directly, mock fallback)
