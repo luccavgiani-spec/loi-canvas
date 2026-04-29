@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
-import { createOrder, processPayment } from '@/lib/api';
+import { createOrder, processPayment, getPublicOrderConfirmation } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 import {
   MP_PUBLIC_KEY,
   DEFAULT_FREE_SHIPPING_THRESHOLD,
@@ -475,6 +476,7 @@ const CardForm = ({
 const Checkout = () => {
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [step, setStep] = useState<CheckoutStep>('form');
   const [form, setForm] = useState({
     firstName: '', lastName: '',
@@ -496,6 +498,51 @@ const Checkout = () => {
     window.addEventListener('resize', handler);
     return () => window.removeEventListener('resize', handler);
   }, []);
+
+  // Polling pos-pagamento Pix: chama get-order-public a cada 3s ate
+  // status='paid' (mp-webhook atualiza). Timeout 5 min. Card aprovado
+  // ja redireciona direto em handleCardSuccess; cartao 'em analise' nao
+  // entra aqui (vai para tela de erro).
+  useEffect(() => {
+    if (!pixData || !orderId) return;
+
+    let cancelled = false;
+    const startedAt = Date.now();
+    const TIMEOUT_MS = 5 * 60 * 1000;
+    let timedOut = false;
+
+    const interval = setInterval(async () => {
+      if (cancelled) return;
+      if (Date.now() - startedAt > TIMEOUT_MS) {
+        timedOut = true;
+        clearInterval(interval);
+        toast({
+          title: 'Pagamento ainda não confirmado.',
+          description: 'Verifique seu email ou recarregue a página em alguns instantes.',
+        });
+        return;
+      }
+      try {
+        const order = await getPublicOrderConfirmation(orderId);
+        if (cancelled) return;
+        if (order.status === 'paid') {
+          clearInterval(interval);
+          clear();
+          navigate(`/pedido-confirmado?order_id=${orderId}`);
+        }
+      } catch (err) {
+        // Falha transitoria — proximo tick tenta de novo. Sem toast spam.
+        console.warn('[checkout polling] tick failed', err);
+      }
+    }, 3000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      // Apenas evita warning de unused — sinaliza intencao do flag.
+      void timedOut;
+    };
+  }, [pixData, orderId, clear, navigate, toast]);
 
   const { amount: freeShippingThreshold } = useSetting<{ amount: number }>(
     'free_shipping_threshold',
