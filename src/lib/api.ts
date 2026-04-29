@@ -200,6 +200,19 @@ export const getProductsByCollectionSlug = async (collectionSlug: string): Promi
   }
 };
 
+// Bestsellers — products flagged is_bestseller=true and visible=true.
+// Errors propagate so the section can decide to silently hide.
+export const getBestsellerProducts = async (): Promise<Product[]> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, collections(name, slug), product_images(filename, sort_order)')
+    .eq('is_bestseller', true)
+    .eq('visible', true)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapDbProduct);
+};
+
 // Collections (query Supabase directly, mock fallback)
 export const getCollections = async (): Promise<Collection[]> => {
   try {
