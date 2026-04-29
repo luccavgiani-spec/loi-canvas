@@ -13,8 +13,9 @@ import {
   createAdminCoupon, updateAdminCoupon, deleteAdminCoupon,
   sendTrackingEmail, sendCampaign, shipOrder, sendCampaignEmail, getAdminNewsletterEmails,
   getAdminMensagens,
+  getAdminReviews, approveAdminReview, unpublishAdminReview, deleteAdminReview, createAdminReview,
 } from '@/lib/api';
-import type { AdminProductRow, AdminCollectionRow } from '@/lib/api';
+import type { AdminProductRow, AdminCollectionRow, AdminReview } from '@/lib/api';
 import { uploadCollabMedia } from '@/lib/storage';
 import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Collab } from '@/types';
 import type { TablesInsert, TablesUpdate, Tables } from '@/integrations/supabase/types';
@@ -29,7 +30,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send, GripVertical, ArrowUpDown } from 'lucide-react';
+import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send, GripVertical, ArrowUpDown, Eye, Star, Check } from 'lucide-react';
+import OrderDetailModal from '@/components/admin/OrderDetailModal';
 import {
   DndContext,
   closestCenter,
@@ -210,6 +212,7 @@ const ADMIN_TABS = [
   { value: 'collections', label: 'Coleções' },
   { value: 'collabs', label: 'Collabs' },
   { value: 'coupons', label: 'Cupons' },
+  { value: 'reviews', label: 'Avaliações' },
   { value: 'newsletter', label: 'Newsletter' },
   { value: 'campanhas', label: 'Campanhas' },
   // TODO: tab mensagens oculta — tabela 'mensagens' não existe, aguarda v3.2+
@@ -250,6 +253,7 @@ const Admin = () => {
         <TabsContent value="collections"><CollectionsTab /></TabsContent>
         <TabsContent value="collabs"><CollabsTab /></TabsContent>
         <TabsContent value="coupons"><CouponsTab /></TabsContent>
+        <TabsContent value="reviews"><ReviewsTab /></TabsContent>
         <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
         <TabsContent value="campanhas"><CampaignsTab /></TabsContent>
         <TabsContent value="mensagens"><MensagensTab /></TabsContent>
@@ -350,6 +354,7 @@ function OrdersTab() {
   const [shipTarget, setShipTarget] = useState<string | null>(null);
   const [trackingInput, setTrackingInput] = useState('');
   const [shipping, setShipping] = useState(false);
+  const [detailOrderId, setDetailOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     getAdminOrders({ status: status || undefined }).then(list => {
@@ -423,6 +428,7 @@ function OrdersTab() {
               <th className={thCls}>Data</th>
               <th className={thCls}>Código de Rastreio</th>
               <th className={thCls}>Ação</th>
+              <th className={thCls}>Detalhes</th>
             </tr>
           </thead>
           <tbody>
@@ -464,12 +470,24 @@ function OrdersTab() {
                     )}
                   </div>
                 </td>
+                <td className={tdCls}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs h-8 gap-1"
+                    onClick={() => setDetailOrderId(o.id)}
+                  >
+                    <Eye size={12} /> Ver
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
         {orders.length === 0 && <EmptyState label="pedido" />}
       </div>
+
+      <OrderDetailModal orderId={detailOrderId} onClose={() => setDetailOrderId(null)} />
 
       <Modal open={!!shipTarget} onClose={closeShip} title="Confirmar envio">
         <div className="space-y-4">
@@ -2052,6 +2070,335 @@ function CouponForm({
         <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{coupon ? 'Salvar' : 'Criar'}</Button>
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
       </div>
+    </form>
+  );
+}
+
+/* ═══════════ REVIEWS ═══════════ */
+type ReviewSubTab = 'pending' | 'approved' | 'create';
+
+function StarRow({ rating, size = 12 }: { rating: number; size?: number }) {
+  return (
+    <span className="inline-flex items-center gap-0.5 align-middle">
+      {[1, 2, 3, 4, 5].map(s => (
+        <Star
+          key={s}
+          size={size}
+          className={s <= rating ? 'fill-current text-foreground' : 'text-muted-foreground/30'}
+        />
+      ))}
+    </span>
+  );
+}
+
+function ReviewsTab() {
+  const { toast } = useToast();
+  const [subTab, setSubTab] = useState<ReviewSubTab>('pending');
+  const [pending, setPending] = useState<AdminReview[]>([]);
+  const [approved, setApproved] = useState<AdminReview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<Record<string, boolean>>({});
+
+  const reload = async () => {
+    setLoading(true);
+    try {
+      const [p, a] = await Promise.all([
+        getAdminReviews('pending'),
+        getAdminReviews('approved'),
+      ]);
+      setPending(p);
+      setApproved(a);
+    } catch (err) {
+      console.error('[ReviewsTab] failed to load', err);
+      toast({ title: 'Erro ao carregar avaliações.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { void reload(); }, []);
+
+  const setRowBusy = (id: string, val: boolean) =>
+    setBusy(prev => ({ ...prev, [id]: val }));
+
+  const handleApprove = async (id: string) => {
+    setRowBusy(id, true);
+    try {
+      await approveAdminReview(id);
+      toast({ title: 'Avaliação aprovada.' });
+      await reload();
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao aprovar avaliação.', variant: 'destructive' });
+    } finally {
+      setRowBusy(id, false);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    if (!confirm('Reprovar esta avaliação? Isso a remove permanentemente.')) return;
+    setRowBusy(id, true);
+    try {
+      await deleteAdminReview(id);
+      toast({ title: 'Avaliação removida.' });
+      await reload();
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao remover avaliação.', variant: 'destructive' });
+    } finally {
+      setRowBusy(id, false);
+    }
+  };
+
+  const handleUnpublish = async (id: string) => {
+    setRowBusy(id, true);
+    try {
+      await unpublishAdminReview(id);
+      toast({ title: 'Avaliação despublicada (volta a pendentes).' });
+      await reload();
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao despublicar.', variant: 'destructive' });
+    } finally {
+      setRowBusy(id, false);
+    }
+  };
+
+  const renderRows = (list: AdminReview[], variant: 'pending' | 'approved') => {
+    if (list.length === 0) {
+      return <EmptyState label={variant === 'pending' ? 'avaliação pendente' : 'avaliação aprovada'} />;
+    }
+    return (
+      <div className="overflow-x-auto">
+        <table className={tableCls}>
+          <thead>
+            <tr className="border-b border-border">
+              <th className={thCls}>Produto</th>
+              <th className={thCls}>Autor</th>
+              <th className={thCls}>Nota</th>
+              <th className={thCls}>Comentário</th>
+              <th className={thCls}>Data</th>
+              <th className={thCls}>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map(r => (
+              <tr key={r.id} className="border-b border-border align-top">
+                <td className={`${tdCls} text-sm`}>{r.product_name ?? <span className="text-muted-foreground">—</span>}</td>
+                <td className={`${tdCls} text-sm font-medium`}>{r.author_name}</td>
+                <td className={tdCls}><StarRow rating={r.rating} /></td>
+                <td className={`${tdCls} text-sm max-w-md`}>
+                  <div className="line-clamp-3 text-muted-foreground">{r.body || <em className="opacity-60">(sem texto)</em>}</div>
+                </td>
+                <td className={`${tdCls} text-xs text-muted-foreground`}>
+                  {r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : '—'}
+                </td>
+                <td className={tdCls}>
+                  {variant === 'pending' ? (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="text-xs h-7 gap-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                        disabled={busy[r.id]}
+                        onClick={() => handleApprove(r.id)}
+                      >
+                        <Check size={12} /> Aprovar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-7 gap-1 text-destructive hover:text-destructive border-destructive/40"
+                        disabled={busy[r.id]}
+                        onClick={() => handleReject(r.id)}
+                      >
+                        <X size={12} /> Reprovar
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-7 gap-1"
+                      disabled={busy[r.id]}
+                      onClick={() => handleUnpublish(r.id)}
+                    >
+                      Despublicar
+                    </Button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <div className="flex gap-1 mb-4 border-b border-border">
+        <button
+          type="button"
+          onClick={() => setSubTab('pending')}
+          className={`px-3 py-2 text-xs font-medium transition-colors ${subTab === 'pending' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Pendentes ({pending.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setSubTab('approved')}
+          className={`px-3 py-2 text-xs font-medium transition-colors ${subTab === 'approved' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Aprovadas ({approved.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setSubTab('create')}
+          className={`px-3 py-2 text-xs font-medium transition-colors ${subTab === 'create' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Criar avaliação
+        </button>
+      </div>
+
+      {loading && subTab !== 'create' ? (
+        <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-12" />)}</div>
+      ) : subTab === 'pending' ? (
+        renderRows(pending, 'pending')
+      ) : subTab === 'approved' ? (
+        renderRows(approved, 'approved')
+      ) : (
+        <CreateReviewForm onCreated={() => { void reload(); setSubTab('approved'); }} />
+      )}
+    </div>
+  );
+}
+
+function CreateReviewForm({ onCreated }: { onCreated: () => void }) {
+  const { toast } = useToast();
+  const [products, setProducts] = useState<AdminProductRow[]>([]);
+  const [productId, setProductId] = useState('');
+  const [authorName, setAuthorName] = useState('');
+  const [rating, setRating] = useState(5);
+  const [hover, setHover] = useState(0);
+  const [body, setBody] = useState('');
+  const [createdAt, setCreatedAt] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getAdminProducts().then(p => {
+      setProducts(p);
+      if (p.length && !productId) setProductId(p[0].id);
+    });
+  }, [productId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!productId) { toast({ title: 'Escolha um produto.', variant: 'destructive' }); return; }
+    if (!authorName.trim()) { toast({ title: 'Informe o autor.', variant: 'destructive' }); return; }
+    if (!body.trim()) { toast({ title: 'Escreva o comentário.', variant: 'destructive' }); return; }
+    setSaving(true);
+    try {
+      await createAdminReview({
+        product_id: productId,
+        author_name: authorName.trim(),
+        rating,
+        body: body.trim(),
+        created_at: createdAt ? new Date(createdAt).toISOString() : undefined,
+      });
+      toast({ title: 'Avaliação criada e publicada.' });
+      setAuthorName('');
+      setBody('');
+      setRating(5);
+      setCreatedAt('');
+      onCreated();
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao criar avaliação.', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
+      <p className="text-xs text-muted-foreground">
+        Avaliações criadas aqui entram <strong>direto como aprovadas</strong>. Use com responsabilidade.
+      </p>
+
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Produto</label>
+        <select
+          value={productId}
+          onChange={e => setProductId(e.target.value)}
+          required
+          className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent"
+        >
+          {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Autor</label>
+        <Input
+          value={authorName}
+          onChange={e => setAuthorName(e.target.value)}
+          placeholder="Nome real ou pseudônimo"
+          maxLength={80}
+          required
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Nota</label>
+        <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map(s => (
+            <button
+              key={s}
+              type="button"
+              onMouseEnter={() => setHover(s)}
+              onMouseLeave={() => setHover(0)}
+              onClick={() => setRating(s)}
+              className="p-0.5"
+            >
+              <Star
+                size={24}
+                className={(hover || rating) >= s ? 'fill-current text-foreground' : 'text-muted-foreground/30'}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Comentário</label>
+        <Textarea
+          value={body}
+          onChange={e => setBody(e.target.value)}
+          rows={4}
+          maxLength={800}
+          required
+          placeholder="O que essa pessoa diria sobre o produto?"
+          className="resize-none"
+        />
+      </div>
+
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Data (opcional)</label>
+        <Input
+          type="datetime-local"
+          value={createdAt}
+          onChange={e => setCreatedAt(e.target.value)}
+        />
+        <p className="text-[11px] text-muted-foreground mt-1">Deixe em branco para usar o momento atual.</p>
+      </div>
+
+      <Button
+        type="submit"
+        disabled={saving}
+        className="bg-primary text-primary-foreground hover:bg-primary/90"
+      >
+        {saving ? 'Criando…' : 'Criar avaliação'}
+      </Button>
     </form>
   );
 }

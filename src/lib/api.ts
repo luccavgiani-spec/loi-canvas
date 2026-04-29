@@ -305,6 +305,81 @@ export const submitReview = async (input: {
   if (error) throw error;
 };
 
+// Admin — reviews. RLS gated por admin_users (já existente).
+export type AdminReview = {
+  id: string;
+  product_id: string | null;
+  product_name: string | null;
+  author_name: string;
+  rating: number;
+  body: string | null;
+  photo_url: string | null;
+  approved: boolean | null;
+  created_at: string | null;
+};
+
+type AdminReviewRow = Tables<'reviews'> & { products: { name: string } | null };
+
+export const getAdminReviews = async (filter: 'pending' | 'approved'): Promise<AdminReview[]> => {
+  const wantApproved = filter === 'approved';
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*, products(name)')
+    .eq('approved', wantApproved)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return ((data ?? []) as unknown as AdminReviewRow[]).map((row) => ({
+    id: row.id,
+    product_id: row.product_id,
+    product_name: row.products?.name ?? null,
+    author_name: row.author_name,
+    rating: row.rating,
+    body: row.body,
+    photo_url: row.photo_url,
+    approved: row.approved,
+    created_at: row.created_at,
+  }));
+};
+
+export const approveAdminReview = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('reviews').update({ approved: true }).eq('id', id);
+  if (error) throw error;
+};
+
+export const unpublishAdminReview = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('reviews').update({ approved: false }).eq('id', id);
+  if (error) throw error;
+};
+
+// Reprovar = DELETE (schema atual não tem coluna is_rejected; manter pendente
+// indefinidamente polui a fila de moderação). Decisão registrada com Lucca.
+export const deleteAdminReview = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('reviews').delete().eq('id', id);
+  if (error) throw error;
+};
+
+// Admin cria avaliação fake — entra direto como aprovada (decisão de produto
+// com Lucca/André). Permitido pela policy "admin updates reviews" + insert
+// padrão (admin é authenticated; default da tabela é approved=true).
+export const createAdminReview = async (input: {
+  product_id: string;
+  author_name: string;
+  rating: number;
+  body: string;
+  created_at?: string;
+}): Promise<void> => {
+  const payload: TablesInsert<'reviews'> = {
+    product_id: input.product_id,
+    author_name: input.author_name,
+    rating: input.rating,
+    body: input.body,
+    approved: true,
+  };
+  if (input.created_at) payload.created_at = input.created_at;
+  const { error } = await supabase.from('reviews').insert(payload);
+  if (error) throw error;
+};
+
 export const uploadReviewPhoto = async (file: File): Promise<string> => {
   const ext = file.name.split('.').pop() ?? 'jpg';
   const fileName = `${crypto.randomUUID()}.${ext}`;
@@ -395,7 +470,7 @@ export const getOrderById = async (orderId: string) => {
   if (productIds.length > 0) {
     const { data: products } = await supabase
       .from('products')
-      .select('id, name, price, asset_folder, slug, collection_id, collections(name, slug)')
+      .select('id, name, sku, price, slug, collection_id, collections(name, slug), product_images(filename, sort_order)')
       .in('id', productIds);
     if (products) {
       productsMap = Object.fromEntries(products.map((p: any) => [p.id, p]));
@@ -408,6 +483,100 @@ export const getOrderById = async (orderId: string) => {
       ...item,
       product: productsMap[item.product_id] || null,
     })),
+  };
+};
+
+// Admin — detalhe completo do pedido para o modal "Ver pedido".
+// Retorna order + items enriquecidos com produto + capa (primeira imagem
+// por sort_order). Funciona com a RLS de admin existente em orders/order_items.
+export type AdminOrderDetail = {
+  id: string;
+  status: string | null;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string | null;
+  subtotal: number;
+  shipping_cost: number | null;
+  discount: number | null;
+  total: number;
+  is_pickup: boolean;
+  tracking_code: string | null;
+  tracking_email_sent_at: string | null;
+  mp_payment_id: string | null;
+  created_at: string | null;
+  items: {
+    id: string;
+    qty: number;
+    unit_price: number;
+    product_id: string | null;
+    product_name: string;
+    product_sku: string | null;
+    product_slug: string | null;
+    image_url: string | null;
+  }[];
+};
+
+type OrderWithItems = Tables<'orders'> & { order_items: Tables<'order_items'>[] };
+type ProductWithImages = Pick<Tables<'products'>, 'id' | 'name' | 'sku' | 'slug'> & {
+  product_images: Pick<Tables<'product_images'>, 'filename' | 'sort_order'>[];
+};
+
+export const getAdminOrderDetail = async (orderId: string): Promise<AdminOrderDetail> => {
+  const { data: order, error } = await supabase
+    .from('orders')
+    .select('*, order_items(*)')
+    .eq('id', orderId)
+    .single();
+  if (error) throw error;
+
+  const orderRow = order as unknown as OrderWithItems;
+  const items = orderRow.order_items ?? [];
+  const productIds = [...new Set(items.map((i) => i.product_id).filter((id): id is string => !!id))];
+
+  let productsMap: Record<string, ProductWithImages> = {};
+  if (productIds.length > 0) {
+    const { data: products } = await supabase
+      .from('products')
+      .select('id, name, sku, slug, product_images(filename, sort_order)')
+      .in('id', productIds);
+    if (products) {
+      productsMap = Object.fromEntries(
+        (products as unknown as ProductWithImages[]).map((p) => [p.id, p]),
+      );
+    }
+  }
+
+  return {
+    id: orderRow.id,
+    status: orderRow.status,
+    customer_name: orderRow.customer_name,
+    customer_email: orderRow.customer_email,
+    customer_phone: orderRow.customer_phone,
+    subtotal: Number(orderRow.subtotal),
+    shipping_cost: orderRow.shipping_cost !== null ? Number(orderRow.shipping_cost) : null,
+    discount: orderRow.discount !== null ? Number(orderRow.discount) : null,
+    total: Number(orderRow.total),
+    is_pickup: orderRow.is_pickup,
+    tracking_code: orderRow.tracking_code,
+    tracking_email_sent_at: orderRow.tracking_email_sent_at,
+    mp_payment_id: orderRow.mp_payment_id,
+    created_at: orderRow.created_at,
+    items: items.map((it) => {
+      const prod = it.product_id ? productsMap[it.product_id] : undefined;
+      const cover = prod?.product_images?.length
+        ? prod.product_images.slice().sort((a, b) => a.sort_order - b.sort_order)[0]
+        : null;
+      return {
+        id: it.id,
+        qty: it.qty,
+        unit_price: Number(it.unit_price),
+        product_id: it.product_id,
+        product_name: prod?.name ?? '(produto removido)',
+        product_sku: prod?.sku ?? null,
+        product_slug: prod?.slug ?? null,
+        image_url: cover ? productImagePublicUrl(cover.filename) : null,
+      };
+    }),
   };
 };
 
