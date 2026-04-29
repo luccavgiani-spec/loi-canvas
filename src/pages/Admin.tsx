@@ -145,22 +145,44 @@ function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs
 }
 
 /* ═══════════ ADMIN ═══════════ */
+const ADMIN_TABS = [
+  { value: 'overview', label: 'Overview' },
+  { value: 'orders', label: 'Pedidos' },
+  { value: 'customers', label: 'Clientes' },
+  { value: 'products', label: 'Produtos' },
+  { value: 'collections', label: 'Coleções' },
+  { value: 'collabs', label: 'Collabs' },
+  { value: 'coupons', label: 'Cupons' },
+  { value: 'newsletter', label: 'Newsletter' },
+  { value: 'campanhas', label: 'Campanhas' },
+  { value: 'mensagens', label: 'Mensagens' },
+] as const;
+
 const Admin = () => {
+  const [tab, setTab] = useState<string>('overview');
+
   return (
-    <div className="container py-8">
-      <h1 className="heading-display text-3xl mb-6">Painel Admin</h1>
-      <Tabs defaultValue="overview">
-        <TabsList className="mb-6 flex-wrap">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="orders">Pedidos</TabsTrigger>
-          <TabsTrigger value="customers">Clientes</TabsTrigger>
-          <TabsTrigger value="products">Produtos</TabsTrigger>
-          <TabsTrigger value="collections">Coleções</TabsTrigger>
-          <TabsTrigger value="collabs">Collabs</TabsTrigger>
-          <TabsTrigger value="coupons">Cupons</TabsTrigger>
-          <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
-          <TabsTrigger value="campanhas">Campanhas</TabsTrigger>
-          <TabsTrigger value="mensagens">Mensagens</TabsTrigger>
+    <div className="container py-8 space-y-6">
+      <h1 className="heading-display text-3xl">Painel Admin</h1>
+
+      <Tabs value={tab} onValueChange={setTab} className="space-y-6">
+        {/* mobile: native select replaces wrapping tab strip */}
+        <select
+          aria-label="Seção do painel"
+          value={tab}
+          onChange={(e) => setTab(e.target.value)}
+          className="md:hidden w-full px-4 py-3 text-sm bg-card border border-border rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          {ADMIN_TABS.map((t) => (
+            <option key={t.value} value={t.value}>{t.label}</option>
+          ))}
+        </select>
+
+        {/* desktop: horizontal tab list */}
+        <TabsList className="hidden md:flex flex-wrap">
+          {ADMIN_TABS.map((t) => (
+            <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value="overview"><OverviewTab /></TabsContent>
