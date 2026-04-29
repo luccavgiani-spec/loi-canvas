@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/LazyVideo';
 import ArrowLink from '@/components/ui/ArrowLink';
+import BestsellersSection from '@/components/home/BestsellersSection';
 import type { Product } from '@/types';
 
 /* ── Horizontal carousel with snap scrolling ── */
@@ -506,7 +507,10 @@ const HomeSections = () => {
         }}
       />
 
-      {/* ── 1. Bestsellers — Carousel ── */}
+      {/* ── Bestsellers — produtos com flag is_bestseller ── */}
+      <BestsellersSection />
+
+      {/* ── 1. Mais pedidas — Carousel ── */}
       <section className="py-16 px-6 md:py-0 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
