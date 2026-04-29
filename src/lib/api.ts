@@ -2,7 +2,7 @@
 import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
 import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, Collection, Collab } from '@/types';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
-import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections, mockCollabs } from '@/lib/mocks';
+import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections } from '@/lib/mocks';
 import { supabase } from '@/integrations/supabase/client';
 
 export type AdminProductRow = Tables<'products'> & {
@@ -632,17 +632,98 @@ export const uploadCollectionCover = async (file: File): Promise<string> => {
 };
 
 // Collabs
-export const getAdminCollabs = () =>
-  fetchApi<Collab[]>('/admin/collabs', undefined, mockCollabs);
+function mapDbCollab(row: Tables<'collabs'>): Collab {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    caption: row.caption ?? undefined,
+    description: row.description ?? undefined,
+    category: row.category ?? undefined,
+    year: row.year ?? undefined,
+    images: row.images ?? [],
+    is_active: row.is_active,
+    sort_order: row.sort_order,
+    created_at: row.created_at,
+  };
+}
 
-export const createAdminCollab = (data: Partial<Collab>) =>
-  fetchApi<Collab>('/admin/collabs', { method: 'POST', body: JSON.stringify(data) });
+function collabToDbInsert(data: Partial<Collab>): TablesInsert<'collabs'> {
+  if (!data.slug) throw new Error('slug is required');
+  if (!data.name) throw new Error('name is required');
+  return {
+    slug: data.slug,
+    name: data.name,
+    caption: data.caption ?? null,
+    description: data.description ?? null,
+    category: data.category ?? null,
+    year: data.year ?? null,
+    images: data.images ?? [],
+    is_active: data.is_active ?? true,
+    sort_order: data.sort_order ?? 0,
+  };
+}
 
-export const updateAdminCollab = (id: string, data: Partial<Collab>) =>
-  fetchApi<Collab>(`/admin/collabs/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+function collabToDbUpdate(data: Partial<Collab>): TablesUpdate<'collabs'> {
+  const out: TablesUpdate<'collabs'> = {};
+  if (data.slug !== undefined) out.slug = data.slug;
+  if (data.name !== undefined) out.name = data.name;
+  if (data.caption !== undefined) out.caption = data.caption || null;
+  if (data.description !== undefined) out.description = data.description || null;
+  if (data.category !== undefined) out.category = data.category || null;
+  if (data.year !== undefined) out.year = data.year || null;
+  if (data.images !== undefined) out.images = data.images;
+  if (data.is_active !== undefined) out.is_active = data.is_active;
+  if (data.sort_order !== undefined) out.sort_order = data.sort_order;
+  return out;
+}
 
-export const deleteAdminCollab = (id: string) =>
-  fetchApi<void>(`/admin/collabs/${id}`, { method: 'DELETE' });
+// Public — only active collabs, ordered by sort_order
+export const getCollabs = async (): Promise<Collab[]> => {
+  const { data, error } = await supabase
+    .from('collabs')
+    .select('*')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map(mapDbCollab);
+};
+
+// Admin — returns all collabs
+export const getAdminCollabs = async (): Promise<Collab[]> => {
+  const { data, error } = await supabase
+    .from('collabs')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map(mapDbCollab);
+};
+
+export const createAdminCollab = async (data: Partial<Collab>): Promise<Collab> => {
+  const { data: row, error } = await supabase
+    .from('collabs')
+    .insert(collabToDbInsert(data))
+    .select()
+    .single();
+  if (error) throw error;
+  return mapDbCollab(row);
+};
+
+export const updateAdminCollab = async (id: string, data: Partial<Collab>): Promise<Collab> => {
+  const { data: row, error } = await supabase
+    .from('collabs')
+    .update(collabToDbUpdate(data))
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return mapDbCollab(row);
+};
+
+export const deleteAdminCollab = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('collabs').delete().eq('id', id);
+  if (error) throw error;
+};
 
 // Email — ship order and send tracking email
 export const shipOrder = (orderId: string, trackingCode: string): Promise<{ ok: boolean }> =>
