@@ -318,6 +318,8 @@ export type AdminReview = {
   created_at: string | null;
 };
 
+type AdminReviewRow = Tables<'reviews'> & { products: { name: string } | null };
+
 export const getAdminReviews = async (filter: 'pending' | 'approved'): Promise<AdminReview[]> => {
   const wantApproved = filter === 'approved';
   const { data, error } = await supabase
@@ -326,7 +328,7 @@ export const getAdminReviews = async (filter: 'pending' | 'approved'): Promise<A
     .eq('approved', wantApproved)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((row: any) => ({
+  return ((data ?? []) as unknown as AdminReviewRow[]).map((row) => ({
     id: row.id,
     product_id: row.product_id,
     product_name: row.products?.name ?? null,
@@ -514,6 +516,11 @@ export type AdminOrderDetail = {
   }[];
 };
 
+type OrderWithItems = Tables<'orders'> & { order_items: Tables<'order_items'>[] };
+type ProductWithImages = Pick<Tables<'products'>, 'id' | 'name' | 'sku' | 'slug'> & {
+  product_images: Pick<Tables<'product_images'>, 'filename' | 'sort_order'>[];
+};
+
 export const getAdminOrderDetail = async (orderId: string): Promise<AdminOrderDetail> => {
   const { data: order, error } = await supabase
     .from('orders')
@@ -522,39 +529,42 @@ export const getAdminOrderDetail = async (orderId: string): Promise<AdminOrderDe
     .single();
   if (error) throw error;
 
-  const items = (order as any).order_items || [];
-  const productIds = [...new Set(items.map((i: any) => i.product_id).filter(Boolean))] as string[];
+  const orderRow = order as unknown as OrderWithItems;
+  const items = orderRow.order_items ?? [];
+  const productIds = [...new Set(items.map((i) => i.product_id).filter((id): id is string => !!id))];
 
-  let productsMap: Record<string, any> = {};
+  let productsMap: Record<string, ProductWithImages> = {};
   if (productIds.length > 0) {
     const { data: products } = await supabase
       .from('products')
       .select('id, name, sku, slug, product_images(filename, sort_order)')
       .in('id', productIds);
     if (products) {
-      productsMap = Object.fromEntries(products.map((p: any) => [p.id, p]));
+      productsMap = Object.fromEntries(
+        (products as unknown as ProductWithImages[]).map((p) => [p.id, p]),
+      );
     }
   }
 
   return {
-    id: order.id,
-    status: order.status,
-    customer_name: order.customer_name,
-    customer_email: order.customer_email,
-    customer_phone: order.customer_phone,
-    subtotal: Number(order.subtotal),
-    shipping_cost: order.shipping_cost !== null ? Number(order.shipping_cost) : null,
-    discount: order.discount !== null ? Number(order.discount) : null,
-    total: Number(order.total),
-    is_pickup: order.is_pickup,
-    tracking_code: order.tracking_code,
-    tracking_email_sent_at: order.tracking_email_sent_at,
-    mp_payment_id: order.mp_payment_id,
-    created_at: order.created_at,
-    items: items.map((it: any) => {
-      const prod = productsMap[it.product_id];
+    id: orderRow.id,
+    status: orderRow.status,
+    customer_name: orderRow.customer_name,
+    customer_email: orderRow.customer_email,
+    customer_phone: orderRow.customer_phone,
+    subtotal: Number(orderRow.subtotal),
+    shipping_cost: orderRow.shipping_cost !== null ? Number(orderRow.shipping_cost) : null,
+    discount: orderRow.discount !== null ? Number(orderRow.discount) : null,
+    total: Number(orderRow.total),
+    is_pickup: orderRow.is_pickup,
+    tracking_code: orderRow.tracking_code,
+    tracking_email_sent_at: orderRow.tracking_email_sent_at,
+    mp_payment_id: orderRow.mp_payment_id,
+    created_at: orderRow.created_at,
+    items: items.map((it) => {
+      const prod = it.product_id ? productsMap[it.product_id] : undefined;
       const cover = prod?.product_images?.length
-        ? prod.product_images.slice().sort((a: any, b: any) => a.sort_order - b.sort_order)[0]
+        ? prod.product_images.slice().sort((a, b) => a.sort_order - b.sort_order)[0]
         : null;
       return {
         id: it.id,
