@@ -19,16 +19,22 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          role: string
+          user_id: string
         }
         Insert: {
           created_at?: string | null
           email: string
           id?: string
+          role: string
+          user_id: string
         }
         Update: {
           created_at?: string | null
           email?: string
           id?: string
+          role?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -322,7 +328,9 @@ export type Database = {
           ritual: string | null
           sku: string
           slug: string
+          status: string | null
           suggested_use: string | null
+          visible: boolean
           weight_g: number
         }
         Insert: {
@@ -342,7 +350,9 @@ export type Database = {
           ritual?: string | null
           sku: string
           slug: string
+          status?: string | null
           suggested_use?: string | null
+          visible?: boolean
           weight_g: number
         }
         Update: {
@@ -362,7 +372,9 @@ export type Database = {
           ritual?: string | null
           sku?: string
           slug?: string
+          status?: string | null
           suggested_use?: string | null
+          visible?: boolean
           weight_g?: number
         }
         Relationships: [

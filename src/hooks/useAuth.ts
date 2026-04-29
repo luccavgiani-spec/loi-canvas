@@ -32,28 +32,16 @@ function setState(next: AuthState) {
 
 // admin_users.user_id is the FK to auth.users.id; the RLS policy limits the
 // result to the caller's own row, so an empty/null result means the user is
-// not an admin. Cast: generated types still reflect the legacy schema
-// (id/email only) until `supabase gen types` is rerun.
+// not an admin.
 async function fetchAdminRole(userId: string): Promise<AdminRole | null> {
-  const { data, error } = await (supabase as unknown as {
-    from: (table: string) => {
-      select: (cols: string) => {
-        eq: (col: string, val: string) => {
-          maybeSingle: () => Promise<{
-            data: { role: AdminRole } | null;
-            error: unknown;
-          }>;
-        };
-      };
-    };
-  })
+  const { data, error } = await supabase
     .from('admin_users')
     .select('role')
     .eq('user_id', userId)
     .maybeSingle();
 
   if (error || !data) return null;
-  return data.role;
+  return data.role as AdminRole;
 }
 
 async function loadAdminProfile(user: User) {

@@ -3,15 +3,19 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   getAdminKPIs, getAdminSalesTimeseries, getAdminTopProducts, getAdminOrders, getAdminCustomers,
   getAdminNewsletter, getAdminCoupons, getAdminCollections, getAdminCollabs,
+  getAdminProducts,
   createAdminProduct, updateAdminProduct, deleteAdminProduct,
+  uploadProductImage, insertProductImage, deleteProductImage, productImagePublicUrl,
   createAdminCollection, updateAdminCollection, deleteAdminCollection,
+  uploadCollectionCover,
   createAdminCollab, updateAdminCollab, deleteAdminCollab,
   createAdminCoupon, updateAdminCoupon, deleteAdminCoupon,
   sendTrackingEmail, sendCampaign, shipOrder, sendCampaignEmail, getAdminNewsletterEmails,
   getAdminMensagens,
 } from '@/lib/api';
-import { mockProducts } from '@/lib/mocks';
-import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Product, Collection, Collab } from '@/types';
+import type { AdminProductRow, AdminCollectionRow } from '@/lib/api';
+import type { KPIs, SalesTimeseriesPoint, TopProduct, Order, Customer, NewsletterSubscriber, Coupon, Collab } from '@/types';
+import type { TablesInsert, TablesUpdate, Tables } from '@/integrations/supabase/types';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -155,7 +159,8 @@ const ADMIN_TABS = [
   { value: 'coupons', label: 'Cupons' },
   { value: 'newsletter', label: 'Newsletter' },
   { value: 'campanhas', label: 'Campanhas' },
-  { value: 'mensagens', label: 'Mensagens' },
+  // TODO: tab mensagens oculta — tabela 'mensagens' não existe, aguarda v3.2+
+  // { value: 'mensagens', label: 'Mensagens' },
 ] as const;
 
 const Admin = () => {
@@ -464,44 +469,95 @@ function CustomersTab() {
 }
 
 /* ═══════════ PRODUCTS ═══════════ */
+type ProductFormPayload = {
+  insert: TablesInsert<'products'>;
+  newFiles: File[];
+  removedImageIds: string[];
+};
+
 function ProductsTab() {
   const { toast } = useToast();
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [collections, setCollections] = useState<Collection[]>([]);
+  const [products, setProducts] = useState<AdminProductRow[]>([]);
+  const [collections, setCollections] = useState<AdminCollectionRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<Product | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [editing, setEditing] = useState<AdminProductRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminProductRow | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => { getAdminCollections().then(setCollections); }, []);
-
-  const emptyProduct: Partial<Product> = { name: '', slug: '', description: '', price: 0, collection: '', images: [], tags: [], badge: undefined, is_bestseller: false };
-
-  const openNew = () => { setEditing(null); setModalOpen(true); };
-  const openEdit = (p: Product) => { setEditing(p); setModalOpen(true); };
-
-  const handleDelete = async (id: string) => {
-    try { await deleteAdminProduct(id); } catch { /* mock */ }
-    setProducts(prev => prev.filter(p => p.id !== id));
-    setDeleteTarget(null);
-    toast({ title: 'Produto excluído com sucesso.' });
-  };
-
-  const handleSave = async (data: Partial<Product>) => {
+  const reload = async () => {
+    setLoading(true);
     try {
-      if (editing) {
-        try { await updateAdminProduct(editing.id, data); } catch { /* mock */ }
-        setProducts(prev => prev.map(p => p.id === editing.id ? { ...p, ...data } as Product : p));
-      } else {
-        const newP = { ...emptyProduct, ...data, id: `new-${Date.now()}`, rating_avg: 0, rating_count: 0, created_at: new Date().toISOString().split('T')[0] } as Product;
-        try { await createAdminProduct(data); } catch { /* mock */ }
-        setProducts(prev => [...prev, newP]);
-      }
-      setModalOpen(false);
-      toast({ title: editing ? 'Produto atualizado com sucesso.' : 'Produto criado com sucesso.' });
-    } catch {
-      toast({ title: 'Erro ao salvar produto.', variant: 'destructive' });
+      const [prods, cols] = await Promise.all([getAdminProducts(), getAdminCollections()]);
+      setProducts(prods);
+      setCollections(cols);
+    } catch (err) {
+      console.error('[ProductsTab] failed to load', err);
+      toast({ title: 'Erro ao carregar produtos.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => { void reload(); }, []);
+
+  const openNew = () => { setEditing(null); setModalOpen(true); };
+  const openEdit = (p: AdminProductRow) => { setEditing(p); setModalOpen(true); };
+
+  const handleDelete = async (target: AdminProductRow) => {
+    try {
+      for (const img of target.product_images) {
+        try { await deleteProductImage(img.id, img.filename); } catch (e) { console.warn('image cleanup failed', e); }
+      }
+      await deleteAdminProduct(target.id);
+      setProducts(prev => prev.filter(p => p.id !== target.id));
+      toast({ title: 'Produto excluído com sucesso.' });
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao excluir produto.', variant: 'destructive' });
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleSave = async (payload: ProductFormPayload) => {
+    setSaving(true);
+    try {
+      const productId = editing
+        ? (await updateAdminProduct(editing.id, payload.insert)).id
+        : (await createAdminProduct(payload.insert)).id;
+
+      for (const id of payload.removedImageIds) {
+        const img = editing?.product_images.find((i) => i.id === id);
+        if (img) {
+          try { await deleteProductImage(img.id, img.filename); } catch (e) { console.warn('removeImage failed', e); }
+        }
+      }
+
+      const baseSort = editing
+        ? Math.max(-1, ...editing.product_images
+            .filter((i) => !payload.removedImageIds.includes(i.id))
+            .map((i) => i.sort_order)) + 1
+        : 0;
+      for (let i = 0; i < payload.newFiles.length; i++) {
+        const filename = await uploadProductImage(productId, payload.newFiles[i]);
+        await insertProductImage(productId, filename, baseSort + i);
+      }
+
+      toast({ title: editing ? 'Produto atualizado com sucesso.' : 'Produto criado com sucesso.' });
+      setModalOpen(false);
+      void reload();
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao salvar produto.', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12" />)}</div>;
+  }
 
   return (
     <div>
@@ -516,41 +572,56 @@ function ProductsTab() {
             <thead>
               <tr className="border-b border-border">
                 <th className={thCls}>Produto</th>
+                <th className={thCls}>SKU</th>
                 <th className={thCls}>Coleção</th>
                 <th className={thCls}>Preço</th>
-                <th className={thCls}>Badge</th>
+                <th className={thCls}>Visível</th>
                 <th className={thCls}>Bestseller</th>
                 <th className={thCls}>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {products.map(p => (
-                <tr key={p.id} className="border-b border-border">
-                  <td className={tdCls}>
-                    <div className="flex items-center gap-2">
-                      <img src={p.images[0]} alt={p.name} className="w-8 h-8 rounded object-cover" />
-                      <span className="font-medium">{p.name}</span>
-                    </div>
-                  </td>
-                  <td className={`${tdCls} text-muted-foreground`}>{p.collection}</td>
-                  <td className={tdCls}>R$ {p.price.toFixed(2)}</td>
-                  <td className={tdCls}>{p.badge && <span className={`badge-product badge-${p.badge} rounded-sm`}>{p.badge}</span>}</td>
-                  <td className={tdCls}>{p.is_bestseller ? 'Sim' : '—'}</td>
-                  <td className={tdCls}>
-                    <div className="flex gap-2">
-                      <button onClick={() => openEdit(p)} className="text-accent hover:text-accent/80"><Pencil size={14} /></button>
-                      <button onClick={() => setDeleteTarget(p.id)} className="text-destructive hover:text-destructive/80"><Trash2 size={14} /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {products.map(p => {
+                const cover = p.product_images.length > 0
+                  ? productImagePublicUrl(p.product_images.slice().sort((a, b) => a.sort_order - b.sort_order)[0].filename)
+                  : null;
+                return (
+                  <tr key={p.id} className="border-b border-border">
+                    <td className={tdCls}>
+                      <div className="flex items-center gap-2">
+                        {cover
+                          ? <img src={cover} alt={p.name} className="w-8 h-8 rounded object-cover" />
+                          : <div className="w-8 h-8 rounded bg-muted" />}
+                        <span className="font-medium">{p.name}</span>
+                      </div>
+                    </td>
+                    <td className={`${tdCls} font-mono text-xs`}>{p.sku}</td>
+                    <td className={`${tdCls} text-muted-foreground`}>{p.collections?.name ?? '—'}</td>
+                    <td className={tdCls}>R$ {Number(p.price).toFixed(2)}</td>
+                    <td className={tdCls}>{p.visible ? 'Sim' : '—'}</td>
+                    <td className={tdCls}>{p.is_bestseller ? 'Sim' : '—'}</td>
+                    <td className={tdCls}>
+                      <div className="flex gap-2">
+                        <button onClick={() => openEdit(p)} className="text-accent hover:text-accent/80"><Pencil size={14} /></button>
+                        <button onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive/80"><Trash2 size={14} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Produto' : 'Novo Produto'}>
-        <ProductForm product={editing} collections={collections} onSave={handleSave} onCancel={() => setModalOpen(false)} />
+      <Modal open={modalOpen} onClose={() => !saving && setModalOpen(false)} title={editing ? 'Editar Produto' : 'Novo Produto'}>
+        <ProductForm
+          product={editing}
+          collections={collections}
+          saving={saving}
+          onSave={handleSave}
+          onCancel={() => setModalOpen(false)}
+        />
       </Modal>
 
       <ConfirmDeleteDialog
@@ -564,42 +635,83 @@ function ProductsTab() {
   );
 }
 
-function ProductForm({ product, collections, onSave, onCancel }: { product: Product | null; collections: Collection[]; onSave: (data: Partial<Product>) => void; onCancel: () => void }) {
+function ProductForm({
+  product,
+  collections,
+  saving,
+  onSave,
+  onCancel,
+}: {
+  product: AdminProductRow | null;
+  collections: AdminCollectionRow[];
+  saving: boolean;
+  onSave: (payload: ProductFormPayload) => void;
+  onCancel: () => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
-    name: product?.name || '',
-    slug: product?.slug || '',
-    description: product?.description || '',
-    details: product?.details || '',
-    how_to_use: product?.how_to_use || '',
-    care_instructions: product?.care_instructions || '',
-    price: product?.price || 0,
-    compare_at_price: product?.compare_at_price || 0,
-    collection: product?.collection || '',
-    tags: product?.tags?.join(', ') || '',
-    badge: product?.badge || '',
-    is_bestseller: product?.is_bestseller || false,
-    images: product?.images || [] as string[],
+    name: product?.name ?? '',
+    slug: product?.slug ?? '',
+    sku: product?.sku ?? '',
+    description: product?.description ?? '',
+    details: product?.details ?? '',
+    suggested_use: product?.suggested_use ?? '',
+    composition: product?.composition ?? '',
+    notes: product?.notes ?? '',
+    ritual: product?.ritual ?? '',
+    accord: product?.accord ?? '',
+    price: product?.price ?? 0,
+    weight_g: product?.weight_g ?? 0,
+    burn_hours: product?.burn_hours ?? 0,
+    collection_id: product?.collection_id ?? '',
+    visible: product?.visible ?? true,
+    is_bestseller: Boolean(product?.is_bestseller),
   });
+  const [existingImages, setExistingImages] = useState<Tables<'product_images'>[]>(
+    (product?.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order),
+  );
+  const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
 
   const autoSlug = (name: string) => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    setNewFiles((prev) => [...prev, ...Array.from(files)]);
+    e.target.value = '';
+  };
+
+  const removeExistingImage = (id: string) => {
+    setExistingImages((prev) => prev.filter((i) => i.id !== id));
+    setRemovedImageIds((prev) => [...prev, id]);
+  };
+
+  const removeNewFile = (idx: number) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
+    const insert: TablesInsert<'products'> = {
       name: form.name,
       slug: form.slug,
-      description: form.description,
-      details: form.details || undefined,
-      how_to_use: form.how_to_use || undefined,
-      care_instructions: form.care_instructions || undefined,
+      sku: form.sku,
       price: Number(form.price),
-      compare_at_price: Number(form.compare_at_price) || undefined,
-      collection: form.collection,
-      tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
-      badge: (form.badge as Product['badge']) || undefined,
-      is_bestseller: form.is_bestseller,
-      images: form.images,
-    });
+      weight_g: Number(form.weight_g),
+      burn_hours: Number(form.burn_hours),
+      collection_id: form.collection_id || null,
+      description: form.description || null,
+      details: form.details || null,
+      suggested_use: form.suggested_use || null,
+      composition: form.composition || null,
+      notes: form.notes || null,
+      ritual: form.ritual || null,
+      accord: form.accord || null,
+      visible: form.visible,
+      is_bestseller: Boolean(form.is_bestseller),
+    };
+    onSave({ insert, newFiles, removedImageIds });
   };
 
   return (
@@ -608,110 +720,209 @@ function ProductForm({ product, collections, onSave, onCancel }: { product: Prod
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Nome</label>
         <Input value={form.name} onChange={e => { const name = e.target.value; setForm(f => ({ ...f, name, slug: product ? f.slug : autoSlug(name) })); }} required />
       </div>
-      <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Slug</label>
-        <Input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} required />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Slug</label>
+          <Input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} required />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">SKU</label>
+          <Input value={form.sku} onChange={e => setForm(f => ({ ...f, sku: e.target.value }))} required />
+        </div>
       </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Descrição</label>
         <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={3} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Preço (R$)</label>
-          <Input type="number" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
+          <Input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} required />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Preço anterior</label>
-          <Input type="number" step="0.01" value={form.compare_at_price} onChange={e => setForm(f => ({ ...f, compare_at_price: Number(e.target.value) }))} />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Coleção</label>
-          <select value={form.collection} onChange={e => setForm(f => ({ ...f, collection: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent">
-            <option value="">Selecione...</option>
-            {collections.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-          </select>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Peso (g)</label>
+          <Input type="number" min="0" step="1" value={form.weight_g} onChange={e => setForm(f => ({ ...f, weight_g: Number(e.target.value) }))} required />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Badge</label>
-          <select value={form.badge} onChange={e => setForm(f => ({ ...f, badge: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent">
-            <option value="">Nenhum</option>
-            <option value="new">Novo</option>
-            <option value="sale">Promoção</option>
-            <option value="limited">Edição Limitada</option>
-          </select>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Queima (h)</label>
+          <Input type="number" min="0" step="1" value={form.burn_hours} onChange={e => setForm(f => ({ ...f, burn_hours: Number(e.target.value) }))} required />
         </div>
       </div>
       <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Tags (separadas por vírgula)</label>
-        <Input value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="floral, cítrico" />
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Coleção</label>
+        <select value={form.collection_id} onChange={e => setForm(f => ({ ...f, collection_id: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent">
+          <option value="">Sem coleção</option>
+          {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
       </div>
-      <div className="flex items-center gap-2">
-        <Switch checked={form.is_bestseller} onCheckedChange={v => setForm(f => ({ ...f, is_bestseller: v }))} />
-        <label className="text-sm">Bestseller</label>
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Acorde</label>
+        <Input value={form.accord} onChange={e => setForm(f => ({ ...f, accord: e.target.value }))} placeholder="ex: floral / amadeirado" />
       </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Detalhes</label>
         <textarea value={form.details} onChange={e => setForm(f => ({ ...f, details: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
       </div>
       <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Como usar</label>
-        <textarea value={form.how_to_use} onChange={e => setForm(f => ({ ...f, how_to_use: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Sugestão de uso</label>
+        <textarea value={form.suggested_use} onChange={e => setForm(f => ({ ...f, suggested_use: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
       </div>
       <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Cuidados</label>
-        <textarea value={form.care_instructions} onChange={e => setForm(f => ({ ...f, care_instructions: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Composição</label>
+        <textarea value={form.composition} onChange={e => setForm(f => ({ ...f, composition: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
       </div>
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Notas</label>
+        <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
+      </div>
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ritual</label>
+        <textarea value={form.ritual} onChange={e => setForm(f => ({ ...f, ritual: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-none" rows={2} />
+      </div>
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
+          <Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} />
+          <label className="text-sm">Visível</label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch checked={form.is_bestseller} onCheckedChange={v => setForm(f => ({ ...f, is_bestseller: v }))} />
+          <label className="text-sm">Bestseller</label>
+        </div>
+      </div>
+
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Imagens</label>
-        <ImageUploader images={form.images} onChange={imgs => setForm(f => ({ ...f, images: imgs }))} />
+        <div className="flex flex-wrap gap-2 mb-2">
+          {existingImages.map((img) => (
+            <div key={img.id} className="relative w-20 h-20 border border-border rounded overflow-hidden group">
+              <img src={productImagePublicUrl(img.filename)} alt="" className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeExistingImage(img.id)}
+                className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Remover imagem"
+              >
+                <X size={12} />
+              </button>
+              <span className="absolute bottom-0 left-0 bg-black/50 text-white text-[9px] px-1">{img.sort_order + 1}</span>
+            </div>
+          ))}
+          {newFiles.map((file, i) => (
+            <div key={`new-${i}`} className="relative w-20 h-20 border border-accent rounded overflow-hidden group">
+              <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeNewFile(i)}
+                className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Remover arquivo"
+              >
+                <X size={12} />
+              </button>
+              <span className="absolute bottom-0 left-0 bg-accent text-accent-foreground text-[9px] px-1">novo</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFiles}
+          />
+          <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="text-xs gap-1">
+            <Upload size={12} /> Adicionar imagens
+          </Button>
+        </div>
       </div>
+
       <div className="flex gap-2 pt-2">
-        <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{product ? 'Salvar' : 'Criar'}</Button>
-        <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
+        <Button type="submit" disabled={saving} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+          {saving ? 'Salvando…' : product ? 'Salvar' : 'Criar'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>Cancelar</Button>
       </div>
     </form>
   );
 }
 
 /* ═══════════ COLLECTIONS ═══════════ */
+type CollectionFormPayload = {
+  insert: TablesInsert<'collections'>;
+  coverFile: File | null;
+  removeCover: boolean;
+};
+
 function CollectionsTab() {
   const { toast } = useToast();
-  const [collections, setCollections] = useState<Collection[]>([]);
+  const [collections, setCollections] = useState<AdminCollectionRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<Collection | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [editing, setEditing] = useState<AdminCollectionRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminCollectionRow | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => { getAdminCollections().then(setCollections); }, []);
-
-  const openNew = () => { setEditing(null); setModalOpen(true); };
-  const openEdit = (c: Collection) => { setEditing(c); setModalOpen(true); };
-
-  const handleDelete = async (id: string) => {
-    try { await deleteAdminCollection(id); } catch { /* mock */ }
-    setCollections(prev => prev.filter(c => c.id !== id));
-    setDeleteTarget(null);
-    toast({ title: 'Coleção excluída com sucesso.' });
-  };
-
-  const handleSave = async (data: Partial<Collection>) => {
+  const reload = async () => {
+    setLoading(true);
     try {
-      if (editing) {
-        try { await updateAdminCollection(editing.id, data); } catch { /* mock */ }
-        setCollections(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Collection : c));
-      } else {
-        const newC = { ...data, id: `col-${Date.now()}`, is_active: true, sort_order: collections.length, created_at: new Date().toISOString().split('T')[0] } as Collection;
-        try { await createAdminCollection(data); } catch { /* mock */ }
-        setCollections(prev => [...prev, newC]);
-      }
-      setModalOpen(false);
-      toast({ title: editing ? 'Coleção atualizada com sucesso.' : 'Coleção criada com sucesso.' });
-    } catch {
-      toast({ title: 'Erro ao salvar coleção.', variant: 'destructive' });
+      const cols = await getAdminCollections();
+      setCollections(cols);
+    } catch (err) {
+      console.error('[CollectionsTab] failed to load', err);
+      toast({ title: 'Erro ao carregar coleções.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => { void reload(); }, []);
+
+  const openNew = () => { setEditing(null); setModalOpen(true); };
+  const openEdit = (c: AdminCollectionRow) => { setEditing(c); setModalOpen(true); };
+
+  const handleDelete = async (target: AdminCollectionRow) => {
+    try {
+      await deleteAdminCollection(target.id);
+      setCollections(prev => prev.filter(c => c.id !== target.id));
+      toast({ title: 'Coleção excluída com sucesso.' });
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao excluir coleção.', variant: 'destructive' });
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleSave = async (payload: CollectionFormPayload) => {
+    setSaving(true);
+    try {
+      let coverUrl: string | null = payload.insert.cover_image ?? null;
+      if (payload.coverFile) {
+        coverUrl = await uploadCollectionCover(payload.coverFile);
+      } else if (payload.removeCover) {
+        coverUrl = null;
+      }
+      const fullInsert: TablesInsert<'collections'> = { ...payload.insert, cover_image: coverUrl };
+      if (editing) {
+        await updateAdminCollection(editing.id, fullInsert);
+      } else {
+        await createAdminCollection(fullInsert);
+      }
+      toast({ title: editing ? 'Coleção atualizada com sucesso.' : 'Coleção criada com sucesso.' });
+      setModalOpen(false);
+      void reload();
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao salvar coleção.', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32" />)}</div>;
+  }
 
   return (
     <div>
@@ -741,15 +952,20 @@ function CollectionsTab() {
               </div>
               <div className="flex gap-2 mt-3 pt-3 border-t border-border">
                 <button onClick={() => openEdit(c)} className="text-xs text-accent hover:underline flex items-center gap-1"><Pencil size={12} /> Editar</button>
-                <button onClick={() => setDeleteTarget(c.id)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
+                <button onClick={() => setDeleteTarget(c)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Coleção' : 'Nova Coleção'}>
-        <CollectionForm collection={editing} onSave={handleSave} onCancel={() => setModalOpen(false)} />
+      <Modal open={modalOpen} onClose={() => !saving && setModalOpen(false)} title={editing ? 'Editar Coleção' : 'Nova Coleção'}>
+        <CollectionForm
+          collection={editing}
+          saving={saving}
+          onSave={handleSave}
+          onCancel={() => setModalOpen(false)}
+        />
       </Modal>
 
       <ConfirmDeleteDialog
@@ -763,27 +979,66 @@ function CollectionsTab() {
   );
 }
 
-function CollectionForm({ collection, onSave, onCancel }: { collection: Collection | null; onSave: (data: Partial<Collection>) => void; onCancel: () => void }) {
+function CollectionForm({
+  collection,
+  saving,
+  onSave,
+  onCancel,
+}: {
+  collection: AdminCollectionRow | null;
+  saving: boolean;
+  onSave: (payload: CollectionFormPayload) => void;
+  onCancel: () => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
-    name: collection?.name || '',
-    slug: collection?.slug || '',
-    description: collection?.description || '',
-    cover_image: collection?.cover_image || '',
-    numeral: collection?.numeral || '',
-    detail: collection?.detail || '',
-    story: collection?.story || '',
-    price_label: collection?.price_label || '',
+    name: collection?.name ?? '',
+    slug: collection?.slug ?? '',
+    description: collection?.description ?? '',
+    numeral: collection?.numeral ?? '',
+    detail: collection?.detail ?? '',
+    story: collection?.story ?? '',
+    price_label: collection?.price_label ?? '',
     is_active: collection?.is_active ?? true,
     sort_order: collection?.sort_order ?? 0,
   });
-
-  const coverImages = form.cover_image ? [form.cover_image] : [];
+  const [existingCover, setExistingCover] = useState<string | null>(collection?.cover_image ?? null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [removeCover, setRemoveCover] = useState(false);
   const autoSlug = (name: string) => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverFile(file);
+    setRemoveCover(false);
+    e.target.value = '';
+  };
+
+  const clearCover = () => {
+    setCoverFile(null);
+    setExistingCover(null);
+    setRemoveCover(true);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ ...form });
+    const insert: TablesInsert<'collections'> = {
+      name: form.name,
+      slug: form.slug,
+      description: form.description || null,
+      numeral: form.numeral || null,
+      detail: form.detail || null,
+      story: form.story || null,
+      price_label: form.price_label || null,
+      is_active: form.is_active,
+      sort_order: form.sort_order,
+      cover_image: existingCover,
+    };
+    onSave({ insert, coverFile, removeCover });
   };
+
+  const previewSrc = coverFile ? URL.createObjectURL(coverFile) : existingCover;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -819,7 +1074,32 @@ function CollectionForm({ collection, onSave, onCancel }: { collection: Collecti
       </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Imagem de capa</label>
-        <ImageUploader images={coverImages} onChange={imgs => setForm(f => ({ ...f, cover_image: imgs[imgs.length - 1] || '' }))} />
+        {previewSrc && (
+          <div className="relative w-32 h-32 border border-border rounded overflow-hidden mb-2 group">
+            <img src={previewSrc} alt="capa" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={clearCover}
+              className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 opacity-0 group-hover:opacity-100 transition-opacity rounded"
+              aria-label="Remover capa"
+            >
+              <X size={12} />
+            </button>
+            {coverFile && (
+              <span className="absolute bottom-0 left-0 bg-accent text-accent-foreground text-[9px] px-1">novo</span>
+            )}
+          </div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFile}
+        />
+        <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="text-xs gap-1">
+          <Upload size={12} /> {previewSrc ? 'Trocar imagem' : 'Selecionar imagem'}
+        </Button>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">
@@ -832,8 +1112,10 @@ function CollectionForm({ collection, onSave, onCancel }: { collection: Collecti
         </div>
       </div>
       <div className="flex gap-2 pt-2">
-        <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{collection ? 'Salvar' : 'Criar'}</Button>
-        <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
+        <Button type="submit" disabled={saving} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+          {saving ? 'Salvando…' : collection ? 'Salvar' : 'Criar'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>Cancelar</Button>
       </div>
     </form>
   );
