@@ -856,41 +856,81 @@ function ProductForm({
 }
 
 /* ═══════════ COLLECTIONS ═══════════ */
+type CollectionFormPayload = {
+  insert: TablesInsert<'collections'>;
+  coverFile: File | null;
+  removeCover: boolean;
+};
+
 function CollectionsTab() {
   const { toast } = useToast();
-  const [collections, setCollections] = useState<Collection[]>([]);
+  const [collections, setCollections] = useState<AdminCollectionRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<Collection | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [editing, setEditing] = useState<AdminCollectionRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminCollectionRow | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => { getAdminCollections().then(setCollections); }, []);
-
-  const openNew = () => { setEditing(null); setModalOpen(true); };
-  const openEdit = (c: Collection) => { setEditing(c); setModalOpen(true); };
-
-  const handleDelete = async (id: string) => {
-    try { await deleteAdminCollection(id); } catch { /* mock */ }
-    setCollections(prev => prev.filter(c => c.id !== id));
-    setDeleteTarget(null);
-    toast({ title: 'Coleção excluída com sucesso.' });
-  };
-
-  const handleSave = async (data: Partial<Collection>) => {
+  const reload = async () => {
+    setLoading(true);
     try {
-      if (editing) {
-        try { await updateAdminCollection(editing.id, data); } catch { /* mock */ }
-        setCollections(prev => prev.map(c => c.id === editing.id ? { ...c, ...data } as Collection : c));
-      } else {
-        const newC = { ...data, id: `col-${Date.now()}`, is_active: true, sort_order: collections.length, created_at: new Date().toISOString().split('T')[0] } as Collection;
-        try { await createAdminCollection(data); } catch { /* mock */ }
-        setCollections(prev => [...prev, newC]);
-      }
-      setModalOpen(false);
-      toast({ title: editing ? 'Coleção atualizada com sucesso.' : 'Coleção criada com sucesso.' });
-    } catch {
-      toast({ title: 'Erro ao salvar coleção.', variant: 'destructive' });
+      const cols = await getAdminCollections();
+      setCollections(cols);
+    } catch (err) {
+      console.error('[CollectionsTab] failed to load', err);
+      toast({ title: 'Erro ao carregar coleções.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => { void reload(); }, []);
+
+  const openNew = () => { setEditing(null); setModalOpen(true); };
+  const openEdit = (c: AdminCollectionRow) => { setEditing(c); setModalOpen(true); };
+
+  const handleDelete = async (target: AdminCollectionRow) => {
+    try {
+      await deleteAdminCollection(target.id);
+      setCollections(prev => prev.filter(c => c.id !== target.id));
+      toast({ title: 'Coleção excluída com sucesso.' });
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao excluir coleção.', variant: 'destructive' });
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleSave = async (payload: CollectionFormPayload) => {
+    setSaving(true);
+    try {
+      let coverUrl: string | null = payload.insert.cover_image ?? null;
+      if (payload.coverFile) {
+        coverUrl = await uploadCollectionCover(payload.coverFile);
+      } else if (payload.removeCover) {
+        coverUrl = null;
+      }
+      const fullInsert: TablesInsert<'collections'> = { ...payload.insert, cover_image: coverUrl };
+      if (editing) {
+        await updateAdminCollection(editing.id, fullInsert);
+      } else {
+        await createAdminCollection(fullInsert);
+      }
+      toast({ title: editing ? 'Coleção atualizada com sucesso.' : 'Coleção criada com sucesso.' });
+      setModalOpen(false);
+      void reload();
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Erro ao salvar coleção.', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32" />)}</div>;
+  }
 
   return (
     <div>
@@ -920,15 +960,20 @@ function CollectionsTab() {
               </div>
               <div className="flex gap-2 mt-3 pt-3 border-t border-border">
                 <button onClick={() => openEdit(c)} className="text-xs text-accent hover:underline flex items-center gap-1"><Pencil size={12} /> Editar</button>
-                <button onClick={() => setDeleteTarget(c.id)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
+                <button onClick={() => setDeleteTarget(c)} className="text-xs text-destructive hover:underline flex items-center gap-1"><Trash2 size={12} /> Excluir</button>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar Coleção' : 'Nova Coleção'}>
-        <CollectionForm collection={editing} onSave={handleSave} onCancel={() => setModalOpen(false)} />
+      <Modal open={modalOpen} onClose={() => !saving && setModalOpen(false)} title={editing ? 'Editar Coleção' : 'Nova Coleção'}>
+        <CollectionForm
+          collection={editing}
+          saving={saving}
+          onSave={handleSave}
+          onCancel={() => setModalOpen(false)}
+        />
       </Modal>
 
       <ConfirmDeleteDialog
@@ -942,27 +987,66 @@ function CollectionsTab() {
   );
 }
 
-function CollectionForm({ collection, onSave, onCancel }: { collection: Collection | null; onSave: (data: Partial<Collection>) => void; onCancel: () => void }) {
+function CollectionForm({
+  collection,
+  saving,
+  onSave,
+  onCancel,
+}: {
+  collection: AdminCollectionRow | null;
+  saving: boolean;
+  onSave: (payload: CollectionFormPayload) => void;
+  onCancel: () => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
-    name: collection?.name || '',
-    slug: collection?.slug || '',
-    description: collection?.description || '',
-    cover_image: collection?.cover_image || '',
-    numeral: collection?.numeral || '',
-    detail: collection?.detail || '',
-    story: collection?.story || '',
-    price_label: collection?.price_label || '',
+    name: collection?.name ?? '',
+    slug: collection?.slug ?? '',
+    description: collection?.description ?? '',
+    numeral: collection?.numeral ?? '',
+    detail: collection?.detail ?? '',
+    story: collection?.story ?? '',
+    price_label: collection?.price_label ?? '',
     is_active: collection?.is_active ?? true,
     sort_order: collection?.sort_order ?? 0,
   });
-
-  const coverImages = form.cover_image ? [form.cover_image] : [];
+  const [existingCover, setExistingCover] = useState<string | null>(collection?.cover_image ?? null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [removeCover, setRemoveCover] = useState(false);
   const autoSlug = (name: string) => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverFile(file);
+    setRemoveCover(false);
+    e.target.value = '';
+  };
+
+  const clearCover = () => {
+    setCoverFile(null);
+    setExistingCover(null);
+    setRemoveCover(true);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ ...form });
+    const insert: TablesInsert<'collections'> = {
+      name: form.name,
+      slug: form.slug,
+      description: form.description || null,
+      numeral: form.numeral || null,
+      detail: form.detail || null,
+      story: form.story || null,
+      price_label: form.price_label || null,
+      is_active: form.is_active,
+      sort_order: form.sort_order,
+      cover_image: existingCover,
+    };
+    onSave({ insert, coverFile, removeCover });
   };
+
+  const previewSrc = coverFile ? URL.createObjectURL(coverFile) : existingCover;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -998,7 +1082,32 @@ function CollectionForm({ collection, onSave, onCancel }: { collection: Collecti
       </div>
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Imagem de capa</label>
-        <ImageUploader images={coverImages} onChange={imgs => setForm(f => ({ ...f, cover_image: imgs[imgs.length - 1] || '' }))} />
+        {previewSrc && (
+          <div className="relative w-32 h-32 border border-border rounded overflow-hidden mb-2 group">
+            <img src={previewSrc} alt="capa" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={clearCover}
+              className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 opacity-0 group-hover:opacity-100 transition-opacity rounded"
+              aria-label="Remover capa"
+            >
+              <X size={12} />
+            </button>
+            {coverFile && (
+              <span className="absolute bottom-0 left-0 bg-accent text-accent-foreground text-[9px] px-1">novo</span>
+            )}
+          </div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFile}
+        />
+        <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="text-xs gap-1">
+          <Upload size={12} /> {previewSrc ? 'Trocar imagem' : 'Selecionar imagem'}
+        </Button>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">
@@ -1011,8 +1120,10 @@ function CollectionForm({ collection, onSave, onCancel }: { collection: Collecti
         </div>
       </div>
       <div className="flex gap-2 pt-2">
-        <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{collection ? 'Salvar' : 'Criar'}</Button>
-        <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
+        <Button type="submit" disabled={saving} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+          {saving ? 'Salvando…' : collection ? 'Salvar' : 'Criar'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>Cancelar</Button>
       </div>
     </form>
   );
