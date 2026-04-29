@@ -149,8 +149,18 @@ export const mockNewsletterSubs: NewsletterSubscriber[] = [
 ];
 
 export const mockCoupons: Coupon[] = [
-  { id: 'cp1', code: 'LOIE15', discount_percent: 15, is_active: true, uses: 45, created_at: '2025-01-01' },
-  { id: 'cp2', code: 'BEMVINDO10', discount_percent: 10, is_active: true, uses: 120, created_at: '2025-01-01' },
+  {
+    id: 'cp1', code: 'LOIE15', type: 'percent', value: 15,
+    is_active: true, current_uses: 45, max_uses: null,
+    valid_from: null, valid_until: null, min_order_value: null,
+    collection_id: null, created_at: '2025-01-01',
+  },
+  {
+    id: 'cp2', code: 'BEMVINDO10', type: 'percent', value: 10,
+    is_active: true, current_uses: 120, max_uses: null,
+    valid_from: null, valid_until: null, min_order_value: null,
+    collection_id: null, created_at: '2025-01-01',
+  },
 ];
 
 export const mockCollections: Collection[] = [

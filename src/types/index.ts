@@ -122,11 +122,23 @@ export interface NewsletterSubscriber {
 export interface Coupon {
   id: string;
   code: string;
-  discount_percent: number;
+  type: 'percent' | 'fixed';
+  value: number;
   is_active: boolean;
-  uses: number;
-  max_uses?: number;
+  current_uses: number;
+  max_uses: number | null;
+  valid_from: string | null;
+  valid_until: string | null;
+  min_order_value: number | null;
+  collection_id: string | null;
   created_at: string;
+}
+
+export interface CouponValidation {
+  valid: boolean;
+  reason?: string;
+  discount?: number;
+  coupon?: Coupon;
 }
 
 export interface Collection {
