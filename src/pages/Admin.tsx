@@ -112,21 +112,28 @@ function ImageUploader({
   images,
   onChange,
   uploadFn,
+  onBusyChange,
 }: {
   images: string[];
   onChange: (imgs: string[]) => void;
   uploadFn?: (file: File) => Promise<string>;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const { toast } = useToast();
+
+  const updateBusy = (next: boolean) => {
+    setBusy(next);
+    onBusyChange?.(next);
+  };
 
   const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     e.target.value = '';
     if (uploadFn) {
-      setBusy(true);
+      updateBusy(true);
       const accumulated: string[] = [...images];
       try {
         for (const file of Array.from(files)) {
@@ -138,7 +145,7 @@ function ImageUploader({
         console.error('[ImageUploader] upload failed', err);
         toast({ title: 'Falha no upload da mídia.', variant: 'destructive' });
       } finally {
-        setBusy(false);
+        updateBusy(false);
       }
       return;
     }
@@ -1579,6 +1586,7 @@ function CollabsTab() {
 }
 
 function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSave: (data: Partial<Collab>) => void; onCancel: () => void }) {
+  const { toast } = useToast();
   const [form, setForm] = useState({
     name: collab?.name || '',
     slug: collab?.slug || '',
@@ -1590,11 +1598,16 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
     is_active: collab?.is_active ?? true,
     sort_order: collab?.sort_order ?? 0,
   });
+  const [uploading, setUploading] = useState(false);
 
   const autoSlug = (name: string) => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (uploading) {
+      toast({ title: 'Aguarde o upload terminar antes de salvar.', variant: 'destructive' });
+      return;
+    }
     onSave({ ...form });
   };
 
@@ -1632,7 +1645,11 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
           images={form.images}
           onChange={imgs => setForm(f => ({ ...f, images: imgs }))}
           uploadFn={uploadCollabMedia}
+          onBusyChange={setUploading}
         />
+        {uploading && (
+          <p className="text-[10px] text-amber-700 mt-1">Aguarde — fazendo upload das mídias…</p>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">
@@ -1647,7 +1664,9 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
         )}
       </div>
       <div className="flex gap-2 pt-2">
-        <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{collab ? 'Salvar' : 'Criar'}</Button>
+        <Button type="submit" disabled={uploading} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+          {uploading ? 'Enviando mídias…' : (collab ? 'Salvar' : 'Criar')}
+        </Button>
         <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
       </div>
     </form>
