@@ -155,7 +155,8 @@ const ADMIN_TABS = [
   { value: 'coupons', label: 'Cupons' },
   { value: 'newsletter', label: 'Newsletter' },
   { value: 'campanhas', label: 'Campanhas' },
-  { value: 'mensagens', label: 'Mensagens' },
+  // TODO: tab mensagens oculta — tabela 'mensagens' não existe, aguarda v3.2+
+  // { value: 'mensagens', label: 'Mensagens' },
 ] as const;
 
 const Admin = () => {
