@@ -33,11 +33,15 @@ export default function AdminLogin() {
     }
 
     setSubmitting(true);
-    const { error: signInError } = await signIn(email.trim(), password);
+    const result = await signIn(email.trim(), password);
     setSubmitting(false);
 
-    if (signInError) {
-      setError('e-mail ou senha incorretos');
+    if (!result.ok) {
+      setError(
+        result.reason === 'forbidden'
+          ? 'este e-mail não tem permissão de acesso ao painel.'
+          : 'e-mail ou senha incorretos.',
+      );
       return;
     }
   };

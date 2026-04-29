@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Session, User, AuthError } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
 export type AdminRole = 'owner' | 'editor';
@@ -10,6 +10,10 @@ export interface AuthState {
   role: AdminRole | null;
   loading: boolean;
 }
+
+export type SignInResult =
+  | { ok: true }
+  | { ok: false; reason: 'credentials' | 'forbidden' };
 
 const initialState: AuthState = {
   user: null,
@@ -26,10 +30,11 @@ function setState(next: AuthState) {
   listeners.forEach((fn) => fn(next));
 }
 
-async function loadAdminProfile(user: User) {
-  // admin_users.user_id is the FK to auth.users.id; RLS limits the result
-  // to the caller's own row. Empty result means the user is not an admin.
-  // Cast: generated types still reflect the legacy schema (id/email only).
+// admin_users.user_id is the FK to auth.users.id; the RLS policy limits the
+// result to the caller's own row, so an empty/null result means the user is
+// not an admin. Cast: generated types still reflect the legacy schema
+// (id/email only) until `supabase gen types` is rerun.
+async function fetchAdminRole(userId: string): Promise<AdminRole | null> {
   const { data, error } = await (supabase as unknown as {
     from: (table: string) => {
       select: (cols: string) => {
@@ -44,14 +49,16 @@ async function loadAdminProfile(user: User) {
   })
     .from('admin_users')
     .select('role')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .maybeSingle();
 
-  if (error || !data) {
-    setState({ user, isAdmin: false, role: null, loading: false });
-    return;
-  }
-  setState({ user, isAdmin: true, role: data.role, loading: false });
+  if (error || !data) return null;
+  return data.role;
+}
+
+async function loadAdminProfile(user: User) {
+  const role = await fetchAdminRole(user.id);
+  setState({ user, isAdmin: role !== null, role, loading: false });
 }
 
 function applySession(session: Session | null) {
@@ -85,9 +92,23 @@ export function useAuth() {
   const signIn = async (
     email: string,
     password: string,
-  ): Promise<{ error: AuthError | null }> => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error };
+  ): Promise<SignInResult> => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error || !data.user) return { ok: false, reason: 'credentials' };
+
+    // Block sign-in for users that exist in auth.users but are not admins.
+    // Tearing the session down here keeps non-admins from ever holding a
+    // live session, which is safer than relying on the route guard alone.
+    const role = await fetchAdminRole(data.user.id);
+    if (role === null) {
+      await supabase.auth.signOut();
+      return { ok: false, reason: 'forbidden' };
+    }
+
+    return { ok: true };
   };
 
   const signOut = async (): Promise<void> => {
