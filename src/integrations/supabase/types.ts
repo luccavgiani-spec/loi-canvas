@@ -372,6 +372,7 @@ export type Database = {
           slug: string
           sort_order: number
           status: string | null
+          stock_quantity: number
           suggested_use: string | null
           visible: boolean
           weight_g: number
@@ -395,6 +396,7 @@ export type Database = {
           slug: string
           sort_order?: number
           status?: string | null
+          stock_quantity?: number
           suggested_use?: string | null
           visible?: boolean
           weight_g: number
@@ -418,6 +420,7 @@ export type Database = {
           slug?: string
           sort_order?: number
           status?: string | null
+          stock_quantity?: number
           suggested_use?: string | null
           visible?: boolean
           weight_g?: number
