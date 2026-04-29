@@ -17,6 +17,9 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Collabs = lazy(() => import("./pages/Collabs"));
 const Policies = lazy(() => import("./pages/Policies"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+const ProtectedAdminRoute = lazy(() => import("./components/ProtectedAdminRoute"));
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const Lembrancas = lazy(() => import("./pages/Lembrancas"));
 const BorrifadoresPage = lazy(() => import("./pages/BorrifadoresPage"));
@@ -53,7 +56,17 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/collabs" element={<Collabs />} />
                 <Route path="/policies" element={<Policies />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedAdminRoute>
+                      <AdminLayout />
+                    </ProtectedAdminRoute>
+                  }
+                >
+                  <Route index element={<Admin />} />
+                </Route>
                 <Route path="/lembrancas" element={<Lembrancas />} />
                 <Route path="/borrifadores" element={<BorrifadoresPage />} />
                 <Route path="*" element={<NotFound />} />

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import Layout from '@/components/layout/Layout';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   getAdminKPIs, getAdminSalesTimeseries, getAdminTopProducts, getAdminOrders, getAdminCustomers,
@@ -146,58 +145,58 @@ function ImageUploader({ images, onChange }: { images: string[]; onChange: (imgs
 }
 
 /* ═══════════ ADMIN ═══════════ */
-const Admin = () => {
-  const [isAuth, setIsAuth] = useState(false);
-  const [password, setPassword] = useState('');
+const ADMIN_TABS = [
+  { value: 'overview', label: 'Overview' },
+  { value: 'orders', label: 'Pedidos' },
+  { value: 'customers', label: 'Clientes' },
+  { value: 'products', label: 'Produtos' },
+  { value: 'collections', label: 'Coleções' },
+  { value: 'collabs', label: 'Collabs' },
+  { value: 'coupons', label: 'Cupons' },
+  { value: 'newsletter', label: 'Newsletter' },
+  { value: 'campanhas', label: 'Campanhas' },
+  { value: 'mensagens', label: 'Mensagens' },
+] as const;
 
-  if (!isAuth) {
-    return (
-      <Layout hideFooter>
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="max-w-sm w-full p-8 bg-card border border-border rounded-lg">
-            <h1 className="heading-display text-2xl mb-4 text-center">Admin</h1>
-            <p className="text-xs text-muted-foreground text-center mb-6">Placeholder auth — será substituído por Supabase Auth</p>
-            <Input type="password" placeholder="Senha" value={password} onChange={e => setPassword(e.target.value)} className="mb-3" />
-            <Button onClick={() => setIsAuth(true)} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm">
-              Entrar
-            </Button>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+const Admin = () => {
+  const [tab, setTab] = useState<string>('overview');
 
   return (
-    <Layout hideFooter>
-      <div className="container py-8">
-        <h1 className="heading-display text-3xl mb-6">Painel Admin</h1>
-        <Tabs defaultValue="overview">
-          <TabsList className="mb-6 flex-wrap">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="orders">Pedidos</TabsTrigger>
-            <TabsTrigger value="customers">Clientes</TabsTrigger>
-            <TabsTrigger value="products">Produtos</TabsTrigger>
-            <TabsTrigger value="collections">Coleções</TabsTrigger>
-            <TabsTrigger value="collabs">Collabs</TabsTrigger>
-            <TabsTrigger value="coupons">Cupons</TabsTrigger>
-            <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
-            <TabsTrigger value="campanhas">Campanhas</TabsTrigger>
-            <TabsTrigger value="mensagens">Mensagens</TabsTrigger>
-          </TabsList>
+    <div className="container py-8 space-y-6">
+      <h1 className="heading-display text-3xl">Painel Admin</h1>
 
-          <TabsContent value="overview"><OverviewTab /></TabsContent>
-          <TabsContent value="orders"><OrdersTab /></TabsContent>
-          <TabsContent value="customers"><CustomersTab /></TabsContent>
-          <TabsContent value="products"><ProductsTab /></TabsContent>
-          <TabsContent value="collections"><CollectionsTab /></TabsContent>
-          <TabsContent value="collabs"><CollabsTab /></TabsContent>
-          <TabsContent value="coupons"><CouponsTab /></TabsContent>
-          <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
-          <TabsContent value="campanhas"><CampaignsTab /></TabsContent>
-          <TabsContent value="mensagens"><MensagensTab /></TabsContent>
-        </Tabs>
-      </div>
-    </Layout>
+      <Tabs value={tab} onValueChange={setTab} className="space-y-6">
+        {/* mobile: native select replaces wrapping tab strip */}
+        <select
+          aria-label="Seção do painel"
+          value={tab}
+          onChange={(e) => setTab(e.target.value)}
+          className="md:hidden w-full px-4 py-3 text-sm bg-card border border-border rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          {ADMIN_TABS.map((t) => (
+            <option key={t.value} value={t.value}>{t.label}</option>
+          ))}
+        </select>
+
+        {/* desktop: horizontal tab list */}
+        <TabsList className="hidden md:flex flex-wrap">
+          {ADMIN_TABS.map((t) => (
+            <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
+          ))}
+        </TabsList>
+
+        <TabsContent value="overview"><OverviewTab /></TabsContent>
+        <TabsContent value="orders"><OrdersTab /></TabsContent>
+        <TabsContent value="customers"><CustomersTab /></TabsContent>
+        <TabsContent value="products"><ProductsTab /></TabsContent>
+        <TabsContent value="collections"><CollectionsTab /></TabsContent>
+        <TabsContent value="collabs"><CollabsTab /></TabsContent>
+        <TabsContent value="coupons"><CouponsTab /></TabsContent>
+        <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
+        <TabsContent value="campanhas"><CampaignsTab /></TabsContent>
+        <TabsContent value="mensagens"><MensagensTab /></TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
