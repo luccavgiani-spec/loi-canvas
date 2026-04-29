@@ -459,20 +459,27 @@ const ProductDetail = () => {
 
               {/* CTAs */}
               {/* FIX: sempre flex-col no mobile; w-full nos botões garante largura correta */}
-              <div className="flex flex-col gap-3 mb-10">
-                <button
-                  onClick={() => addItem(product)}
-                  className="loi-btn w-full justify-center"
-                >
-                  adicionar ao carrinho
-                </button>
-                <button
-                  onClick={() => addItem(product)}
-                  className="loi-btn-outline w-full justify-center"
-                >
-                  comprar agora
-                </button>
-              </div>
+              {(() => {
+                const outOfStock = (product.stock_quantity ?? 0) <= 0;
+                return (
+                  <div className="flex flex-col gap-3 mb-10">
+                    <button
+                      onClick={() => addItem(product)}
+                      disabled={outOfStock}
+                      className="loi-btn w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {outOfStock ? 'esgotado' : 'adicionar ao carrinho'}
+                    </button>
+                    <button
+                      onClick={() => addItem(product)}
+                      disabled={outOfStock}
+                      className="loi-btn-outline w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {outOfStock ? 'esgotado' : 'comprar agora'}
+                    </button>
+                  </div>
+                );
+              })()}
 
 
             </div>
