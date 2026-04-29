@@ -24,13 +24,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package, Truck, Mail, Send, GripVertical, ArrowUpDown, Eye, Star, Check } from 'lucide-react';
+import { DollarSign, ShoppingCart, Users, TrendingUp, Plus, Pencil, Trash2, X, Upload, Package, Truck, Mail, Send, ArrowUpDown, Eye, Star, Check } from 'lucide-react';
 import OrderDetailModal from '@/components/admin/OrderDetailModal';
 import {
   DndContext,
@@ -46,162 +42,14 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  useSortable,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { VideoPlayer } from '@/components/ui/VideoPlayer';
-
-/* ─────────── Shared styles ─────────── */
-const cardCls = 'bg-card border border-border rounded-lg p-4';
-const tableCls = 'w-full text-base';
-const thCls = 'py-3 pr-4 text-left text-sm text-muted-foreground uppercase tracking-wider';
-const tdCls = 'py-3 pr-4';
-
-/* ─────────── Confirm Delete Dialog ─────────── */
-function ConfirmDeleteDialog({ open, onOpenChange, title, description, onConfirm }: {
-  open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; onConfirm: () => void;
-}) {
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-            Excluir
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
-
-/* ─────────── Empty State ─────────── */
-function EmptyState({ label }: { label: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <Package size={40} className="text-muted-foreground/40 mb-4" />
-      <p className="text-base text-muted-foreground">Nenhum(a) {label} encontrado(a).</p>
-    </div>
-  );
-}
-
-/* ─────────── Modal ─────────── */
-function Modal({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
-      <div className="fixed inset-0 bg-black/40" />
-      <div
-        className="relative bg-background border border-border rounded-lg w-full max-w-lg max-h-[85vh] overflow-y-auto p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-heading font-semibold">{title}</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-/* ─────────── Image Upload UI ─────────── */
-function ImageUploader({
-  images,
-  onChange,
-  uploadFn,
-  onBusyChange,
-}: {
-  images: string[];
-  onChange: (imgs: string[]) => void;
-  uploadFn?: (file: File) => Promise<string>;
-  onBusyChange?: (busy: boolean) => void;
-}) {
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
-  const { toast } = useToast();
-
-  const updateBusy = (next: boolean) => {
-    setBusy(next);
-    onBusyChange?.(next);
-  };
-
-  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    e.target.value = '';
-    if (uploadFn) {
-      updateBusy(true);
-      const accumulated: string[] = [...images];
-      try {
-        for (const file of Array.from(files)) {
-          const url = await uploadFn(file);
-          accumulated.push(url);
-          onChange([...accumulated]);
-        }
-      } catch (err) {
-        console.error('[ImageUploader] upload failed', err);
-        toast({ title: 'Falha no upload da mídia.', variant: 'destructive' });
-      } finally {
-        updateBusy(false);
-      }
-      return;
-    }
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          onChange([...images, reader.result]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleUrlAdd = () => {
-    const url = prompt('Cole a URL da imagem ou vídeo:');
-    if (url?.trim()) onChange([...images, url.trim()]);
-  };
-
-  const remove = (idx: number) => onChange(images.filter((_, i) => i !== idx));
-
-  return (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-2">
-        {images.map((src, i) => (
-          <div key={i} className="relative w-20 h-20 border border-border rounded overflow-hidden group">
-            {src.endsWith('.mp4') ? (
-              <VideoPlayer src={src} className="w-full h-full object-cover" />
-            ) : (
-              <img src={src} alt="" className="w-full h-full object-cover" />
-            )}
-            <button
-              type="button"
-              onClick={() => remove(i)}
-              className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <X size={12} />
-            </button>
-            <span className="absolute bottom-0 left-0 bg-black/50 text-white text-[9px] px-1">{i + 1}</span>
-          </div>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input ref={fileRef} type="file" accept="image/*,video/mp4" multiple className="hidden" onChange={handleFiles} />
-        <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => fileRef.current?.click()} className="text-xs gap-1">
-          <Upload size={12} /> {busy ? 'Enviando…' : 'Upload'}
-        </Button>
-        <Button type="button" variant="outline" size="sm" onClick={handleUrlAdd} className="text-xs gap-1">
-          <ImageIcon size={12} /> URL
-        </Button>
-      </div>
-    </div>
-  );
-}
+import { cardCls, tableCls, thCls, tdCls } from '@/components/admin/shared/styles';
+import { ConfirmDeleteDialog } from '@/components/admin/shared/ConfirmDeleteDialog';
+import { EmptyState } from '@/components/admin/shared/EmptyState';
+import { Modal } from '@/components/admin/shared/Modal';
+import { ImageUploader } from '@/components/admin/shared/ImageUploader';
+import { SortableProductRow, type OrderItem } from '@/components/admin/shared/SortableProductRow';
 
 /* ═══════════ ADMIN ═══════════ */
 const ADMIN_TABS = [
@@ -1245,43 +1093,6 @@ function CollectionForm({
 }
 
 /* ═══════════ COLLECTION PRODUCTS ORDER (drag-and-drop) ═══════════ */
-type OrderItem = { id: string; name: string; sku: string; thumbnail: string | null };
-
-function SortableProductRow({ item }: { item: OrderItem }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.6 : 1,
-  };
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center gap-3 p-2 border border-border rounded bg-card"
-    >
-      <button
-        type="button"
-        {...attributes}
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
-        aria-label="Arrastar"
-      >
-        <GripVertical size={16} />
-      </button>
-      <div className="w-10 h-10 flex-shrink-0 rounded overflow-hidden bg-muted">
-        {item.thumbnail ? (
-          <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
-        ) : null}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm truncate">{item.name}</p>
-        <p className="text-xs text-muted-foreground font-mono truncate">{item.sku}</p>
-      </div>
-    </div>
-  );
-}
-
 function CollectionProductsOrder({ collectionId, onClose }: { collectionId: string; onClose: () => void }) {
   const { toast } = useToast();
   const [items, setItems] = useState<OrderItem[]>([]);
