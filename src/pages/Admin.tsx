@@ -665,7 +665,7 @@ function ProductForm({
     burn_hours: product?.burn_hours ?? 0,
     collection_id: product?.collection_id ?? '',
     visible: product?.visible ?? true,
-    is_bestseller: product?.is_bestseller ?? false,
+    is_bestseller: Boolean(product?.is_bestseller),
   });
   const [existingImages, setExistingImages] = useState<Tables<'product_images'>[]>(
     (product?.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order),
@@ -709,7 +709,7 @@ function ProductForm({
       ritual: form.ritual || null,
       accord: form.accord || null,
       visible: form.visible,
-      is_bestseller: form.is_bestseller,
+      is_bestseller: Boolean(form.is_bestseller),
     };
     onSave({ insert, newFiles, removedImageIds });
   };
