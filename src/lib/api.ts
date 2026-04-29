@@ -330,7 +330,34 @@ export const processPayment = (data: {
     mp_payment_id: string;
   }>('mp-process-payment', data);
 
-// Order by ID (for confirmation page)
+// Public confirmation page payload (sem PII / sem product_id).
+// Pesa numa edge function `get-order-public` para que orders/order_items
+// possam ter RLS hardened sem quebrar /pedido-confirmado.
+export type PublicOrderConfirmation = {
+  id: string;
+  status: string;
+  total: number;
+  shipping_cost: number;
+  is_pickup: boolean;
+  created_at: string;
+  items: { product_name: string; quantity: number; unit_price: number }[];
+  pickup_address: string | null;
+};
+
+export const getPublicOrderConfirmation = async (
+  orderId: string,
+): Promise<PublicOrderConfirmation> => {
+  const { data, error } = await supabase.functions.invoke<PublicOrderConfirmation>(
+    'get-order-public',
+    { body: { order_id: orderId } },
+  );
+  if (error) throw error;
+  if (!data) throw new Error('Pedido não encontrado');
+  return data;
+};
+
+// Order by ID (admin / fallback). Public confirmation page deve usar
+// getPublicOrderConfirmation acima.
 export const getOrderById = async (orderId: string) => {
   // Fetch order + items (no FK from order_items.product_id → products)
   const { data: order, error } = await supabase
