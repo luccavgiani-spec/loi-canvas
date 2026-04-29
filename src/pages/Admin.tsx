@@ -4,6 +4,7 @@ import {
   getAdminKPIs, getAdminSalesTimeseries, getAdminTopProducts, getAdminOrders, getAdminCustomers,
   getAdminNewsletter, getAdminCoupons, getAdminCollections, getAdminCollabs,
   getAdminProducts, getAdminProductsByCollection, updateProductsSortOrder,
+  updateBestsellerSortOrder,
   createAdminProduct, updateAdminProduct, deleteAdminProduct,
   uploadProductImage, insertProductImage, deleteProductImage, productImagePublicUrl,
   createAdminCollection, updateAdminCollection, deleteAdminCollection,
@@ -522,6 +523,7 @@ type ProductFormPayload = {
 
 function ProductsTab() {
   const { toast } = useToast();
+  const [subTab, setSubTab] = useState<'list' | 'bestseller-order'>('list');
   const [products, setProducts] = useState<AdminProductRow[]>([]);
   const [collections, setCollections] = useState<AdminCollectionRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -606,6 +608,27 @@ function ProductsTab() {
 
   return (
     <div>
+      <div className="flex gap-1 mb-4 border-b border-border">
+        <button
+          type="button"
+          onClick={() => setSubTab('list')}
+          className={`px-3 py-2 text-xs font-medium transition-colors ${subTab === 'list' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Lista
+        </button>
+        <button
+          type="button"
+          onClick={() => setSubTab('bestseller-order')}
+          className={`px-3 py-2 text-xs font-medium transition-colors ${subTab === 'bestseller-order' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          Ordem dos Bestsellers
+        </button>
+      </div>
+
+      {subTab === 'bestseller-order' ? (
+        <BestsellerProductsOrder products={products} onSaved={() => void reload()} />
+      ) : (
+      <>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-medium">Produtos ({products.length})</h3>
         <Button size="sm" onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1"><Plus size={14} /> Novo Produto</Button>
@@ -676,6 +699,8 @@ function ProductsTab() {
         description="Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita."
         onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
       />
+      </>
+      )}
     </div>
   );
 }
@@ -1336,6 +1361,108 @@ function CollectionProductsOrder({ collectionId, onClose }: { collectionId: stri
   );
 }
 
+/* ═══════════ BESTSELLER ORDER (drag-and-drop) ═══════════ */
+// TODO(home): a secao publica que renderiza esses bestsellers (componente
+// BestsellersSection.tsx) foi desreferenciada da home no Bloco G1.5.
+// Quando a home re-incluir, a ordem definida aqui passa a refletir.
+function BestsellerProductsOrder({ products, onSaved }: { products: AdminProductRow[]; onSaved: () => void }) {
+  const { toast } = useToast();
+  const [items, setItems] = useState<OrderItem[]>([]);
+  const [originalIds, setOriginalIds] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  useEffect(() => {
+    const bestsellers = products
+      .filter(p => p.is_bestseller)
+      .slice()
+      .sort((a, b) => {
+        const ao = a.bestseller_sort_order ?? 0;
+        const bo = b.bestseller_sort_order ?? 0;
+        if (ao !== bo) return ao - bo;
+        // Tie-break: created_at desc (mantem o default antigo)
+        return (b.created_at ?? '').localeCompare(a.created_at ?? '');
+      });
+    const mapped: OrderItem[] = bestsellers.map(p => {
+      const firstImg = (p.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order)[0];
+      return {
+        id: p.id,
+        name: p.name,
+        sku: p.sku ?? '',
+        thumbnail: firstImg ? productImagePublicUrl(firstImg.filename) : null,
+      };
+    });
+    setItems(mapped);
+    setOriginalIds(mapped.map(m => m.id));
+  }, [products]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setItems(prev => {
+      const oldIndex = prev.findIndex(p => p.id === active.id);
+      const newIndex = prev.findIndex(p => p.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  };
+
+  const dirty = items.some((it, idx) => originalIds[idx] !== it.id);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const ordered = items.map((it, idx) => ({ id: it.id, bestseller_sort_order: idx }));
+      await updateBestsellerSortOrder(ordered);
+      setOriginalIds(items.map(i => i.id));
+      toast({ title: 'Ordem dos bestsellers salva.' });
+      onSaved();
+    } catch (err) {
+      console.error('[BestsellerProductsOrder] save failed', err);
+      toast({ title: 'Erro ao salvar ordem. Alguns produtos podem não ter sido atualizados.', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (items.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground py-4">
+        Nenhum produto marcado como bestseller. Marque a flag "Bestseller" em algum produto para começar.
+      </p>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground mb-3">
+        Arraste para reordenar os {items.length} bestsellers. A ordem é usada por <code>getBestsellerProducts</code>.
+      </p>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+            {items.map(item => <SortableProductRow key={item.id} item={item} />)}
+          </div>
+        </SortableContext>
+      </DndContext>
+      <div className="flex gap-2 pt-4 mt-4 border-t border-border">
+        <Button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !dirty}
+          className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          {saving ? 'Salvando…' : 'Salvar ordem'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════ COLLABS ═══════════ */
 function CollabsTab() {
   const { toast } = useToast();
@@ -1374,9 +1501,16 @@ function CollabsTab() {
         const updated = await updateAdminCollab(editing.id, data);
         setCollabs(prev => prev.map(c => (c.id === editing.id ? updated : c)));
       } else {
+        // Sempre adiciona ao fim. Inserir manualmente em uma posição
+        // intermediaria duplicaria sort_order de alguma collab existente
+        // e quebrava a renderizacao da home (chave React duplicada).
+        // Reordenacao posterior via edicao explicita do campo Ordem.
+        const nextSortOrder = collabs.length === 0
+          ? 0
+          : Math.max(...collabs.map(c => c.sort_order)) + 1;
         const created = await createAdminCollab({
           ...data,
-          sort_order: data.sort_order ?? collabs.length,
+          sort_order: nextSortOrder,
         });
         setCollabs(prev => [...prev, created]);
       }
@@ -1508,10 +1642,12 @@ function CollabForm({ collab, onSave, onCancel }: { collab: Collab | null; onSav
           <Switch checked={form.is_active} onCheckedChange={v => setForm(f => ({ ...f, is_active: v }))} />
           <label className="text-sm">Ativa</label>
         </div>
-        <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ordem</label>
-          <Input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
-        </div>
+        {collab && (
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Ordem</label>
+            <Input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
+          </div>
+        )}
       </div>
       <div className="flex gap-2 pt-2">
         <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">{collab ? 'Salvar' : 'Criar'}</Button>
