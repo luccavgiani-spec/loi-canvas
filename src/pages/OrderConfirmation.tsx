@@ -5,6 +5,7 @@ import { getPublicOrderConfirmation, type PublicOrderConfirmation, type UpsellPr
 import { useCart } from '@/contexts/CartContext';
 import { Loader2, Package } from 'lucide-react';
 import type { Product } from '@/types';
+import { PickupMap } from '@/components/order/PickupMap';
 
 const CHAR = '#29241f';
 const OLIVA = '#565600';
@@ -256,6 +257,7 @@ const OrderConfirmation = () => {
                         endereço para retirada: {order.pickup_address}
                       </p>
                     )}
+                    {order.pickup_address && <PickupMap address={order.pickup_address} />}
                     <p style={{
                       fontFamily: BODY_TEXT_FAMILY,
                       fontWeight: 300,
