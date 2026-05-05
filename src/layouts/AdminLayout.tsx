@@ -11,8 +11,19 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { to: '/admin', label: 'Dashboard', end: true },
-  { to: '/admin/produtos', label: 'Produtos' },
-  { to: '/admin/colecoes', label: 'Coleções' },
+];
+
+const siteShortcuts: { to: string; label: string }[] = [
+  { to: '/',             label: 'Início' },
+  { to: '/colecoes',     label: 'Coleções' },
+  { to: '/velas',        label: 'Velas' },
+  { to: '/borrifadores', label: 'Borrifadores' },
+  { to: '/corpo',        label: 'Corpo' },
+  { to: '/lembrancas',   label: 'Lembranças' },
+  { to: '/collabs',      label: 'Collabs' },
+  { to: '/sobre',        label: 'Sobre' },
+  { to: '/contact',      label: 'Contato' },
+  { to: '/policies',     label: 'Políticas' },
 ];
 
 const siteShortcuts: { to: string; label: string }[] = [
