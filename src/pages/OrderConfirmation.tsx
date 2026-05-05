@@ -228,7 +228,7 @@ const OrderConfirmation = () => {
                       margin: '0 0 8px',
                       lineHeight: 1.5,
                     }}>
-                      <strong>até 5 dias úteis</strong> para retirada após confirmação do pagamento
+                      <strong>até 10 dias úteis</strong> para retirada após confirmação do pagamento
                     </p>
                     {order.pickup_address && (
                       <p style={{
@@ -267,7 +267,7 @@ const OrderConfirmation = () => {
                       margin: '0 0 8px',
                       lineHeight: 1.5,
                     }}>
-                      <strong>5 a 10 dias úteis</strong> após a confirmação do pagamento
+                      <strong>7 a 15 dias úteis</strong> após a postagem
                     </p>
                     <p style={{
                       fontFamily: BODY_TEXT_FAMILY,
@@ -322,11 +322,9 @@ const OrderConfirmation = () => {
               <div style={{ textAlign: 'center', marginBottom: 28 }}>
                 <span style={{ ...LABEL, display: 'block', marginBottom: 10 }}>você também pode gostar</span>
                 <h2 style={{
-                  fontFamily: BODY_TEXT_FAMILY,
-                  fontSize: 'clamp(1.1rem,2.4vw,1.6rem)',
+                  fontFamily: "'Wagon', sans-serif",
+                  fontSize: 'clamp(1.4rem,3vw,2rem)',
                   fontWeight: 300,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
                   color: CHAR,
                   margin: 0,
                 }}>
