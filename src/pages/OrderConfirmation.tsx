@@ -19,6 +19,8 @@ const LABEL: React.CSSProperties = {
   color: `${CHAR}99`,
 };
 
+const BODY_TEXT_FAMILY = "'Sackers Gothic', sans-serif";
+
 const OrderConfirmation = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -121,8 +123,11 @@ const OrderConfirmation = () => {
             </p>
 
             <p style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontSize: '0.95rem',
+              fontFamily: BODY_TEXT_FAMILY,
+              fontWeight: 300,
+              fontSize: '0.75rem',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               color: `${CHAR}77`,
               lineHeight: 1.6,
             }}>
@@ -144,7 +149,8 @@ const OrderConfirmation = () => {
                 <div key={idx} style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{
-                      fontFamily: "'Wagon', sans-serif",
+                      fontFamily: BODY_TEXT_FAMILY,
+                      fontWeight: 300,
                       fontSize: '1rem',
                       color: CHAR,
                       margin: 0,
@@ -165,7 +171,8 @@ const OrderConfirmation = () => {
                     </p>
                   </div>
                   <span style={{
-                    fontFamily: "'Wagon', sans-serif",
+                    fontFamily: BODY_TEXT_FAMILY,
+                    fontWeight: 300,
                     fontSize: '0.95rem',
                     color: CHAR,
                     whiteSpace: 'nowrap',
@@ -178,14 +185,15 @@ const OrderConfirmation = () => {
 
             <div style={{ borderTop: `1px solid ${CHAR}14`, marginTop: 20, paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{
-                fontFamily: "'Wagon', sans-serif",
+                fontFamily: BODY_TEXT_FAMILY,
+                fontWeight: 300,
                 fontSize: '1.05rem',
                 color: CHAR,
               }}>
                 Total
               </span>
               <span style={{
-                fontFamily: "'Wagon', sans-serif",
+                fontFamily: BODY_TEXT_FAMILY,
                 fontSize: '1.2rem',
                 fontWeight: 500,
                 color: CHAR,
@@ -211,8 +219,11 @@ const OrderConfirmation = () => {
                 {order.is_pickup ? (
                   <>
                     <p style={{
-                      fontFamily: "'Wagon', sans-serif",
-                      fontSize: '1rem',
+                      fontFamily: BODY_TEXT_FAMILY,
+                      fontWeight: 300,
+                      fontSize: '0.85rem',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
                       color: CHAR,
                       margin: '0 0 8px',
                       lineHeight: 1.5,
@@ -221,7 +232,8 @@ const OrderConfirmation = () => {
                     </p>
                     {order.pickup_address && (
                       <p style={{
-                        fontFamily: "'Wagon', sans-serif",
+                        fontFamily: BODY_TEXT_FAMILY,
+                        fontWeight: 300,
                         fontSize: '0.9rem',
                         color: `${CHAR}99`,
                         margin: '0 0 12px',
@@ -231,8 +243,11 @@ const OrderConfirmation = () => {
                       </p>
                     )}
                     <p style={{
-                      fontFamily: "'Wagon', sans-serif",
-                      fontSize: '0.9rem',
+                      fontFamily: BODY_TEXT_FAMILY,
+                      fontWeight: 300,
+                      fontSize: '0.75rem',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
                       color: `${CHAR}77`,
                       margin: 0,
                       lineHeight: 1.6,
@@ -243,8 +258,11 @@ const OrderConfirmation = () => {
                 ) : (
                   <>
                     <p style={{
-                      fontFamily: "'Wagon', sans-serif",
-                      fontSize: '1rem',
+                      fontFamily: BODY_TEXT_FAMILY,
+                      fontWeight: 300,
+                      fontSize: '0.85rem',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
                       color: CHAR,
                       margin: '0 0 8px',
                       lineHeight: 1.5,
@@ -252,8 +270,11 @@ const OrderConfirmation = () => {
                       <strong>5 a 10 dias úteis</strong> após a confirmação do pagamento
                     </p>
                     <p style={{
-                      fontFamily: "'Wagon', sans-serif",
-                      fontSize: '0.9rem',
+                      fontFamily: BODY_TEXT_FAMILY,
+                      fontWeight: 300,
+                      fontSize: '0.75rem',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
                       color: `${CHAR}77`,
                       margin: '0 0 12px',
                       lineHeight: 1.6,
@@ -265,8 +286,11 @@ const OrderConfirmation = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        fontFamily: "'Wagon', sans-serif",
-                        fontSize: '0.85rem',
+                        fontFamily: BODY_TEXT_FAMILY,
+                        fontWeight: 300,
+                        fontSize: '0.7rem',
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
                         color: OLIVA,
                         textDecoration: 'underline',
                         textUnderlineOffset: '3px',
@@ -275,8 +299,11 @@ const OrderConfirmation = () => {
                       Acompanhe pelo site oficial dos Correios
                     </a>
                     <p style={{
-                      fontFamily: "'Wagon', sans-serif",
-                      fontSize: '0.8rem',
+                      fontFamily: BODY_TEXT_FAMILY,
+                      fontWeight: 300,
+                      fontSize: '0.75rem',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
                       color: `${CHAR}55`,
                       margin: '8px 0 0',
                       lineHeight: 1.5,
@@ -295,9 +322,11 @@ const OrderConfirmation = () => {
               <div style={{ textAlign: 'center', marginBottom: 28 }}>
                 <span style={{ ...LABEL, display: 'block', marginBottom: 10 }}>você também pode gostar</span>
                 <h2 style={{
-                  fontFamily: "'Wagon', sans-serif",
-                  fontSize: 'clamp(1.4rem,3vw,2rem)',
+                  fontFamily: BODY_TEXT_FAMILY,
+                  fontSize: 'clamp(1.1rem,2.4vw,1.6rem)',
                   fontWeight: 300,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
                   color: CHAR,
                   margin: 0,
                 }}>
@@ -326,7 +355,8 @@ const OrderConfirmation = () => {
                     </Link>
                     <Link to={`/product/${product.slug}`} style={{ textDecoration: 'none' }}>
                       <p style={{
-                        fontFamily: "'Wagon', sans-serif",
+                        fontFamily: BODY_TEXT_FAMILY,
+                        fontWeight: 300,
                         fontSize: '0.95rem',
                         color: CHAR,
                         margin: 0,
@@ -338,7 +368,8 @@ const OrderConfirmation = () => {
                       </p>
                     </Link>
                     <span style={{
-                      fontFamily: "'Wagon', sans-serif",
+                      fontFamily: BODY_TEXT_FAMILY,
+                      fontWeight: 300,
                       fontSize: '0.9rem',
                       color: `${CHAR}88`,
                     }}>
@@ -392,7 +423,8 @@ const OrderConfirmation = () => {
               voltar à loja
             </button>
             <p style={{
-              fontFamily: "'Wagon', sans-serif",
+              fontFamily: BODY_TEXT_FAMILY,
+              fontWeight: 300,
               fontSize: '0.85rem',
               color: `${CHAR}55`,
             }}>
