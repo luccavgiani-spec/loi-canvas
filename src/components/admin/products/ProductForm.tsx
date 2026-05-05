@@ -1,29 +1,94 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Upload, X } from 'lucide-react';
+import { GripVertical, Upload, X } from 'lucide-react';
 import { productImagePublicUrl } from '@/lib/api';
 import type { AdminProductRow, AdminCollectionRow } from '@/lib/api';
 import type { TablesInsert, Tables } from '@/integrations/supabase/types';
+import { supabase } from '@/integrations/supabase/client';
 
 export type ProductFormPayload = {
   insert: TablesInsert<'products'>;
   newFiles: File[];
   removedImageIds: string[];
+  upsellProductIds: string[];
 };
 
 interface ProductFormProps {
   product: AdminProductRow | null;
   collections: AdminCollectionRow[];
+  products: AdminProductRow[];
   saving: boolean;
   onSave: (payload: ProductFormPayload) => void;
   onCancel: () => void;
 }
 
+type UpsellItem = { id: string; name: string; thumbnail: string | null };
+
+function SortableUpsellRow({ item, onRemove }: { item: UpsellItem; onRemove: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 p-2 border border-border rounded bg-card"
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+        aria-label="Arrastar"
+      >
+        <GripVertical size={14} />
+      </button>
+      <div className="w-8 h-8 flex-shrink-0 rounded overflow-hidden bg-muted">
+        {item.thumbnail ? (
+          <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
+        ) : null}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm truncate">{item.name}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="text-muted-foreground hover:text-destructive"
+        aria-label="Remover"
+      >
+        <X size={14} />
+      </button>
+    </div>
+  );
+}
+
 export function ProductForm({
   product,
   collections,
+  products,
   saving,
   onSave,
   onCancel,
@@ -79,6 +144,86 @@ export function ProductForm({
   const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
   const [newFiles, setNewFiles] = useState<File[]>([]);
 
+  // ── Upsells: lista ordenada de produtos cross-sell para este item ─────
+  // Carregamos product_upsells uma única vez ao abrir o modal (quando
+  // editing um produto existente). Para um produto novo, começa vazio
+  // e só persiste após o INSERT (orquestrado em ProductsTab).
+  const [upsellItems, setUpsellItems] = useState<UpsellItem[]>([]);
+  const [upsellPicker, setUpsellPicker] = useState<string>('');
+
+  // Lookup: id → UpsellItem derivado da prop products (nenhuma query extra).
+  // useMemo porque products pode ser passado como nova referência em re-renders
+  // mesmo sem mudança real.
+  const productLookup = useMemo(() => {
+    const map = new Map<string, UpsellItem>();
+    for (const p of products) {
+      const cover = (p.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order)[0];
+      map.set(p.id, {
+        id: p.id,
+        name: p.name,
+        thumbnail: cover ? productImagePublicUrl(cover.filename) : null,
+      });
+    }
+    return map;
+  }, [products]);
+
+  // 1 query no abrir do modal (quando editing). Sem flicker porque o estado
+  // inicial é [] — a seção apenas renderiza vazia até o effect popular.
+  useEffect(() => {
+    if (!product) return;
+    let cancelled = false;
+    void (async () => {
+      const { data, error } = await supabase
+        .from('product_upsells')
+        .select('upsell_product_id, sort_order')
+        .eq('product_id', product.id)
+        .order('sort_order', { ascending: true });
+      if (cancelled || error || !data) return;
+      const ordered = data
+        .map((row: { upsell_product_id: string }) => productLookup.get(row.upsell_product_id))
+        .filter((it): it is UpsellItem => Boolean(it));
+      setUpsellItems(ordered);
+    })();
+    return () => { cancelled = true; };
+  }, [product, productLookup]);
+
+  const upsellSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  // Lista do dropdown: produtos visíveis, exceto o próprio (na edição) e os
+  // já adicionados. Recalcula em memória — sem query.
+  const upsellOptions = useMemo(() => {
+    const selectedIds = new Set(upsellItems.map((it) => it.id));
+    return products
+      .filter((p) => p.visible)
+      .filter((p) => p.id !== product?.id)
+      .filter((p) => !selectedIds.has(p.id))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [products, product, upsellItems]);
+
+  const addUpsell = (id: string) => {
+    const it = productLookup.get(id);
+    if (!it) return;
+    setUpsellItems((prev) => (prev.find((x) => x.id === id) ? prev : [...prev, it]));
+  };
+
+  const removeUpsell = (id: string) => {
+    setUpsellItems((prev) => prev.filter((x) => x.id !== id));
+  };
+
+  const handleUpsellDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setUpsellItems((prev) => {
+      const oldIndex = prev.findIndex((p) => p.id === active.id);
+      const newIndex = prev.findIndex((p) => p.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  };
+
   const autoSlug = (name: string) => name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +263,12 @@ export function ProductForm({
       is_bestseller: Boolean(form.is_bestseller),
       stock_quantity: Number(form.stock_quantity) || 0,
     };
-    onSave({ insert, newFiles, removedImageIds });
+    onSave({
+      insert,
+      newFiles,
+      removedImageIds,
+      upsellProductIds: upsellItems.map((it) => it.id),
+    });
   };
 
   return (
@@ -230,6 +380,47 @@ export function ProductForm({
             onChange={e => setForm(f => ({ ...f, stock_quantity: Number(e.target.value) }))}
           />
         </div>
+      </div>
+
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Produtos Upsell</label>
+        <p className="text-xs text-muted-foreground mb-2">
+          produtos sugeridos em /pedido-confirmado quando o cliente comprar este item
+        </p>
+
+        {upsellItems.length > 0 && (
+          <DndContext sensors={upsellSensors} collisionDetection={closestCenter} onDragEnd={handleUpsellDragEnd}>
+            <SortableContext items={upsellItems.map((it) => it.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-2 mb-2">
+                {upsellItems.map((it) => (
+                  <SortableUpsellRow key={it.id} item={it} onRemove={() => removeUpsell(it.id)} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
+
+        <select
+          value={upsellPicker}
+          onChange={(e) => {
+            const id = e.target.value;
+            if (id) {
+              addUpsell(id);
+              setUpsellPicker('');
+            }
+          }}
+          disabled={upsellOptions.length === 0}
+          className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent disabled:opacity-50"
+        >
+          <option value="">
+            {upsellOptions.length === 0
+              ? (upsellItems.length > 0 ? 'Todos os produtos já foram adicionados' : 'Nenhum produto disponível')
+              : '+ Adicionar produto upsell'}
+          </option>
+          {upsellOptions.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
       </div>
 
       <div>

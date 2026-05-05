@@ -8,6 +8,7 @@ import {
   createAdminProduct, updateAdminProduct, deleteAdminProduct,
   uploadProductImage, insertProductImage, deleteProductImage, productImagePublicUrl,
 } from '@/lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import type { AdminProductRow, AdminCollectionRow } from '@/lib/api';
 import { tableCls, thCls, tdCls } from '@/components/admin/shared/styles';
 import { ConfirmDeleteDialog } from '@/components/admin/shared/ConfirmDeleteDialog';
@@ -84,6 +85,40 @@ export function ProductsTab() {
       for (let i = 0; i < payload.newFiles.length; i++) {
         const filename = await uploadProductImage(productId, payload.newFiles[i]);
         await insertProductImage(productId, filename, baseSort + i);
+      }
+
+      // Persistência dos upsells: replace-all (DELETE WHERE product_id =
+      // savedId, depois N INSERTs com sort_order = idx). Falhas aqui NÃO
+      // revertem o save do produto/imagens — o modal fica aberto pra
+      // retry. Tabela tem ~90 rows máx, não vale otimizar com diff.
+      //
+      // TODO(retry-hazard): se persistência falhar ao CRIAR produto novo,
+      // clicar Salvar de novo duplica o produto (createAdminProduct roda
+      // 2x porque editing continua null). Mesmo padrão já existe para
+      // falhas de upload de imagem. Fix futuro: rastrear createdProductId
+      // em estado e fazer UPDATE no retry.
+      try {
+        const { error: delErr } = await supabase
+          .from('product_upsells')
+          .delete()
+          .eq('product_id', productId);
+        if (delErr) throw delErr;
+        if (payload.upsellProductIds.length > 0) {
+          const rows = payload.upsellProductIds.map((id, idx) => ({
+            product_id: productId,
+            upsell_product_id: id,
+            sort_order: idx,
+          }));
+          const { error: insErr } = await supabase.from('product_upsells').insert(rows);
+          if (insErr) throw insErr;
+        }
+      } catch (upsellErr) {
+        console.error('[ProductsTab] upsells persistence failed', upsellErr);
+        toast({
+          title: 'Produto salvo, mas upsells não foram atualizados. Tente novamente.',
+          variant: 'destructive',
+        });
+        return;
       }
 
       toast({ title: editing ? 'Produto atualizado com sucesso.' : 'Produto criado com sucesso.' });
@@ -181,6 +216,7 @@ export function ProductsTab() {
         <ProductForm
           product={editing}
           collections={collections}
+          products={products}
           saving={saving}
           onSave={handleSave}
           onCancel={() => setModalOpen(false)}
