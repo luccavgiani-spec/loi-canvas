@@ -85,19 +85,32 @@ const HeroSection = () => {
             width: '100%',
           }}
         >
-          <div className="flex items-center gap-4 sm:gap-8 mt-10 px-6 sm:px-0">
+          <div className="flex items-center gap-3 sm:gap-6 mt-10 px-6 sm:px-0 flex-wrap justify-center">
             <a
-              href="/colecoes"
+              href="/velas"
               className="hero-fadeUp hero-btn-primary"
               style={{ animationDelay: '1.0s' }}
             >
-              navegar
+              velas
             </a>
-
+            <a
+              href="/borrifadores"
+              className="hero-fadeUp hero-btn-primary"
+              style={{ animationDelay: '1.05s' }}
+            >
+              borrifadores
+            </a>
+            <a
+              href="/corpo"
+              className="hero-fadeUp hero-btn-primary"
+              style={{ animationDelay: '1.1s' }}
+            >
+              corpo
+            </a>
             <a
               href="/sobre"
               className="hero-fadeUp hero-btn-ghost group"
-              style={{ animationDelay: '1.1s' }}
+              style={{ animationDelay: '1.15s' }}
             >
               <span>nossa história</span>
             </a>

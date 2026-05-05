@@ -1,7 +1,9 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Menu, X, Search, Truck } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const NAV_SECTIONS = [
   {
@@ -23,8 +25,8 @@ const NAV_SECTIONS = [
   {
     label: 'corpo',
     items: [
-      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/colecoes' },
-      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/colecoes' },
+      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/colecoes/barra-massagem' },
+      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/colecoes/oleo-corporal-massagem' },
     ],
   },
 ];
@@ -40,6 +42,9 @@ const Header = () => {
   const [trackingOpen, setTrackingOpen] = useState(false);
   const [trackingCode, setTrackingCode] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [searchLoading, setSearchLoading] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const trackingRef = useRef<HTMLDivElement>(null);
@@ -94,12 +99,45 @@ const Header = () => {
   const dropdownText = '#f4edd2';
   const dropdownMuted = 'rgba(244,237,210,0.3)';
 
-  const handleSearch = (e: React.FormEvent) => {
+  // Busca com short-circuit: tenta produto primeiro (nome ou slug),
+  // depois coleção. Se achar, navega direto. Sem página de resultados.
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      window.location.href = `/colecoes?q=${encodeURIComponent(searchQuery.trim())}`;
-      setSearchOpen(false);
-      setSearchQuery('');
+    const term = searchQuery.trim();
+    if (!term || searchLoading) return;
+    setSearchLoading(true);
+    try {
+      const like = `%${term}%`;
+      const { data: products } = await supabase
+        .from('products')
+        .select('slug')
+        .or(`name.ilike.${like},slug.ilike.${like}`)
+        .eq('visible', true)
+        .limit(1);
+      if (products && products.length > 0) {
+        navigate(`/product/${products[0].slug}`);
+        setSearchOpen(false);
+        setSearchQuery('');
+        return;
+      }
+      const { data: collections } = await supabase
+        .from('collections')
+        .select('slug')
+        .or(`name.ilike.${like},slug.ilike.${like}`)
+        .eq('is_active', true)
+        .limit(1);
+      if (collections && collections.length > 0) {
+        navigate(`/colecoes/${collections[0].slug}`);
+        setSearchOpen(false);
+        setSearchQuery('');
+        return;
+      }
+      toast({ title: 'Nenhum produto ou coleção encontrado.' });
+    } catch (err) {
+      console.error('[search] failed', err);
+      toast({ title: 'Erro ao buscar.', variant: 'destructive' });
+    } finally {
+      setSearchLoading(false);
     }
   };
 

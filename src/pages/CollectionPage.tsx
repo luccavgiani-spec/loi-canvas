@@ -60,7 +60,7 @@ const CollectionPage = () => {
     return result;
   }, [products, sort]);
 
-  if (notFound && !loading) return <Navigate to="/colecoes" replace />;
+  if (notFound && !loading) return <Navigate to="/" replace />;
 
   // /colecoes/<parent> -> rota canônica do pai. Defesa-em-profundidade
   // para URLs antigas/cacheadas; links internos novos vão direto à canônica.
@@ -93,6 +93,14 @@ const CollectionPage = () => {
 
   const otherCollections = allCollections.filter(c => c.slug !== slug && c.is_active);
 
+  // Volta pra rota canônica do tipo (Velas/Borrifadores/Corpo) quando
+  // a leaf tem pai. Sem pai (coleção órfã), volta pra home.
+  const parent = collection.parent_collection_id
+    ? allCollections.find((c) => c.id === collection.parent_collection_id)
+    : null;
+  const backTo = parent ? `/${parent.slug}` : '/';
+  const backLabel = parent ? parent.name.toLowerCase() : 'início';
+
   return (
     <Layout>
       <div ref={ref} style={{ textTransform: 'uppercase' }}>
@@ -112,7 +120,7 @@ const CollectionPage = () => {
 
           <div className="relative z-10 max-w-[1400px] mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24">
             <Link
-              to="/colecoes"
+              to={backTo}
               className="reveal-fade inline-flex items-center gap-2 mb-10 group/back"
               style={{
                 fontFamily: "var(--font-body)",
@@ -126,7 +134,7 @@ const CollectionPage = () => {
               }}
             >
               <ArrowLeft size={14} className="transition-transform duration-300 group-hover/back:-translate-x-1" />
-              todas as coleções
+              {backLabel}
             </Link>
 
             <div className="max-w-2xl">

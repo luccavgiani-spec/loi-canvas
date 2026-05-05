@@ -110,10 +110,18 @@ const Hero = () => {
           ))}
         </div>
 
-        {/* navegar button */}
-        <Link to="/colecoes" style={{ color: 'rgba(244,237,210,0.65)' }}>
-          <ArrowLink>navegar</ArrowLink>
-        </Link>
+        {/* navegar buttons — agora 3 categorias */}
+        <div className="flex items-center gap-5 sm:gap-8 flex-wrap justify-center">
+          <Link to="/velas" style={{ color: 'rgba(244,237,210,0.65)' }}>
+            <ArrowLink>velas</ArrowLink>
+          </Link>
+          <Link to="/borrifadores" style={{ color: 'rgba(244,237,210,0.65)' }}>
+            <ArrowLink>borrifadores</ArrowLink>
+          </Link>
+          <Link to="/corpo" style={{ color: 'rgba(244,237,210,0.65)' }}>
+            <ArrowLink>corpo</ArrowLink>
+          </Link>
+        </div>
       </div>
     </section>
   );

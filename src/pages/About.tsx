@@ -323,32 +323,41 @@ const About = () => {
         >
           CONHEÇA NOSSOS PRODUTOS
         </p>
-        <Link
-          to="/colecoes"
-          style={{
-            display: 'inline-block',
-            border: '1px solid #29241f',
-            fontFamily: "'Sackers Gothic', sans-serif",
-            fontWeight: 300,
-            fontSize: '0.7rem',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: '#29241f',
-            padding: '1rem 2.5rem',
-            textDecoration: 'none',
-            transition: 'background-color 0.2s, color 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#29241f';
-            (e.currentTarget as HTMLAnchorElement).style.color = '#fcf5e0';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'transparent';
-            (e.currentTarget as HTMLAnchorElement).style.color = '#29241f';
-          }}
-        >
-          CONHECER COLEÇÕES
-        </Link>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {[
+            { to: '/velas', label: 'VELAS' },
+            { to: '/borrifadores', label: 'BORRIFADORES' },
+            { to: '/corpo', label: 'CORPO' },
+          ].map((cta) => (
+            <Link
+              key={cta.to}
+              to={cta.to}
+              style={{
+                display: 'inline-block',
+                border: '1px solid #29241f',
+                fontFamily: "'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.7rem',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: '#29241f',
+                padding: '1rem 2.5rem',
+                textDecoration: 'none',
+                transition: 'background-color 0.2s, color 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#29241f';
+                (e.currentTarget as HTMLAnchorElement).style.color = '#fcf5e0';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'transparent';
+                (e.currentTarget as HTMLAnchorElement).style.color = '#29241f';
+              }}
+            >
+              {cta.label}
+            </Link>
+          ))}
+        </div>
       </section>
     </Layout>
   );
