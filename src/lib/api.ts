@@ -1,6 +1,6 @@
 // v2 - schema corrigido
 import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
-import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, CouponValidation, CartItem, Collection, Collab } from '@/types';
+import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, CouponValidation, CartItem, Collection, Collab, VipCoupon } from '@/types';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections } from '@/lib/mocks';
 import { supabase } from '@/integrations/supabase/client';
@@ -868,7 +868,10 @@ export const validateCoupon = async (
     .maybeSingle();
 
   if (error) return { valid: false, reason: 'Erro ao validar cupom' };
-  if (!data) return { valid: false, reason: 'Cupom inválido ou expirado' };
+  if (!data) {
+    // Fallback VIP — Edge Function com service role lê vip_coupons (RLS lockdown).
+    return await validateVipCoupon(trimmed, cartItems);
+  }
 
   const coupon = mapDbCoupon(data);
   const collectionName = (data as { collections?: { name: string } | null }).collections?.name;
@@ -912,7 +915,131 @@ export const validateCoupon = async (
     valid: true,
     discount: Math.round(discount * 100) / 100,
     coupon,
+    kind: 'normal',
   };
+};
+
+async function validateVipCoupon(code: string, cartItems: CartItem[]): Promise<CouponValidation> {
+  try {
+    const payload = {
+      code,
+      cartItems: cartItems.map((i) => ({
+        product_id: i.product.id,
+        quantity: i.quantity,
+        price: i.product.price,
+      })),
+    };
+    const result = await callEdgeFunction<
+      | { valid: false; reason: string }
+      | { valid: true; kind: 'vip'; discount: number; applied_items: { product_id: string; discount_amount: number }[] }
+    >('validate-vip-coupon', payload);
+    if (!result.valid) return { valid: false, reason: result.reason };
+    return { valid: true, discount: result.discount, kind: 'vip' };
+  } catch {
+    return { valid: false, reason: 'Cupom inválido ou expirado' };
+  }
+}
+
+// VIP Coupons — admin CRUD via Supabase (RLS-gated, admin_users only).
+type VipCouponRow = Tables<'vip_coupons'> & {
+  vip_coupon_discounts: Pick<Tables<'vip_coupon_discounts'>, 'collection_id' | 'discount_percent'>[];
+};
+
+function mapDbVipCoupon(row: VipCouponRow): VipCoupon {
+  return {
+    id: row.id,
+    code: row.code,
+    active: row.active,
+    created_at: row.created_at,
+    discounts: (row.vip_coupon_discounts ?? []).map((d) => ({
+      collection_id: d.collection_id,
+      discount_percent: Number(d.discount_percent),
+    })),
+  };
+}
+
+export const getAdminVipCoupons = async (): Promise<VipCoupon[]> => {
+  const { data, error } = await supabase
+    .from('vip_coupons')
+    .select('id, code, active, created_at, vip_coupon_discounts(collection_id, discount_percent)')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((row) => mapDbVipCoupon(row as VipCouponRow));
+};
+
+export const createAdminVipCoupon = async (input: {
+  code: string;
+  active?: boolean;
+  discounts: { collection_id: string; discount_percent: number }[];
+}): Promise<VipCoupon> => {
+  const code = input.code.trim().toUpperCase();
+  if (!code) throw new Error('Código vazio');
+
+  const { data: created, error: insertErr } = await supabase
+    .from('vip_coupons')
+    .insert({ code, active: input.active ?? true })
+    .select('id, code, active, created_at')
+    .single();
+  if (insertErr) throw insertErr;
+
+  const rows = input.discounts
+    .filter((d) => d.discount_percent > 0)
+    .map((d) => ({ coupon_id: created.id, collection_id: d.collection_id, discount_percent: d.discount_percent }));
+  if (rows.length > 0) {
+    const { error: discErr } = await supabase.from('vip_coupon_discounts').insert(rows);
+    if (discErr) throw discErr;
+  }
+
+  return {
+    id: created.id,
+    code: created.code,
+    active: created.active,
+    created_at: created.created_at,
+    discounts: rows.map((r) => ({ collection_id: r.collection_id, discount_percent: r.discount_percent })),
+  };
+};
+
+export const updateAdminVipCoupon = async (
+  id: string,
+  input: {
+    code?: string;
+    active?: boolean;
+    discounts?: { collection_id: string; discount_percent: number }[];
+  },
+): Promise<VipCoupon> => {
+  const patch: TablesUpdate<'vip_coupons'> = {};
+  if (input.code !== undefined) patch.code = input.code.trim().toUpperCase();
+  if (input.active !== undefined) patch.active = input.active;
+
+  if (Object.keys(patch).length > 0) {
+    const { error: updErr } = await supabase.from('vip_coupons').update(patch).eq('id', id);
+    if (updErr) throw updErr;
+  }
+
+  if (input.discounts) {
+    const { error: delErr } = await supabase.from('vip_coupon_discounts').delete().eq('coupon_id', id);
+    if (delErr) throw delErr;
+    const rows = input.discounts
+      .filter((d) => d.discount_percent > 0)
+      .map((d) => ({ coupon_id: id, collection_id: d.collection_id, discount_percent: d.discount_percent }));
+    if (rows.length > 0) {
+      const { error: insErr } = await supabase.from('vip_coupon_discounts').insert(rows);
+      if (insErr) throw insErr;
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('vip_coupons')
+    .select('id, code, active, created_at, vip_coupon_discounts(collection_id, discount_percent)')
+    .eq('id', id)
+    .single();
+  if (error) throw error;
+  return mapDbVipCoupon(data as VipCouponRow);
+};
+
+export const deleteAdminVipCoupon = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('vip_coupons').delete().eq('id', id);
+  if (error) throw error;
 };
 
 // Collections Admin — Supabase direct (admin sees all, including is_active=false)
