@@ -403,6 +403,15 @@ export const createOrder = (data: {
   customer: { name: string; email: string; phone: string };
   is_pickup?: boolean;
   coupon_code?: string;
+  shipping_address?: {
+    cep: string;
+    street: string;
+    number: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    complement?: string;
+  };
 }) =>
   callEdgeFunction<{ order_id: string; total: number; discount?: number }>('create-order', data);
 
@@ -504,6 +513,16 @@ export const getOrderById = async (orderId: string) => {
 // Admin — detalhe completo do pedido para o modal "Ver pedido".
 // Retorna order + items enriquecidos com produto + capa (primeira imagem
 // por sort_order). Funciona com a RLS de admin existente em orders/order_items.
+export type ShippingAddress = {
+  cep: string;
+  street: string;
+  number: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  complement?: string;
+};
+
 export type AdminOrderDetail = {
   id: string;
   status: string | null;
@@ -515,6 +534,7 @@ export type AdminOrderDetail = {
   discount: number | null;
   total: number;
   is_pickup: boolean;
+  shipping_address: ShippingAddress | null;
   tracking_code: string | null;
   tracking_email_sent_at: string | null;
   mp_payment_id: string | null;
@@ -530,6 +550,24 @@ export type AdminOrderDetail = {
     image_url: string | null;
   }[];
 };
+
+function parseShippingAddress(value: unknown): ShippingAddress | null {
+  if (!value || typeof value !== 'object') return null;
+  const v = value as Record<string, unknown>;
+  const required = ['cep', 'street', 'number', 'neighborhood', 'city', 'state'] as const;
+  for (const k of required) {
+    if (typeof v[k] !== 'string' || !(v[k] as string)) return null;
+  }
+  return {
+    cep:          v.cep as string,
+    street:       v.street as string,
+    number:       v.number as string,
+    neighborhood: v.neighborhood as string,
+    city:         v.city as string,
+    state:        v.state as string,
+    complement:   typeof v.complement === 'string' ? v.complement : undefined,
+  };
+}
 
 type OrderWithItems = Tables<'orders'> & { order_items: Tables<'order_items'>[] };
 type ProductWithImages = Pick<Tables<'products'>, 'id' | 'name' | 'sku' | 'slug'> & {
@@ -572,6 +610,7 @@ export const getAdminOrderDetail = async (orderId: string): Promise<AdminOrderDe
     discount: orderRow.discount !== null ? Number(orderRow.discount) : null,
     total: Number(orderRow.total),
     is_pickup: orderRow.is_pickup,
+    shipping_address: parseShippingAddress(orderRow.shipping_address),
     tracking_code: orderRow.tracking_code,
     tracking_email_sent_at: orderRow.tracking_email_sent_at,
     mp_payment_id: orderRow.mp_payment_id,

@@ -287,6 +287,7 @@ export type Database = {
           is_pickup: boolean
           mp_payment_id: string | null
           mp_preference_id: string | null
+          shipping_address: Json | null
           shipping_cost: number | null
           status: string | null
           subtotal: number
@@ -304,6 +305,7 @@ export type Database = {
           is_pickup?: boolean
           mp_payment_id?: string | null
           mp_preference_id?: string | null
+          shipping_address?: Json | null
           shipping_cost?: number | null
           status?: string | null
           subtotal: number
@@ -321,6 +323,7 @@ export type Database = {
           is_pickup?: boolean
           mp_payment_id?: string | null
           mp_preference_id?: string | null
+          shipping_address?: Json | null
           shipping_cost?: number | null
           status?: string | null
           subtotal?: number
