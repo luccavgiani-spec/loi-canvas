@@ -43,10 +43,11 @@ serve(async (req) => {
     }
 
     // Items + lookup de product_name em 2 queries (sem embedded join).
-    // order_items.product_id NÃO tem FK para products.id (há ~59 órfãos
-    // históricos), então PostgREST não resolve `products(name)` embedado
-    // — retorna PGRST200. Mantendo o padrão da v2 deployada: select cru
-    // de order_items, depois lookup separado de nomes em products.
+    // order_items.product_id NÃO tem FK para products.id (69 de 87 rows
+    // são órfãs, ~79%, dado histórico de testes), então PostgREST não
+    // resolve `products(name)` embedado — retorna PGRST200. Mantendo o
+    // padrão da v2 deployada: select cru de order_items, depois lookup
+    // separado de nomes em products.
     const { data: rawItems, error: itemsErr } = await supabase
       .from('order_items')
       .select('product_id, qty, unit_price')
@@ -56,8 +57,12 @@ serve(async (req) => {
 
     type RawItem = { product_id: string | null; qty: number; unit_price: number };
 
-    // product_ids do pedido (excluindo órfãos) — input do lookup de nomes
-    // E dos algoritmos de upsell abaixo. Reutilizado nos dois lugares.
+    // NOTE: order_items.product_id não tem FK para products.id (69/87 rows
+    // órfãs). Filtramos null e confiamos que IDs presentes existem;
+    // órfãos retornam product_name='Produto' e caem no fallback de
+    // bestsellers (não geram upsells configurados — a query de upsells
+    // contra IDs órfãos retorna 0 rows e o fallback dispara).
+    // Reutilizado no lookup de nomes E nos algoritmos de upsell abaixo.
     const orderProductIds = (rawItems as RawItem[] ?? [])
       .map((r) => r.product_id)
       .filter((id): id is string => id !== null);
