@@ -274,7 +274,7 @@ const ProductDetail = () => {
               {/* 3. Descrição — texto corrido */}
               {product.description && (
                 <p
-                  className="mb-6 break-words"
+                  className="mb-6 break-words whitespace-pre-line"
                   style={{
                     fontFamily: FONT_BODY,
                     fontWeight: 300,
@@ -308,7 +308,7 @@ const ProductDetail = () => {
                       <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
-                      className="pb-4 break-words"
+                      className="pb-4 break-words whitespace-pre-line"
                       style={{
                         fontFamily: FONT_BODY,
                         fontWeight: 300,
@@ -343,7 +343,7 @@ const ProductDetail = () => {
                       <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
-                      className="pb-4 break-words"
+                      className="pb-4 break-words whitespace-pre-line"
                       style={{
                         fontFamily: FONT_BODY,
                         fontWeight: 300,
@@ -378,7 +378,7 @@ const ProductDetail = () => {
                       <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
-                      className="pb-4 break-words"
+                      className="pb-4 break-words whitespace-pre-line"
                       style={{
                         fontFamily: FONT_BODY,
                         fontWeight: 300,
@@ -413,7 +413,7 @@ const ProductDetail = () => {
                       <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
-                      className="pb-4 break-words"
+                      className="pb-4 break-words whitespace-pre-line"
                       style={{
                         fontFamily: FONT_BODY,
                         fontWeight: 300,
