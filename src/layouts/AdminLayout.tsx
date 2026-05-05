@@ -26,18 +26,6 @@ const siteShortcuts: { to: string; label: string }[] = [
   { to: '/policies',     label: 'Políticas' },
 ];
 
-const siteShortcuts: { to: string; label: string }[] = [
-  { to: '/',             label: 'Início' },
-  { to: '/colecoes',     label: 'Coleções' },
-  { to: '/velas',        label: 'Velas' },
-  { to: '/borrifadores', label: 'Borrifadores' },
-  { to: '/corpo',        label: 'Corpo' },
-  { to: '/lembrancas',   label: 'Lembranças' },
-  { to: '/collabs',      label: 'Collabs' },
-  { to: '/sobre',        label: 'Sobre' },
-  { to: '/contact',      label: 'Contato' },
-  { to: '/policies',     label: 'Políticas' },
-];
 
 const COLOR = {
   cream: '#fcf5e0',
