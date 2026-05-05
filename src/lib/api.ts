@@ -190,6 +190,7 @@ export const getProductsByCollectionSlug = async (collectionSlug: string): Promi
       detail: colRow.detail || undefined,
       story: colRow.story || undefined,
       price_label: colRow.price_label || undefined,
+      parent_collection_id: colRow.parent_collection_id ?? null,
       is_active: colRow.is_active,
       sort_order: colRow.sort_order,
       created_at: colRow.created_at,
