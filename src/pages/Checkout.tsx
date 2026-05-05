@@ -75,8 +75,10 @@ const INPUT: React.CSSProperties = {
   border: `1px solid ${CHAR}22`,
   borderRadius: 0,
   color: CHAR,
-  fontFamily: "'Wagon', sans-serif",
-  fontSize: '1.5rem',
+  fontFamily: "'Sackers Gothic', sans-serif",
+  fontWeight: 300,
+  fontSize: '1rem',
+  letterSpacing: '0.04em',
   outline: 'none',
   boxSizing: 'border-box' as const,
 };
@@ -94,14 +96,21 @@ const IFRAME_CONTAINER: React.CSSProperties = {
   display: 'block',
 };
 
+// TODO: O CardForm legado (mp.cardForm em Checkout.tsx, ~linha 261) não expõe
+// customization.visual.fontFamily — controle visual só via injeção de CSS. Se
+// 'Sackers Gothic' não renderizar dentro do iframe MP em produção, migrar para
+// Bricks API: mp.bricks().create('cardPayment', { customization: { visual: { fontFamily } } }).
+// Ref: https://www.mercadopago.com.br/developers/pt/docs/checkout-bricks/card-payment-brick/visual-customizations
 const MP_IFRAME_CSS = `
   div[id^="mp__"] iframe {
     width: 100% !important;
     height: 46px !important;
     border: none !important;
     padding: 0 14px !important;
-    font-family: 'Wagon', sans-serif !important;
-    font-size: 1.5rem !important;
+    font-family: 'Sackers Gothic', sans-serif !important;
+    font-weight: 300 !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.04em !important;
     color: ${CHAR} !important;
     background: transparent !important;
   }
@@ -809,7 +818,7 @@ const Checkout = () => {
       position: isMobile ? 'static' : 'sticky' as const,
       top: isMobile ? undefined : 96,
     }}>
-      <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>resumo</span>
+      <span style={{ ...LABEL, display: 'block', marginBottom: 16 }}>resumo</span>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
         {items.map(item => (
           <div key={item.product.id} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -948,7 +957,7 @@ const Checkout = () => {
 
               {/* ── Seus dados ── */}
               <section>
-                <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>seus dados</span>
+                <span style={{ ...LABEL, display: 'block', marginBottom: 16 }}>seus dados</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
                   {/* FIX: nome/sobrenome em coluna única no mobile */}
@@ -1002,7 +1011,7 @@ const Checkout = () => {
               {/* ── Endereço de entrega ── */}
               {!isPickup && (
               <section>
-                <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>endereço de entrega</span>
+                <span style={{ ...LABEL, display: 'block', marginBottom: 16 }}>endereço de entrega</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
                   <div>
@@ -1071,7 +1080,7 @@ const Checkout = () => {
 
               {/* ── Pagamento ── */}
               <section>
-                <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>pagamento</span>
+                <span style={{ ...LABEL, display: 'block', marginBottom: 16 }}>pagamento</span>
 
                 {step === 'form' && (
                   <>
