@@ -429,6 +429,15 @@ export const processPayment = (data: {
 // Public confirmation page payload (sem PII / sem product_id).
 // Pesa numa edge function `get-order-public` para que orders/order_items
 // possam ter RLS hardened sem quebrar /pedido-confirmado.
+export type UpsellProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  // null quando o produto não tem imagem cadastrada em product_images.
+  image_url: string | null;
+};
+
 export type PublicOrderConfirmation = {
   id: string;
   status: string;
@@ -438,6 +447,11 @@ export type PublicOrderConfirmation = {
   created_at: string;
   items: { product_name: string; quantity: number; unit_price: number }[];
   pickup_address: string | null;
+  // Até 3 produtos sugeridos, computados server-side: prioriza
+  // product_upsells configurados via admin; se vazio, cai para
+  // bestsellers visíveis (excluindo produtos já no pedido). Pode
+  // ser [] em cenário extremo (pedido só com órfãos + zero bestsellers).
+  upsells: UpsellProduct[];
 };
 
 export const getPublicOrderConfirmation = async (
