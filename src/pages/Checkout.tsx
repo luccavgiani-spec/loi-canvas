@@ -265,7 +265,7 @@ const CardForm = ({
       if (!mpInstance) {
         mpInstance = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
       }
-      const deviceId = mpInstance.getDeviceId?.() || '';
+      const deviceId = (window as any).MP_DEVICE_SESSION_ID || '';
       const mp = mpInstance;
       const cardForm = mp.cardForm({
         amount: String(total),
