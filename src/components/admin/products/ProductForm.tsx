@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -48,6 +48,31 @@ export function ProductForm({
     is_bestseller: Boolean(product?.is_bestseller),
     stock_quantity: product?.stock_quantity ?? 0,
   });
+  // Seletor de Tipo derivado em runtime via parent_collection_id.
+  // Pais conhecidos por slug; ordem importa pra UI.
+  const PARENT_SLUGS = ['velas', 'borrifadores', 'corpo'] as const;
+  const parents = useMemo(
+    () =>
+      collections
+        .filter((c) => c.parent_collection_id == null && (PARENT_SLUGS as readonly string[]).includes(c.slug))
+        .sort(
+          (a, b) =>
+            PARENT_SLUGS.indexOf(a.slug as (typeof PARENT_SLUGS)[number]) -
+            PARENT_SLUGS.indexOf(b.slug as (typeof PARENT_SLUGS)[number]),
+        ),
+    [collections],
+  );
+  const initialTypeId = useMemo(() => {
+    if (!product?.collection_id) return '';
+    const current = collections.find((c) => c.id === product.collection_id);
+    return current?.parent_collection_id ?? '';
+  }, [product, collections]);
+  const [typeId, setTypeId] = useState<string>(initialTypeId);
+  const childCollections = useMemo(
+    () => (typeId ? collections.filter((c) => c.parent_collection_id === typeId) : []),
+    [collections, typeId],
+  );
+
   const [existingImages, setExistingImages] = useState<Tables<'product_images'>[]>(
     (product?.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order),
   );
@@ -131,10 +156,34 @@ export function ProductForm({
         </div>
       </div>
       <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Tipo</label>
+        <select
+          value={typeId}
+          onChange={(e) => {
+            setTypeId(e.target.value);
+            setForm((f) => ({ ...f, collection_id: '' }));
+          }}
+          required
+          className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent"
+        >
+          <option value="">Selecione um tipo</option>
+          {parents.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
+      </div>
+      <div>
         <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Coleção</label>
-        <select value={form.collection_id} onChange={e => setForm(f => ({ ...f, collection_id: e.target.value }))} className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent">
-          <option value="">Sem coleção</option>
-          {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        <select
+          value={form.collection_id}
+          onChange={(e) => setForm((f) => ({ ...f, collection_id: e.target.value }))}
+          disabled={!typeId}
+          className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent disabled:opacity-50"
+        >
+          <option value="">{typeId ? 'Selecione uma coleção' : 'Selecione um tipo primeiro'}</option>
+          {childCollections.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
         </select>
       </div>
       <div>

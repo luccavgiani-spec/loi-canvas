@@ -78,7 +78,7 @@ const CartDrawer = () => {
                 }}
               >
                 {remaining > 0
-                  ? `Faltam R$ ${remaining.toFixed(2)} para frete grátis`
+                  ? `${remaining >= 1 ? 'faltam' : 'falta'} R$ ${remaining.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} para frete grátis`
                   : 'Você ganhou frete grátis!'}
               </p>
             </div>

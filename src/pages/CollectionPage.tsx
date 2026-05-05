@@ -62,6 +62,17 @@ const CollectionPage = () => {
 
   if (notFound && !loading) return <Navigate to="/colecoes" replace />;
 
+  // /colecoes/<parent> -> rota canônica do pai. Defesa-em-profundidade
+  // para URLs antigas/cacheadas; links internos novos vão direto à canônica.
+  if (
+    !loading &&
+    collection &&
+    collection.parent_collection_id == null &&
+    (['velas', 'borrifadores', 'corpo'] as string[]).includes(collection.slug)
+  ) {
+    return <Navigate to={`/${collection.slug}`} replace />;
+  }
+
   if (error) return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center">

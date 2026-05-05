@@ -15,6 +15,7 @@ import { ConfirmDeleteDialog } from '@/components/admin/shared/ConfirmDeleteDial
 import { EmptyState } from '@/components/admin/shared/EmptyState';
 import { Modal } from '@/components/admin/shared/Modal';
 import { CouponForm, type CouponFormPayload } from '@/components/admin/coupons/CouponForm';
+import { VipCouponsModal } from '@/components/admin/coupons/VipCouponsModal';
 
 function formatDiscount(c: Coupon): string {
   return c.type === 'percent'
@@ -38,6 +39,7 @@ export function CouponsTab() {
   const [collections, setCollections] = useState<AdminCollectionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [vipModalOpen, setVipModalOpen] = useState(false);
   const [editing, setEditing] = useState<Coupon | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
@@ -118,7 +120,10 @@ export function CouponsTab() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-medium">Cupons ({coupons.length})</h3>
-        <Button size="sm" onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1"><Plus size={14} /> Novo Cupom</Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => setVipModalOpen(true)} className="text-xs">Cupons VIP</Button>
+          <Button size="sm" onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs gap-1"><Plus size={14} /> Novo Cupom</Button>
+        </div>
       </div>
 
       {coupons.length === 0 ? <EmptyState label="cupom" /> : (
@@ -179,6 +184,12 @@ export function CouponsTab() {
         title="Excluir cupom"
         description="Tem certeza que deseja excluir este cupom? Esta ação não pode ser desfeita."
         onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
+      />
+
+      <VipCouponsModal
+        open={vipModalOpen}
+        onClose={() => setVipModalOpen(false)}
+        collections={collections}
       />
     </div>
   );

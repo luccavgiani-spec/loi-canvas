@@ -139,6 +139,15 @@ export interface CouponValidation {
   reason?: string;
   discount?: number;
   coupon?: Coupon;
+  kind?: 'normal' | 'vip';
+}
+
+export interface VipCoupon {
+  id: string;
+  code: string;
+  active: boolean;
+  created_at: string;
+  discounts: { collection_id: string; discount_percent: number }[];
 }
 
 export interface Collection {
@@ -151,6 +160,7 @@ export interface Collection {
   detail?: string;
   story?: string;
   price_label?: string;
+  parent_collection_id?: string | null;
   is_active: boolean;
   sort_order: number;
   created_at: string;

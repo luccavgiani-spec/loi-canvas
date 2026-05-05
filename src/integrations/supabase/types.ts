@@ -90,6 +90,7 @@ export type Database = {
           is_active: boolean
           name: string
           numeral: string | null
+          parent_collection_id: string | null
           price_label: string | null
           slug: string
           sort_order: number
@@ -104,6 +105,7 @@ export type Database = {
           is_active?: boolean
           name: string
           numeral?: string | null
+          parent_collection_id?: string | null
           price_label?: string | null
           slug: string
           sort_order?: number
@@ -118,12 +120,21 @@ export type Database = {
           is_active?: boolean
           name?: string
           numeral?: string | null
+          parent_collection_id?: string | null
           price_label?: string | null
           slug?: string
           sort_order?: number
           story?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "collections_parent_collection_id_fkey"
+            columns: ["parent_collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       coupons: {
         Row: {
@@ -543,6 +554,63 @@ export type Database = {
           default_shipping_cost?: number | null
           enabled?: boolean | null
           free_shipping_threshold?: number | null
+          id?: string
+        }
+        Relationships: []
+      }
+      vip_coupon_discounts: {
+        Row: {
+          collection_id: string
+          coupon_id: string
+          discount_percent: number
+          id: string
+        }
+        Insert: {
+          collection_id: string
+          coupon_id: string
+          discount_percent: number
+          id?: string
+        }
+        Update: {
+          collection_id?: string
+          coupon_id?: string
+          discount_percent?: number
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_coupon_discounts_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vip_coupon_discounts_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "vip_coupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vip_coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
           id?: string
         }
         Relationships: []
