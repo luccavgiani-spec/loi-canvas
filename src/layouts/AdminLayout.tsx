@@ -11,8 +11,6 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { to: '/admin', label: 'Dashboard', end: true },
-  { to: '/admin/produtos', label: 'Produtos' },
-  { to: '/admin/colecoes', label: 'Coleções' },
 ];
 
 const siteShortcuts: { to: string; label: string }[] = [
