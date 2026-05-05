@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { useCart } from '@/contexts/CartContext';
 import { createOrder, processPayment, getPublicOrderConfirmation, validateCoupon } from '@/lib/api';
-import type { Coupon } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import {
   MP_PUBLIC_KEY,
@@ -563,9 +562,11 @@ const Checkout = () => {
     ? 0
     : (subtotal >= freeShippingThreshold ? 0 : shippingFlatRate);
 
-  // Cupom
+  // Cupom — `applied` unifica cupom normal e VIP. VIP não retorna o
+  // registro completo (Edge Function só devolve discount), então o
+  // estado precisa funcionar com qualquer um dos dois caminhos.
   const [couponInput, setCouponInput] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [applied, setApplied] = useState<{ code: string; kind: 'normal' | 'vip' } | null>(null);
   const [discount, setDiscount] = useState(0);
   const [couponLoading, setCouponLoading] = useState(false);
 
@@ -575,12 +576,12 @@ const Checkout = () => {
   // Carrinho pode ter mudado (item removido, qty alterada) e a regra
   // de coleção ou pedido mínimo pode ter virado.
   useEffect(() => {
-    if (!appliedCoupon) return;
+    if (!applied) return;
     let cancelled = false;
-    validateCoupon(appliedCoupon.code, items, subtotal).then(res => {
+    validateCoupon(applied.code, items, subtotal).then(res => {
       if (cancelled) return;
       if (!res.valid) {
-        setAppliedCoupon(null);
+        setApplied(null);
         setDiscount(0);
         toast({ title: res.reason ?? 'Cupom não pôde ser aplicado.', variant: 'destructive' });
       } else {
@@ -588,7 +589,7 @@ const Checkout = () => {
       }
     });
     return () => { cancelled = true; };
-  }, [items, subtotal, appliedCoupon, toast]);
+  }, [items, subtotal, applied, toast]);
 
   const handleApplyCoupon = async () => {
     const code = couponInput.trim();
@@ -600,7 +601,7 @@ const Checkout = () => {
         toast({ title: res.reason ?? 'Cupom inválido.', variant: 'destructive' });
         return;
       }
-      setAppliedCoupon(res.coupon ?? null);
+      setApplied({ code: code.toUpperCase(), kind: res.kind ?? 'normal' });
       setDiscount(res.discount ?? 0);
       setCouponInput('');
       toast({ title: 'Cupom aplicado.' });
@@ -610,7 +611,7 @@ const Checkout = () => {
   };
 
   const handleRemoveCoupon = () => {
-    setAppliedCoupon(null);
+    setApplied(null);
     setDiscount(0);
   };
 
@@ -688,7 +689,7 @@ const Checkout = () => {
       const orderRes = await createOrder({
         items: orderItems,
         is_pickup: isPickup,
-        coupon_code: appliedCoupon?.code,
+        coupon_code: applied?.code,
         customer: {
           name: `${result.data.firstName} ${result.data.lastName}`,
           email: result.data.email,
@@ -846,7 +847,7 @@ const Checkout = () => {
         </div>
 
         {/* Cupom de desconto */}
-        {!appliedCoupon ? (
+        {!applied ? (
           <div style={{ paddingTop: 10, borderTop: `1px solid ${CHAR}14`, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={{ ...LABEL, fontSize: '0.7rem' }}>cupom de desconto</label>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -883,7 +884,7 @@ const Checkout = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: `1px solid ${CHAR}14` }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: OLIVA }}>
-                Desconto ({appliedCoupon.code})
+                Desconto ({applied.code})
               </span>
               <button
                 type="button"
@@ -895,7 +896,7 @@ const Checkout = () => {
               </button>
             </div>
             <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: OLIVA }}>
-              − R$ {discount.toFixed(2)}
+              − R$ {discount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
         )}
