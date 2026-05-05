@@ -568,6 +568,7 @@ const Checkout = () => {
   const [couponInput, setCouponInput] = useState('');
   const [applied, setApplied] = useState<{ code: string; kind: 'normal' | 'vip' } | null>(null);
   const [discount, setDiscount] = useState(0);
+  const [appliedItems, setAppliedItems] = useState<Map<string, number>>(new Map());
   const [couponLoading, setCouponLoading] = useState(false);
 
   const total = Math.max(0, subtotal + shipping - discount);
@@ -583,9 +584,13 @@ const Checkout = () => {
       if (!res.valid) {
         setApplied(null);
         setDiscount(0);
+        setAppliedItems(new Map());
         toast({ title: res.reason ?? 'Cupom não pôde ser aplicado.', variant: 'destructive' });
       } else {
         setDiscount(res.discount ?? 0);
+        setAppliedItems(
+          new Map((res.applied_items ?? []).map((i) => [i.product_id, i.discount_amount])),
+        );
       }
     });
     return () => { cancelled = true; };
@@ -603,6 +608,9 @@ const Checkout = () => {
       }
       setApplied({ code: code.toUpperCase(), kind: res.kind ?? 'normal' });
       setDiscount(res.discount ?? 0);
+      setAppliedItems(
+        new Map((res.applied_items ?? []).map((i) => [i.product_id, i.discount_amount])),
+      );
       setCouponInput('');
       toast({ title: 'Cupom aplicado.' });
     } finally {
@@ -613,6 +621,7 @@ const Checkout = () => {
   const handleRemoveCoupon = () => {
     setApplied(null);
     setDiscount(0);
+    setAppliedItems(new Map());
   };
 
   const isFormComplete = isPickup
@@ -812,25 +821,49 @@ const Checkout = () => {
     }}>
       <span style={{ ...LABEL, display: 'block', marginBottom: 20 }}>resumo</span>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
-        {items.map(item => (
-          <div key={item.product.id} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            {item.product.images?.[0] && (
-              <img src={item.product.images[0]} alt={item.product.name}
-                style={{ width: 44, height: 44, objectFit: 'cover', filter: 'saturate(0.6)', flexShrink: 0 }} />
-            )}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {item.product.name}
-              </p>
-              <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: CHAR, margin: 0 }}>
-                Qtd: {item.quantity}
-              </p>
+        {items.map(item => {
+          const original = item.product.price * item.quantity;
+          const itemDiscount = appliedItems.get(item.product.id) ?? 0;
+          const discounted = original - itemDiscount;
+          const pct = itemDiscount > 0 && original > 0
+            ? Math.round((1 - discounted / original) * 100)
+            : 0;
+          return (
+            <div key={item.product.id} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              {item.product.images?.[0] && (
+                <img src={item.product.images[0]} alt={item.product.name}
+                  style={{ width: 44, height: 44, objectFit: 'cover', filter: 'saturate(0.6)', flexShrink: 0 }} />
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {item.product.name}
+                </p>
+                <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: CHAR, margin: 0 }}>
+                  Qtd: {item.quantity}
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', whiteSpace: 'nowrap' }}>
+                {pct > 0 ? (
+                  <>
+                    <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '0.85rem', color: `${CHAR}66`, textDecoration: 'line-through' }}>
+                      R$ {original.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR }}>
+                      R$ {discounted.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.65rem', letterSpacing: '0.1em', color: OLIVA, marginTop: 2 }}>
+                      −{pct}%
+                    </span>
+                  </>
+                ) : (
+                  <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR }}>
+                    R$ {original.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                )}
+              </div>
             </div>
-            <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR, whiteSpace: 'nowrap' }}>
-              R$ {(item.product.price * item.quantity).toFixed(2)}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div style={{ borderTop: `1px solid ${CHAR}14`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -881,23 +914,50 @@ const Checkout = () => {
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: `1px solid ${CHAR}14` }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 10, borderTop: `1px solid ${CHAR}14` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: OLIVA }}>
+                  Desconto ({applied.code})
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRemoveCoupon}
+                  disabled={fieldDisabled}
+                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'sans-serif', fontSize: '0.75rem', color: `${CHAR}99`, textDecoration: 'underline', textAlign: 'left' }}
+                >
+                  remover
+                </button>
+              </div>
               <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: OLIVA }}>
-                Desconto ({applied.code})
+                − R$ {discount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
-              <button
-                type="button"
-                onClick={handleRemoveCoupon}
-                disabled={fieldDisabled}
-                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'sans-serif', fontSize: '0.75rem', color: `${CHAR}99`, textDecoration: 'underline', textAlign: 'left' }}
-              >
-                remover
-              </button>
             </div>
-            <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: OLIVA }}>
-              − R$ {discount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
+
+            {/* Detalhamento por item — só pra cupons VIP que têm applied_items.
+                Cupom normal aplica desconto sobre o subtotal e não tem item-by-item. */}
+            {applied.kind === 'vip' && appliedItems.size > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 12, borderLeft: `1px solid ${OLIVA}33` }}>
+                {items
+                  .filter((it) => (appliedItems.get(it.product.id) ?? 0) > 0)
+                  .map((it) => {
+                    const original = it.product.price * it.quantity;
+                    const itemDisc = appliedItems.get(it.product.id) ?? 0;
+                    const pct = original > 0 ? Math.round((itemDisc / original) * 100) : 0;
+                    const colName = (it.product.collection ?? '').trim();
+                    return (
+                      <div key={it.product.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                        <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.7rem', letterSpacing: '0.05em', color: `${CHAR}99`, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {it.product.name}{colName ? ` (${colName})` : ''} −{pct}%
+                        </span>
+                        <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.7rem', color: `${CHAR}99`, whiteSpace: 'nowrap' }}>
+                          − R$ {itemDisc.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </div>
         )}
 

@@ -140,6 +140,7 @@ export interface CouponValidation {
   discount?: number;
   coupon?: Coupon;
   kind?: 'normal' | 'vip';
+  applied_items?: { product_id: string; discount_amount: number }[];
 }
 
 export interface VipCoupon {

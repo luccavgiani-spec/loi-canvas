@@ -936,7 +936,12 @@ async function validateVipCoupon(code: string, cartItems: CartItem[]): Promise<C
       | { valid: true; kind: 'vip'; discount: number; applied_items: { product_id: string; discount_amount: number }[] }
     >('validate-vip-coupon', payload);
     if (!result.valid) return { valid: false, reason: result.reason };
-    return { valid: true, discount: result.discount, kind: 'vip' };
+    return {
+      valid: true,
+      discount: result.discount,
+      kind: 'vip',
+      applied_items: result.applied_items,
+    };
   } catch {
     return { valid: false, reason: 'Cupom inválido ou expirado' };
   }
