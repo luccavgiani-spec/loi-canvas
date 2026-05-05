@@ -83,6 +83,23 @@ export interface Customer {
   orders_count?: number;
   total_spent?: number;
   created_at?: string;
+  first_order_at?: string | null;
+  last_order_at?: string | null;
+  shipping_address?: {
+    cep?: string;
+    street?: string;
+    number?: string;
+    neighborhood?: string;
+    city?: string;
+    state?: string;
+    complement?: string;
+  } | null;
+  favorite_products?: Array<{
+    product_id: string;
+    name: string;
+    slug: string;
+    qty: number;
+  }>;
 }
 
 export interface ShippingQuote {

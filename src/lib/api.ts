@@ -674,29 +674,23 @@ export const getAdminOrders = async (params?: { status?: string }): Promise<Orde
 
 export const getAdminCustomers = async (): Promise<Customer[]> => {
   try {
-    const { data: customers, error } = await supabase
-      .from('customers')
+    const { data, error } = await supabase
+      .from('admin_customer_summary' as any)
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('last_order_at', { ascending: false, nullsFirst: false });
     if (error) throw error;
-    const { data: orderStats } = await supabase
-      .from('orders')
-      .select('customer_email, total')
-      .neq('status', 'cancelled');
-    const statsMap: Record<string, { count: number; total: number }> = {};
-    for (const o of orderStats || []) {
-      if (!statsMap[o.customer_email]) statsMap[o.customer_email] = { count: 0, total: 0 };
-      statsMap[o.customer_email].count += 1;
-      statsMap[o.customer_email].total += Number(o.total);
-    }
-    return (customers || []).map((c: any) => ({
+    return (data ?? []).map((c: any) => ({
       id: c.id,
       name: c.name,
       email: c.email,
       phone: c.phone || '',
-      orders_count: statsMap[c.email]?.count ?? 0,
-      total_spent: statsMap[c.email]?.total ?? 0,
-      created_at: c.created_at,
+      orders_count: c.orders_count,
+      total_spent: Number(c.total_spent),
+      created_at: c.customer_since,
+      first_order_at: c.first_order_at,
+      last_order_at: c.last_order_at,
+      shipping_address: c.shipping_address,
+      favorite_products: c.favorite_products || [],
     }));
   } catch (err) {
     console.warn('[getAdminCustomers] Supabase query failed, using mock fallback:', err);

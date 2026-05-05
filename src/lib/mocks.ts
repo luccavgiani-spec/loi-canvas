@@ -115,9 +115,55 @@ export const mockOrders: Order[] = [
 ];
 
 export const mockCustomers: Customer[] = [
-  { id: 'c1', name: 'Maria Silva', email: 'maria@email.com', phone: '11999887766', orders_count: 5, total_spent: 1245, created_at: '2024-11-01' },
-  { id: 'c2', name: 'João Pereira', email: 'joao@email.com', phone: '21988776655', orders_count: 3, total_spent: 789, created_at: '2025-01-15' },
-  { id: 'c3', name: 'Ana Lima', email: 'ana@email.com', phone: '31977665544', orders_count: 1, total_spent: 332, created_at: '2025-03-10' },
+  {
+    id: 'c1',
+    name: 'Maria Silva',
+    email: 'maria@email.com',
+    phone: '11999887766',
+    orders_count: 5,
+    total_spent: 1245,
+    created_at: '2024-11-01',
+    first_order_at: '2024-11-01T10:00:00Z',
+    last_order_at: '2025-04-22T15:30:00Z',
+    shipping_address: {
+      cep: '12914-100',
+      street: 'Rua das Flores',
+      number: '42',
+      neighborhood: 'Centro',
+      city: 'Bragança Paulista',
+      state: 'SP',
+    },
+    favorite_products: [
+      { product_id: 'sal-1', name: 'Campos', slug: 'campos', qty: 3 },
+      { product_id: 'ref-3', name: 'Caramelo', slug: 'caramelo', qty: 2 },
+    ],
+  },
+  {
+    id: 'c2',
+    name: 'João Pereira',
+    email: 'joao@email.com',
+    phone: '21988776655',
+    orders_count: 3,
+    total_spent: 789,
+    created_at: '2025-01-15',
+    first_order_at: '2025-01-15T09:00:00Z',
+    last_order_at: '2025-03-20T12:00:00Z',
+    shipping_address: null,
+    favorite_products: [],
+  },
+  {
+    id: 'c3',
+    name: 'Ana Lima',
+    email: 'ana@email.com',
+    phone: '31977665544',
+    orders_count: 1,
+    total_spent: 332,
+    created_at: '2025-03-10',
+    first_order_at: null,
+    last_order_at: null,
+    shipping_address: null,
+    favorite_products: [],
+  },
 ];
 
 export const mockKPIs: KPIs = {
