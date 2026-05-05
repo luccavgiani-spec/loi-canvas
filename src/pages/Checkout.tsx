@@ -827,14 +827,14 @@ const Checkout = () => {
                 style={{ width: 44, height: 44, objectFit: 'cover', filter: 'saturate(0.6)', flexShrink: 0 }} />
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1rem', color: CHAR, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {item.product.name}
               </p>
               <p style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: CHAR, margin: 0 }}>
                 Qtd: {item.quantity}
               </p>
             </div>
-            <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR, whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1rem', color: CHAR, whiteSpace: 'nowrap' }}>
               R$ {(item.product.price * item.quantity).toFixed(2)}
             </span>
           </div>
@@ -842,14 +842,14 @@ const Checkout = () => {
       </div>
       <div style={{ borderTop: `1px solid ${CHAR}14`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR }}>Subtotal</span>
-          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR }}>R$ {subtotal.toFixed(2)}</span>
+          <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1rem', color: CHAR }}>Subtotal</span>
+          <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1rem', color: CHAR }}>R$ {subtotal.toFixed(2)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR }}>
+          <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1rem', color: CHAR }}>
             {isPickup ? 'Retirada na loja' : 'Frete'}
           </span>
-          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: CHAR }}>
+          <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1rem', color: CHAR }}>
             {shipping === 0 ? 'Grátis' : `R$ ${shipping.toFixed(2)}`}
           </span>
         </div>
@@ -891,7 +891,7 @@ const Checkout = () => {
         ) : (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: `1px solid ${CHAR}14` }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: OLIVA }}>
+              <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1rem', color: OLIVA }}>
                 Desconto ({appliedCoupon.code})
               </span>
               <button
@@ -903,15 +903,15 @@ const Checkout = () => {
                 remover
               </button>
             </div>
-            <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1rem', color: OLIVA }}>
+            <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1rem', color: OLIVA }}>
               − R$ {discount.toFixed(2)}
             </span>
           </div>
         )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, borderTop: `1px solid ${CHAR}14` }}>
-          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1.15rem', color: CHAR }}>Total</span>
-          <span style={{ fontFamily: "'Wagon', sans-serif", fontSize: '1.25rem', fontWeight: 500, color: CHAR }}>
+          <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, fontSize: '1.15rem', color: CHAR }}>Total</span>
+          <span style={{ fontFamily: "'Sackers Gothic', sans-serif", fontSize: '1.25rem', fontWeight: 500, color: CHAR }}>
             R$ {total.toFixed(2)}
           </span>
         </div>
