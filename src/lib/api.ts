@@ -250,6 +250,7 @@ export const getCollections = async (): Promise<Collection[]> => {
       detail: row.detail || undefined,
       story: row.story || undefined,
       price_label: row.price_label || undefined,
+      parent_collection_id: row.parent_collection_id ?? null,
       is_active: row.is_active,
       sort_order: row.sort_order,
       created_at: row.created_at,

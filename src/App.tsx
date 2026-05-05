@@ -23,6 +23,8 @@ const ProtectedAdminRoute = lazy(() => import("./components/ProtectedAdminRoute"
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const Lembrancas = lazy(() => import("./pages/Lembrancas"));
 const BorrifadoresPage = lazy(() => import("./pages/BorrifadoresPage"));
+const VelasPage = lazy(() => import("./pages/VelasPage"));
+const CorpoPage = lazy(() => import("./pages/CorpoPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -69,6 +71,8 @@ const App = () => (
                 </Route>
                 <Route path="/lembrancas" element={<Lembrancas />} />
                 <Route path="/borrifadores" element={<BorrifadoresPage />} />
+                <Route path="/velas" element={<VelasPage />} />
+                <Route path="/corpo" element={<CorpoPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

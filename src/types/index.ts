@@ -160,6 +160,7 @@ export interface Collection {
   detail?: string;
   story?: string;
   price_label?: string;
+  parent_collection_id?: string | null;
   is_active: boolean;
   sort_order: number;
   created_at: string;
