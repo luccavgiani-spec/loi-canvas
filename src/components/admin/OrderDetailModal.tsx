@@ -353,10 +353,29 @@ export default function OrderDetailModal({ orderId, onClose }: OrderDetailModalP
                 {/* Endereço de cobrança / observação */}
                 <div className="pt-4 border-t border-border">
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">Endereço de cobrança</p>
-                  <p className="text-xs text-muted-foreground">
-                    {/* schema atual de orders não armazena endereço estruturado */}
-                    Não armazenado neste pedido.
-                  </p>
+                  {order.is_pickup ? (
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <p>Retirada presencial</p>
+                      <p className="flex items-start gap-1.5">
+                        <MapPin size={11} className="mt-0.5 shrink-0" />
+                        <span>{pickupAddress}</span>
+                      </p>
+                    </div>
+                  ) : order.shipping_address ? (
+                    <div className="text-xs text-muted-foreground space-y-0.5">
+                      <p>
+                        {order.shipping_address.street}, {order.shipping_address.number}
+                        {order.shipping_address.complement ? ` - ${order.shipping_address.complement}` : ''}
+                      </p>
+                      <p>
+                        {order.shipping_address.neighborhood} - {order.shipping_address.city}/{order.shipping_address.state} - CEP {order.shipping_address.cep}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Não armazenado neste pedido.
+                    </p>
+                  )}
                 </div>
               </Card>
 

@@ -702,15 +702,15 @@ const Checkout = () => {
           name: `${result.data.firstName} ${result.data.lastName}`,
           email: result.data.email,
           phone: result.data.phone,
-          address: {
-            cep:          result.data.cep,
-            street:       result.data.street,
-            number:       result.data.number,
-            neighborhood: result.data.neighborhood,
-            city:         result.data.city,
-            state:        result.data.state,
-          },
-        } as any,
+        },
+        shipping_address: isPickup ? undefined : {
+          cep:          result.data.cep,
+          street:       result.data.street,
+          number:       result.data.number,
+          neighborhood: result.data.neighborhood,
+          city:         result.data.city,
+          state:        result.data.state,
+        },
       });
       setOrderId(orderRes.order_id);
       setStep('payment');
