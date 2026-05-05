@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut } from 'lucide-react';
+import { Menu, X, LogOut, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface NavItem {
@@ -13,6 +13,19 @@ const navItems: NavItem[] = [
   { to: '/admin', label: 'Dashboard', end: true },
   { to: '/admin/produtos', label: 'Produtos' },
   { to: '/admin/colecoes', label: 'Coleções' },
+];
+
+const siteShortcuts: { to: string; label: string }[] = [
+  { to: '/',             label: 'Início' },
+  { to: '/colecoes',     label: 'Coleções' },
+  { to: '/velas',        label: 'Velas' },
+  { to: '/borrifadores', label: 'Borrifadores' },
+  { to: '/corpo',        label: 'Corpo' },
+  { to: '/lembrancas',   label: 'Lembranças' },
+  { to: '/collabs',      label: 'Collabs' },
+  { to: '/sobre',        label: 'Sobre' },
+  { to: '/contact',      label: 'Contato' },
+  { to: '/policies',     label: 'Políticas' },
 ];
 
 const COLOR = {
@@ -46,6 +59,33 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
         >
           {item.label.toLowerCase()}
         </NavLink>
+      ))}
+
+      <div
+        className="mt-4 pt-4 px-4 pb-2 font-sackers text-[9px] uppercase tracking-[0.3em] opacity-40"
+        style={{
+          borderTop: '1px solid rgba(244, 237, 210, 0.1)',
+          color: COLOR.creamDeep,
+        }}
+      >
+        ver no site
+      </div>
+      {siteShortcuts.map((item) => (
+        <a
+          key={item.to}
+          href={item.to}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onNavigate}
+          className="font-sackers text-[11px] uppercase tracking-[0.2em] px-4 py-3 transition-colors opacity-60 hover:opacity-100 flex items-center justify-between gap-3"
+          style={{
+            color: COLOR.creamDeep,
+            borderLeft: '2px solid transparent',
+          }}
+        >
+          <span>{item.label.toLowerCase()}</span>
+          <ExternalLink size={11} className="opacity-70 shrink-0" />
+        </a>
       ))}
     </nav>
   );
