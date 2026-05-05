@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getPublicOrderConfirmation, getProducts, type PublicOrderConfirmation } from '@/lib/api';
+import { getPublicOrderConfirmation, type PublicOrderConfirmation, type UpsellProduct } from '@/lib/api';
 import { useCart } from '@/contexts/CartContext';
 import { Loader2, Package } from 'lucide-react';
 import type { Product } from '@/types';
+import { PickupMap } from '@/components/order/PickupMap';
 
 const CHAR = '#29241f';
 const OLIVA = '#565600';
@@ -30,7 +31,6 @@ const OrderConfirmation = () => {
 
   const [order, setOrder] = useState<PublicOrderConfirmation | null>(null);
   const [loading, setLoading] = useState(true);
-  const [related, setRelated] = useState<Product[]>([]);
 
   useEffect(() => {
     if (!orderId) {
@@ -45,9 +45,6 @@ const OrderConfirmation = () => {
         const data = await getPublicOrderConfirmation(orderId);
         if (cancelled) return;
         setOrder(data);
-
-        const all = await getProducts();
-        if (!cancelled) setRelated(all.slice(0, 4));
       } catch {
         if (!cancelled) navigate('/', { replace: true });
       } finally {
@@ -58,6 +55,24 @@ const OrderConfirmation = () => {
     load();
     return () => { cancelled = true; };
   }, [orderId, navigate]);
+
+  // Bridge UpsellProduct → Product para passar ao addItem do CartContext.
+  // O CartDrawer só usa id/slug/name/price/images[0]; os demais campos
+  // ficam stub vazios. Construir aqui (não no addItem) mantém o tipo
+  // Product compartilhado intocado.
+  const upsellToCartProduct = (u: UpsellProduct): Product => ({
+    id: u.id,
+    slug: u.slug,
+    name: u.name,
+    description: '',
+    price: u.price,
+    images: u.image_url ? [u.image_url] : [],
+    collection: '',
+    tags: [],
+    rating_avg: 0,
+    rating_count: 0,
+    created_at: new Date().toISOString(),
+  });
 
   if (loading) {
     return (
@@ -242,6 +257,7 @@ const OrderConfirmation = () => {
                         endereço para retirada: {order.pickup_address}
                       </p>
                     )}
+                    {order.pickup_address && <PickupMap address={order.pickup_address} />}
                     <p style={{
                       fontFamily: BODY_TEXT_FAMILY,
                       fontWeight: 300,
@@ -317,7 +333,7 @@ const OrderConfirmation = () => {
           </section>
 
           {/* ── Section 4: Upsell ── */}
-          {related.length > 0 && (
+          {order.upsells.length > 0 && (
             <section style={{ marginBottom: 56 }}>
               <div style={{ textAlign: 'center', marginBottom: 28 }}>
                 <span style={{ ...LABEL, display: 'block', marginBottom: 10 }}>você também pode gostar</span>
@@ -337,21 +353,21 @@ const OrderConfirmation = () => {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
                 gap: 20,
               }}>
-                {related.map(product => (
-                  <div key={product.id} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <Link to={`/product/${product.slug}`} style={{ textDecoration: 'none' }}>
+                {order.upsells.map(upsell => (
+                  <div key={upsell.id} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <Link to={`/product/${upsell.slug}`} style={{ textDecoration: 'none' }}>
                       <div style={{ aspectRatio: '1', overflow: 'hidden', background: CREME }}>
-                        {product.images[0] ? (
+                        {upsell.image_url ? (
                           <img
-                            src={product.images[0]}
-                            alt={product.name}
+                            src={upsell.image_url}
+                            alt={upsell.name}
                             style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(0.6)' }}
                             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                           />
                         ) : null}
                       </div>
                     </Link>
-                    <Link to={`/product/${product.slug}`} style={{ textDecoration: 'none' }}>
+                    <Link to={`/product/${upsell.slug}`} style={{ textDecoration: 'none' }}>
                       <p style={{
                         fontFamily: BODY_TEXT_FAMILY,
                         fontWeight: 300,
@@ -362,7 +378,7 @@ const OrderConfirmation = () => {
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
                       }}>
-                        {product.name}
+                        {upsell.name}
                       </p>
                     </Link>
                     <span style={{
@@ -371,10 +387,10 @@ const OrderConfirmation = () => {
                       fontSize: '0.9rem',
                       color: `${CHAR}88`,
                     }}>
-                      R$ {product.price.toFixed(2)}
+                      R$ {upsell.price.toFixed(2)}
                     </span>
                     <button
-                      onClick={() => addItem(product, 1)}
+                      onClick={() => addItem(upsellToCartProduct(upsell), 1)}
                       style={{
                         padding: '8px 12px',
                         background: 'transparent',
