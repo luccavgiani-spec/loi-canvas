@@ -170,18 +170,56 @@ function CustomersTab() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   useEffect(() => { getAdminCustomers().then(setCustomers); }, []);
 
+  const formatDate = (iso?: string | null) =>
+    iso ? new Date(iso).toLocaleDateString('pt-BR') : '—';
+
+  const formatCityState = (addr?: Customer['shipping_address']) => {
+    if (!addr) return '—';
+    const compact = `${addr.city ?? ''}/${addr.state ?? ''}`.replace(/^\//, '').replace(/\/$/, '');
+    return compact || '—';
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className={tableCls}>
-        <thead><tr className="border-b border-border"><th className={thCls}>Nome</th><th className={thCls}>E-mail</th><th className={thCls}>Pedidos</th><th className={thCls}>Total Gasto</th><th className={thCls}>Desde</th></tr></thead>
+        <thead>
+          <tr className="border-b border-border">
+            <th className={thCls}>Nome</th>
+            <th className={thCls}>E-mail</th>
+            <th className={thCls}>Pedidos</th>
+            <th className={thCls}>Total Gasto</th>
+            <th className={thCls}>Primeira compra</th>
+            <th className={thCls}>Última compra</th>
+            <th className={thCls}>Endereço</th>
+            <th className={thCls}>Favoritos</th>
+          </tr>
+        </thead>
         <tbody>
           {customers.map(c => (
-            <tr key={c.id} className="border-b border-border">
+            <tr key={c.id} className="border-b border-border align-top">
               <td className={`${tdCls} font-medium`}>{c.name}</td>
               <td className={`${tdCls} text-muted-foreground`}>{c.email}</td>
               <td className={tdCls}>{c.orders_count}</td>
               <td className={tdCls}>R$ {c.total_spent?.toFixed(2)}</td>
-              <td className={`${tdCls} text-muted-foreground`}>{c.created_at}</td>
+              <td className={`${tdCls} text-muted-foreground whitespace-nowrap`}>{formatDate(c.first_order_at)}</td>
+              <td className={`${tdCls} text-muted-foreground whitespace-nowrap`}>{formatDate(c.last_order_at)}</td>
+              <td className={`${tdCls} text-muted-foreground whitespace-nowrap`}>{formatCityState(c.shipping_address)}</td>
+              <td className={tdCls}>
+                {c.favorite_products && c.favorite_products.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    {c.favorite_products.slice(0, 3).map(p => (
+                      <span
+                        key={p.product_id}
+                        className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border border-border bg-muted text-muted-foreground"
+                      >
+                        {p.name} ({p.qty})
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground">—</span>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
