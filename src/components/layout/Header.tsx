@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag, Menu, X, Search, Truck } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect, useRef } from 'react';
+import SearchAutocomplete from '@/components/layout/SearchAutocomplete';
 
 // Flag temporária — futuramente migra para config/admin
 const SHOW_CORPO = false;
@@ -43,7 +44,6 @@ const Header = () => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [mobileSectionOpen, setMobileSectionOpen] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [trackingOpen, setTrackingOpen] = useState(false);
   const [trackingCode, setTrackingCode] = useState('');
   const location = useLocation();
@@ -101,15 +101,6 @@ const Header = () => {
   const dropdownText = '#f4edd2';
   const dropdownMuted = 'rgba(244,237,210,0.3)';
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      window.location.href = `/colecoes?q=${encodeURIComponent(searchQuery.trim())}`;
-      setSearchOpen(false);
-      setSearchQuery('');
-    }
-  };
-
   const handleTracking = (e: React.FormEvent) => {
     e.preventDefault();
     if (trackingCode.trim()) {
@@ -166,21 +157,11 @@ const Header = () => {
                 <Search size={17} strokeWidth={1.5} />
               </IconBtn>
               {searchOpen && (
-                <div
-                  className="absolute top-full left-0 mt-3"
-                  style={{ background: dropdownBg, backdropFilter: 'blur(16px)', border: `1px solid ${dropdownBorder}`, padding: '12px 16px', minWidth: 240 }}
-                >
-                  <form onSubmit={handleSearch} className="flex items-center gap-2">
-                    <Search size={14} style={{ color: dropdownMuted, flexShrink: 0 }} />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Buscar produtos..."
-                      autoFocus
-                      style={{ background: 'transparent', border: 'none', outline: 'none', fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.1em', color: dropdownText, width: '100%' }}
-                    />
-                  </form>
+                <div className="absolute top-full left-0 mt-3" style={{ minWidth: 320 }}>
+                  <SearchAutocomplete
+                    variant="desktop-dropdown"
+                    onSelectClose={() => setSearchOpen(false)}
+                  />
                 </div>
               )}
             </div>
@@ -335,17 +316,10 @@ const Header = () => {
           className="md:hidden px-6 py-3"
           style={{ background: 'rgba(41,36,31,0.97)', borderTop: '1px solid rgba(244,237,210,0.08)', backdropFilter: 'blur(12px)' }}
         >
-          <form onSubmit={handleSearch} className="flex items-center gap-2">
-            <Search size={14} style={{ color: '#fcf5e0', flexShrink: 0 }} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar produtos..."
-              autoFocus
-              style={{ background: 'transparent', border: 'none', outline: 'none', fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.75rem', letterSpacing: '0.1em', color: '#fcf5e0', width: '100%' }}
-            />
-          </form>
+          <SearchAutocomplete
+            variant="mobile-bar"
+            onSelectClose={() => setSearchOpen(false)}
+          />
         </div>
       )}
 

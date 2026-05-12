@@ -203,6 +203,46 @@ export const getProductsByCollectionSlug = async (collectionSlug: string): Promi
   }
 };
 
+// Busca rápida por nome do produto — alimenta o autocomplete da navbar.
+// Limit 6 / `visible = true` / case-insensitive via ilike. Retorna apenas
+// o que o dropdown precisa renderizar (sem joins pesados).
+export type ProductSearchSuggestion = {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  image: string | null;
+};
+
+export const searchProductsByName = async (
+  term: string,
+): Promise<ProductSearchSuggestion[]> => {
+  const cleaned = term.trim();
+  if (cleaned.length < 2) return [];
+  // ilike escapa nada além de %/_; nomes de produto não contêm — seguro o
+  // suficiente para um SELECT sem RPC. Caso entre conteúdo arbitrário no
+  // futuro, substituir por RPC com bind param.
+  const { data, error } = await supabase
+    .from('products')
+    .select('id, slug, name, price, product_images(filename, sort_order)')
+    .eq('visible', true)
+    .ilike('name', `%${cleaned}%`)
+    .order('name')
+    .limit(6);
+  if (error) throw error;
+  return (data ?? []).map((row: any) => {
+    const images = (row.product_images as { filename: string; sort_order: number }[] | null | undefined) ?? [];
+    const cover = images.slice().sort((a, b) => a.sort_order - b.sort_order)[0];
+    return {
+      id: row.id,
+      slug: row.slug,
+      name: row.name,
+      price: Number(row.price),
+      image: cover ? fileToUrl(cover.filename) : null,
+    };
+  });
+};
+
 // Bestsellers — products flagged is_bestseller=true and visible=true.
 // Errors propagate so the section can decide to silently hide.
 export const getBestsellerProducts = async (): Promise<Product[]> => {
