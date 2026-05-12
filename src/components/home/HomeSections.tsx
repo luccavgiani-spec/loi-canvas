@@ -450,7 +450,10 @@ const HomeSections = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [bestsellers, setBestsellers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const ref = useReveal(0.15, [loading]);
+  // Bestsellers vem de um fetch separado de getProducts. Sem incluir
+  // bestsellers.length nas deps, a secao monta DEPOIS que loading virou
+  // false e seus .reveal nunca recebem .revealed (somem).
+  const ref = useReveal(0.15, [loading, bestsellers.length]);
 
   useEffect(() => {
     getProducts()
