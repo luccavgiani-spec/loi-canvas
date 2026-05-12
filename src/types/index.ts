@@ -18,6 +18,7 @@ export interface Product {
   weight_g?: number | null;
   burn_hours?: number | null;
   accord?: string;
+  olfactory_family?: string | null;
   images: string[];
   collection: string;
   tags: string[];

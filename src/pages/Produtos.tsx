@@ -38,7 +38,6 @@ const Produtos = () => {
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useCart();
-  const ref = useReveal(0.15, [loading]);
 
   const sortParam = searchParams.get('ordem') ?? '';
   const sort: SortKey = isSortKey(sortParam) ? sortParam : 'recent';
@@ -67,6 +66,10 @@ const Produtos = () => {
     }
     return filtered;
   }, [products, filters, categoryMap, sort]);
+
+  // Re-scan reveal targets quando o grid filtrado muda — senao cards
+  // recem-montados ficam em .reveal sem .revealed e somem (opacity:0).
+  const ref = useReveal(0.15, [visibleSorted]);
 
   const updateSort = (next: SortKey) => {
     const params = new URLSearchParams(searchParams);

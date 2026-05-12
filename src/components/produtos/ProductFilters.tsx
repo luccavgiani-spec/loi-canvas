@@ -9,7 +9,7 @@ import {
   PRICE_RANGES,
   countActive,
   emptyFilters,
-  getProductFamilies,
+  getProductFamily,
   type Availability,
   type ProductFiltersState,
 } from '@/lib/productFilters';
@@ -116,9 +116,8 @@ const FiltersBody = ({ products, collections, filters, onChange }: Props) => {
 
       const familyCount: Record<string, number> = {};
       products.forEach((p) => {
-        getProductFamilies(p.accord).forEach((f) => {
-          familyCount[f] = (familyCount[f] || 0) + 1;
-        });
+        const fam = getProductFamily(p);
+        if (fam) familyCount[fam] = (familyCount[fam] || 0) + 1;
       });
 
       const sizeCount: Record<number, number> = {};

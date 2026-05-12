@@ -65,6 +65,7 @@ function mapDbProduct(row: any): Product {
     weight_g: row.weight_g ?? null,
     burn_hours: row.burn_hours ?? null,
     accord: row.accord ?? '',
+    olfactory_family: row.olfactory_family ?? null,
     description: row.description ?? '',
     details: row.details ?? '',
     suggested_use: row.suggested_use ?? '',

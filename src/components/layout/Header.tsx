@@ -166,6 +166,20 @@ const Header = () => {
               )}
             </div>
 
+            {/* Produtos (sem dropdown) */}
+            <Link
+              to="/produtos"
+              onClick={() => setActiveSection(null)}
+              className={linkClass}
+              style={{
+                textDecoration: 'none',
+                color: location.pathname === '/produtos' ? activeLinkColor : undefined,
+                opacity: activeSection ? 0.45 : 1,
+              }}
+            >
+              produtos
+            </Link>
+
             {/* Section dropdowns */}
             {NAV_SECTIONS.map((section) => (
               <div key={section.label} className="relative">
@@ -336,6 +350,16 @@ const Header = () => {
           }}
         >
           <ul className="space-y-0" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            <li>
+              <Link
+                to="/produtos"
+                onClick={() => setMobileOpen(false)}
+                className="block py-2.5"
+                style={{ fontFamily: "var(--font-body)", fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.72rem', color: '#fcf5e0', textDecoration: 'none', borderBottom: '1px solid rgba(244,237,210,0.06)' }}
+              >
+                produtos
+              </Link>
+            </li>
             {NAV_SECTIONS.map((section) => (
               <li key={section.label}>
                 <button
