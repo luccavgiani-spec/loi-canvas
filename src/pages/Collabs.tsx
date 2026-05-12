@@ -113,9 +113,9 @@ const Collabs = () => {
         <div className="text-center pb-16 px-6">
           <h1
             className="reveal heading-display"
-            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#000', marginBottom: '0.75rem' }}
+            style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#000', marginBottom: '0.75rem', textTransform: 'none' }}
           >
-            colaborações
+            Colaborações
           </h1>
           <span
             className="reveal"

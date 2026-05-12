@@ -147,6 +147,7 @@ const CollectionPage = () => {
                   fontSize: 'clamp(2.5rem, 6vw, 4rem)',
                   color: '#29241f',
                   lineHeight: 1.1,
+                  textTransform: 'none',
                 }}
               >
                 {collection.name}
