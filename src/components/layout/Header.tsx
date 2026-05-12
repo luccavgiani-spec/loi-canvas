@@ -3,7 +3,10 @@ import { ShoppingBag, Menu, X, Search, Truck } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect, useRef } from 'react';
 
-const NAV_SECTIONS = [
+// Flag temporária — futuramente migra para config/admin
+const SHOW_CORPO = false;
+
+const ALL_NAV_SECTIONS = [
   {
     label: 'velas',
     items: [
@@ -28,6 +31,10 @@ const NAV_SECTIONS = [
     ],
   },
 ];
+
+const NAV_SECTIONS = ALL_NAV_SECTIONS.filter(
+  (s) => SHOW_CORPO || s.label !== 'corpo',
+);
 
 const Header = () => {
   const { count, setIsOpen } = useCart();
