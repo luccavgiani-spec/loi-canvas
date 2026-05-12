@@ -27,8 +27,8 @@ const ALL_NAV_SECTIONS = [
   {
     label: 'corpo',
     items: [
-      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/colecoes' },
-      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/colecoes' },
+      { num: 'i',  label: 'barra para massagem',         desc: '', to: '/produtos?categoria=corpo' },
+      { num: 'ii', label: 'óleo corporal para massagem', desc: '', to: '/produtos?categoria=corpo' },
     ],
   },
 ];

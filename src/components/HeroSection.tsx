@@ -87,7 +87,7 @@ const HeroSection = () => {
         >
           <div className="flex items-center gap-4 sm:gap-8 mt-10 px-6 sm:px-0">
             <a
-              href="/colecoes"
+              href="/produtos"
               className="hero-fadeUp hero-btn-primary"
               style={{ animationDelay: '1.0s' }}
             >

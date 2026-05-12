@@ -2,13 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 
-const Shop = lazy(() => import("./pages/Shop"));
 const Produtos = lazy(() => import("./pages/Produtos"));
 const CollectionPage = lazy(() => import("./pages/CollectionPage"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
@@ -50,7 +49,7 @@ const App = () => (
             <Suspense fallback={<div className="min-h-screen" style={{ background: '#fcf5e0' }} />}>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/colecoes" element={<Shop />} />
+                <Route path="/colecoes" element={<Navigate to="/produtos" replace />} />
                 <Route path="/produtos" element={<Produtos />} />
                 <Route path="/colecoes/:slug" element={<CollectionPage />} />
                 <Route path="/product/:slug" element={<ProductDetail />} />

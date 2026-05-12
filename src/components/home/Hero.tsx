@@ -111,7 +111,7 @@ const Hero = () => {
         </div>
 
         {/* navegar button */}
-        <Link to="/colecoes" style={{ color: 'rgba(244,237,210,0.65)' }}>
+        <Link to="/produtos" style={{ color: 'rgba(244,237,210,0.65)' }}>
           <ArrowLink>navegar</ArrowLink>
         </Link>
       </div>
