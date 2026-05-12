@@ -22,27 +22,16 @@ export const AVAILABILITY_OPTIONS: { id: Availability; label: string }[] = [
   { id: 'em-breve', label: 'em breve' },
 ];
 
-// Famílias olfativas derivadas do campo `accord` dos produtos. Lista curada
-// a partir dos acordes existentes no banco; quando admin formalizar isso em
-// schema próprio (ver PR description), trocar este array por leitura direta.
-export const OLFACTORY_FAMILIES: { id: string; label: string; match: RegExp }[] = [
-  { id: 'citrico',     label: 'cítrico',     match: /c[ií]tric/i },
-  { id: 'herbal',      label: 'herbal',      match: /herbal/i },
-  { id: 'amadeirado',  label: 'amadeirado',  match: /amadeirad/i },
-  { id: 'floral',      label: 'floral',      match: /floral/i },
-  { id: 'especiado',   label: 'especiado',   match: /especiad/i },
-  { id: 'verde',       label: 'verde',       match: /\bverde\b/i },
-  { id: 'aquatico',    label: 'aquático',    match: /aqu[áa]tic/i },
-  { id: 'mineral',     label: 'mineral',     match: /mineral/i },
-  { id: 'ambarado',    label: 'ambarado',    match: /amb[ae]rad/i },
-  { id: 'frutado',     label: 'frutado',     match: /frutad/i },
-  { id: 'chipre',      label: 'chipre',      match: /chipre/i },
-  { id: 'terroso',     label: 'terroso',     match: /terros/i },
-  { id: 'almiscarado', label: 'almiscarado', match: /almiscarad/i },
-  { id: 'canforado',   label: 'canforado',   match: /canforad/i },
-  { id: 'resinoso',    label: 'resinoso',    match: /resinos/i },
-  { id: 'couro',       label: 'couro',       match: /\bcouro\b/i },
-  { id: 'cremoso',     label: 'cremoso',     match: /cremos/i },
+// Famílias olfativas — leitura direta da coluna `olfactory_family` (text)
+// preenchida pelo admin. O id é o valor exato no banco; o label é o que aparece
+// na sidebar (lowercase, alinhado ao tom editorial do site).
+export const OLFACTORY_FAMILIES: { id: string; label: string }[] = [
+  { id: 'Cítricos & Frescos',    label: 'cítricos & frescos' },
+  { id: 'Verdes & Herbais',      label: 'verdes & herbais' },
+  { id: 'Florais',               label: 'florais' },
+  { id: 'Amadeirados',           label: 'amadeirados' },
+  { id: 'Especiados & Quentes',  label: 'especiados & quentes' },
+  { id: 'Gourmand & Conforto',   label: 'gourmand & conforto' },
 ];
 
 export const getProductAvailability = (product: Product): Availability => {
@@ -51,10 +40,8 @@ export const getProductAvailability = (product: Product): Availability => {
   return 'estoque';
 };
 
-export const getProductFamilies = (accord: string | undefined | null): string[] => {
-  if (!accord) return [];
-  return OLFACTORY_FAMILIES.filter((f) => f.match.test(accord)).map((f) => f.id);
-};
+export const getProductFamily = (product: Product): string | null =>
+  product.olfactory_family ?? null;
 
 export interface ProductFiltersState {
   categoria: string[];   // root collection slugs
@@ -158,8 +145,8 @@ export const applyFilters = (
     }
 
     if (filters.familia.length > 0) {
-      const fams = getProductFamilies(p.accord);
-      if (!fams.some((f) => filters.familia.includes(f))) return false;
+      const fam = getProductFamily(p);
+      if (!fam || !filters.familia.includes(fam)) return false;
     }
 
     if (filters.tam.length > 0) {
