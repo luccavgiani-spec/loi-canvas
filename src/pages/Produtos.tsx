@@ -15,8 +15,10 @@ import {
   buildCategoryMap,
   emptyFilters,
   filtersFromParams,
+  getProductAvailability,
   writeFiltersToParams,
 } from '@/lib/productFilters';
+import ProductPriceTag from '@/components/shop/ProductPriceTag';
 
 type SortKey = 'recent' | 'price_asc' | 'price_desc' | 'name_asc';
 
@@ -261,77 +263,78 @@ const Produtos = () => {
                 </div>
               ) : (
                 <div className="reveal-stagger grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-                  {visibleSorted.map((product) => (
-                    <div key={product.id} className="reveal group">
-                      <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
-                        {product.images[0] ? (
-                          <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            loading="lazy"
-                            decoding="async"
+                  {visibleSorted.map((product) => {
+                    const availability = getProductAvailability(product);
+                    const canAdd = availability === 'estoque';
+                    return (
+                      <div key={product.id} className="reveal group">
+                        <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
+                          {product.images[0] ? (
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
+                          )}
+                          <div
+                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }}
                           />
-                        ) : (
-                          <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
-                        )}
-                        <div
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }}
-                        />
-                        <button
-                          onClick={(e) => { e.preventDefault(); addItem(product); }}
-                          className="absolute bottom-0 left-0 right-0 py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300"
-                          style={{
-                            background: 'rgba(86,86,0,0.9)',
-                            color: '#f4edd2',
-                            fontFamily: "var(--font-body)",
-                            fontWeight: 300,
-                            letterSpacing: '0.2em',
-                            textTransform: 'uppercase',
-                            fontSize: '0.65rem',
-                            backdropFilter: 'blur(4px)',
-                          }}
-                        >
-                          adicionar ao carrinho
-                        </button>
-                      </Link>
-                      <Link to={`/product/${product.slug}`} className="block">
-                        <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
-                          {product.name}
-                        </h3>
-                        {product.notes && (
-                          <p
+                          <button
+                            onClick={(e) => { e.preventDefault(); if (canAdd) addItem(product); }}
+                            disabled={!canAdd}
+                            aria-disabled={!canAdd}
+                            className="absolute bottom-0 left-0 right-0 py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 disabled:cursor-not-allowed"
                             style={{
+                              background: canAdd ? 'rgba(86,86,0,0.9)' : 'rgba(41,36,31,0.75)',
+                              color: '#f4edd2',
                               fontFamily: "var(--font-body)",
                               fontWeight: 300,
-                              fontSize: '0.75rem',
-                              color: 'rgba(0,0,0,0.7)',
-                              lineHeight: 1.6,
-                              marginBottom: 8,
-                              textTransform: 'lowercase',
-                              display: '-webkit-box',
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
+                              letterSpacing: '0.2em',
+                              textTransform: 'uppercase',
+                              fontSize: '0.65rem',
+                              backdropFilter: 'blur(4px)',
                             }}
                           >
-                            {product.notes}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-3">
-                          <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
-                            R$ {product.price.toFixed(2)}
-                          </span>
-                          {product.compare_at_price && (
-                            <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(0,0,0,0.4)', textDecoration: 'line-through' }}>
-                              R$ {product.compare_at_price.toFixed(2)}
-                            </span>
+                            {availability === 'em-breve'
+                              ? 'em breve'
+                              : availability === 'esgotado'
+                                ? 'esgotado'
+                                : 'adicionar ao carrinho'}
+                          </button>
+                        </Link>
+                        <Link to={`/product/${product.slug}`} className="block">
+                          <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
+                            {product.name}
+                          </h3>
+                          {product.notes && (
+                            <p
+                              style={{
+                                fontFamily: "var(--font-body)",
+                                fontWeight: 300,
+                                fontSize: '0.75rem',
+                                color: 'rgba(0,0,0,0.7)',
+                                lineHeight: 1.6,
+                                marginBottom: 8,
+                                textTransform: 'lowercase',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                              }}
+                            >
+                              {product.notes}
+                            </p>
                           )}
-                        </div>
-                      </Link>
-                    </div>
-                  ))}
+                          <ProductPriceTag product={product} />
+                        </Link>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

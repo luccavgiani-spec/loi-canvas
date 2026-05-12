@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import type { Product } from '@/types';
 import { useCart } from '@/contexts/CartContext';
+import ProductPriceTag from '@/components/shop/ProductPriceTag';
+import { getProductAvailability } from '@/lib/productFilters';
 
 interface Props {
   product: Product;
@@ -8,6 +10,8 @@ interface Props {
 
 const ProductCard = ({ product }: Props) => {
   const { addItem } = useCart();
+  const availability = getProductAvailability(product);
+  const canAdd = availability === 'estoque';
 
   return (
     <div className="group">
@@ -30,22 +34,22 @@ const ProductCard = ({ product }: Props) => {
             {product.badge === 'sale' ? 'Sale' : product.badge === 'new' ? 'Novo' : 'Limited'}
           </span>
         )}
-        {/* Quick add on hover */}
         <button
-          onClick={(e) => { e.preventDefault(); addItem(product); }}
-          className="absolute bottom-0 left-0 right-0 bg-primary/90 text-primary-foreground text-sm uppercase tracking-wider py-2.5 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+          onClick={(e) => { e.preventDefault(); if (canAdd) addItem(product); }}
+          disabled={!canAdd}
+          className="absolute bottom-0 left-0 right-0 bg-primary/90 text-primary-foreground text-sm uppercase tracking-wider py-2.5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 disabled:cursor-not-allowed disabled:opacity-70"
+          aria-disabled={!canAdd}
         >
-          Adicionar ao carrinho
+          {availability === 'em-breve'
+            ? 'Em breve'
+            : availability === 'esgotado'
+              ? 'Esgotado'
+              : 'Adicionar ao carrinho'}
         </button>
       </Link>
       <Link to={`/product/${product.slug}`}>
         <h3 className="text-base font-medium mb-1" style={{ fontFamily: "'Wagon', sans-serif" }}>{product.name}</h3>
-        <div className="flex items-center gap-2">
-          <span className="text-base text-accent font-medium">R$ {product.price.toFixed(2)}</span>
-          {product.compare_at_price && (
-            <span className="text-sm text-muted-foreground line-through">R$ {product.compare_at_price.toFixed(2)}</span>
-          )}
-        </div>
+        <ProductPriceTag product={product} />
       </Link>
     </div>
   );

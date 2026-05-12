@@ -7,6 +7,8 @@ import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/LazyVideo';
 import ArrowLink from '@/components/ui/ArrowLink';
+import ProductPriceTag from '@/components/shop/ProductPriceTag';
+import { getProductAvailability } from '@/lib/productFilters';
 import type { Product, Collab } from '@/types';
 
 /* ── Horizontal carousel with snap scrolling ── */
@@ -77,86 +79,87 @@ const ProductCarousel = memo(({
         ref={scrollRef}
         className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2"
       >
-        {products.map((product) => (
-          <div
-            key={product.id}
-            data-carousel-item
-            className="group flex-shrink-0 snap-start"
-          >
-            <Link to={`/product/${product.slug}`} className="block relative overflow-hidden mb-4" style={{ aspectRatio: '3/4' }}>
-              {product.images[0]?.match(/\.mp4$/i) ? (
-                <LazyVideo
-                  src={product.images[0]}
-                  className="relative w-full h-full"
-                  rootMargin="100px 0px"
+        {products.map((product) => {
+          const availability = getProductAvailability(product);
+          const canAdd = availability === 'estoque';
+          return (
+            <div
+              key={product.id}
+              data-carousel-item
+              className="group flex-shrink-0 snap-start"
+            >
+              <Link to={`/product/${product.slug}`} className="block relative overflow-hidden mb-4" style={{ aspectRatio: '3/4' }}>
+                {product.images[0]?.match(/\.mp4$/i) ? (
+                  <LazyVideo
+                    src={product.images[0]}
+                    className="relative w-full h-full"
+                    rootMargin="100px 0px"
+                  />
+                ) : (
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                    width={400}
+                    height={533}
+                  />
+                )}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)' }}
                 />
-              ) : (
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
-                  decoding="async"
-                  width={400}
-                  height={533}
-                />
-              )}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%)' }}
-              />
-              {product.badge && (
-                <span
-                  className="absolute top-3 left-3"
+                {product.badge && (
+                  <span
+                    className="absolute top-3 left-3"
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontWeight: 300,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      fontSize: '0.6rem',
+                      color: '#f4edd2',
+                      background: 'rgba(0,0,0,0.6)',
+                      padding: '4px 10px',
+                      backdropFilter: 'blur(4px)',
+                    }}
+                  >
+                    {product.badge === 'sale' ? 'Promoção' : product.badge === 'new' ? 'Novo' : 'Edição Limitada'}
+                  </span>
+                )}
+                <button
+                  onClick={(e) => { e.preventDefault(); if (canAdd) addItem(product); }}
+                  disabled={!canAdd}
+                  aria-disabled={!canAdd}
+                  className="absolute bottom-0 left-0 right-0 py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 disabled:cursor-not-allowed"
                   style={{
+                    background: canAdd ? 'rgba(86,86,0,0.9)' : 'rgba(41,36,31,0.75)',
+                    color: '#f4edd2',
                     fontFamily: "var(--font-body)",
                     fontWeight: 300,
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
-                    fontSize: '0.6rem',
-                    color: '#f4edd2',
-                    background: 'rgba(0,0,0,0.6)',
-                    padding: '4px 10px',
+                    fontSize: '0.65rem',
                     backdropFilter: 'blur(4px)',
                   }}
                 >
-                  {product.badge === 'sale' ? 'Promoção' : product.badge === 'new' ? 'Novo' : 'Edição Limitada'}
-                </span>
-              )}
-              <button
-                onClick={(e) => { e.preventDefault(); addItem(product); }}
-                className="absolute bottom-0 left-0 right-0 py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300"
-                style={{
-                  background: 'rgba(86,86,0,0.9)',
-                  color: '#f4edd2',
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 300,
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  fontSize: '0.65rem',
-                  backdropFilter: 'blur(4px)',
-                }}
-              >
-                adicionar ao carrinho
-              </button>
-            </Link>
-            <Link to={`/product/${product.slug}`} className="block">
-              <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: dark ? '#f4edd2' : '#000', marginBottom: 4 }}>
-                {product.name}
-              </h3>
-              <div className="flex items-center gap-3">
-                <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: dark ? '#f4edd2' : '#000' }}>
-                  R$ {product.price.toFixed(2)}
-                </span>
-                {product.compare_at_price && (
-                  <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.7rem', color: dark ? 'rgba(244,237,210,0.4)' : 'rgba(0,0,0,0.4)', textDecoration: 'line-through' }}>
-                    R$ {product.compare_at_price.toFixed(2)}
-                  </span>
-                )}
-              </div>
-            </Link>
-          </div>
-        ))}
+                  {availability === 'em-breve'
+                    ? 'em breve'
+                    : availability === 'esgotado'
+                      ? 'esgotado'
+                      : 'adicionar ao carrinho'}
+                </button>
+              </Link>
+              <Link to={`/product/${product.slug}`} className="block">
+                <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: dark ? '#f4edd2' : '#000', marginBottom: 4 }}>
+                  {product.name}
+                </h3>
+                <ProductPriceTag product={product} dark={dark} />
+              </Link>
+            </div>
+          );
+        })}
       </div>
 
       {products.length > 4 && (
