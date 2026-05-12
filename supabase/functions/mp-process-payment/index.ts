@@ -134,6 +134,34 @@ serve(async (req) => {
     }
 
     // ─── CARD FLOW — Orders API (/v1/orders) ─────────────────────────────────
+    // Orders API valida estritamente que sum(items[].unit_price * quantity)
+    // == total_amount. Como `items` acima só contém os produtos, precisamos
+    // adicionar Frete (positivo) e Desconto (negativo) como linhas próprias
+    // para fechar a conta — mesmo pattern de mp-create-preference. Sem isso,
+    // MP rejeita com "Inconsistência entre itens e total do pedido".
+    const shippingCost = Number(order.shipping_cost ?? 0);
+    if (shippingCost > 0) {
+      items.push({
+        id: 'shipping',
+        title: 'Frete',
+        description: 'Frete do pedido',
+        category_id: 'home_deco',
+        quantity: 1,
+        unit_price: shippingCost,
+      });
+    }
+    const discountValue = Number(order.discount ?? 0);
+    if (discountValue > 0) {
+      items.push({
+        id: 'discount',
+        title: 'Desconto',
+        description: 'Desconto aplicado',
+        category_id: 'home_deco',
+        quantity: 1,
+        unit_price: -discountValue,
+      });
+    }
+
     const debitMethods = ['debvisa', 'debmaster', 'debcabal', 'debelo'];
     const paymentType = debitMethods.includes(payment_method_id) ? 'debit_card' : 'credit_card';
 

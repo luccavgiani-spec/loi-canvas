@@ -15,7 +15,7 @@ const navItems: NavItem[] = [
 
 const siteShortcuts: { to: string; label: string }[] = [
   { to: '/',             label: 'Início' },
-  { to: '/colecoes',     label: 'Coleções' },
+  { to: '/produtos',     label: 'Produtos' },
   { to: '/velas',        label: 'Velas' },
   { to: '/borrifadores', label: 'Borrifadores' },
   { to: '/corpo',        label: 'Corpo' },

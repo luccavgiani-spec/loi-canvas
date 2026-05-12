@@ -324,7 +324,7 @@ const About = () => {
           CONHEÇA NOSSOS PRODUTOS
         </p>
         <Link
-          to="/colecoes"
+          to="/produtos"
           style={{
             display: 'inline-block',
             border: '1px solid #29241f',

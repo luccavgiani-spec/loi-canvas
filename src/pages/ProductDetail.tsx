@@ -9,6 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { Star, Truck, RefreshCw, Leaf, Package } from 'lucide-react';
 import ReviewSection from '@/components/product/ReviewSection';
 import ShippingCalculator from '@/components/ShippingCalculator';
+import ProductPriceTag from '@/components/shop/ProductPriceTag';
 
 const FONT_BODY = "'Sackers Gothic', sans-serif";
 
@@ -460,22 +461,33 @@ const ProductDetail = () => {
               {/* CTAs */}
               {/* FIX: sempre flex-col no mobile; w-full nos botões garante largura correta */}
               {(() => {
-                const outOfStock = (product.stock_quantity ?? 0) <= 0;
+                const availability = product.status === 'em breve'
+                  ? 'em-breve'
+                  : (product.stock_quantity ?? 0) <= 0
+                    ? 'esgotado'
+                    : 'estoque';
+                const canAdd = availability === 'estoque';
+                const ctaLabel = (action: string) =>
+                  availability === 'em-breve'
+                    ? 'em breve'
+                    : availability === 'esgotado'
+                      ? 'esgotado'
+                      : action;
                 return (
                   <div className="flex flex-col gap-3 mb-10">
                     <button
                       onClick={() => addItem(product)}
-                      disabled={outOfStock}
+                      disabled={!canAdd}
                       className="loi-btn w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {outOfStock ? 'esgotado' : 'adicionar ao carrinho'}
+                      {ctaLabel('adicionar ao carrinho')}
                     </button>
                     <button
                       onClick={() => addItem(product)}
-                      disabled={outOfStock}
+                      disabled={!canAdd}
                       className="loi-btn-outline w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {outOfStock ? 'esgotado' : 'comprar agora'}
+                      {ctaLabel('comprar agora')}
                     </button>
                   </div>
                 );
@@ -521,9 +533,7 @@ const ProductDetail = () => {
                       <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1rem', color: '#000', marginBottom: 4 }}>
                         {p.name}
                       </h3>
-                      <span style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
-                        R$ {p.price.toFixed(2)}
-                      </span>
+                      <ProductPriceTag product={p} size="sm" />
                     </Link>
                   </div>
                 ))}

@@ -26,6 +26,7 @@ export interface Product {
   rating_count: number;
   is_bestseller?: boolean;
   stock_quantity?: number;
+  status?: string | null;
   created_at: string;
 }
 
