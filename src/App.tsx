@@ -9,6 +9,7 @@ import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 
 const Shop = lazy(() => import("./pages/Shop"));
+const Produtos = lazy(() => import("./pages/Produtos"));
 const CollectionPage = lazy(() => import("./pages/CollectionPage"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Checkout = lazy(() => import("./pages/Checkout"));
@@ -50,6 +51,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/colecoes" element={<Shop />} />
+                <Route path="/produtos" element={<Produtos />} />
                 <Route path="/colecoes/:slug" element={<CollectionPage />} />
                 <Route path="/product/:slug" element={<ProductDetail />} />
                 <Route path="/checkout" element={<Checkout />} />
