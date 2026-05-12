@@ -73,6 +73,7 @@ function mapDbProduct(row: any): Product {
     ritual: row.ritual ?? '',
     is_bestseller: row.is_bestseller ?? false,
     stock_quantity: row.stock_quantity ?? 0,
+    status: row.status ?? null,
     images: (row.product_images as { filename: string; sort_order: number }[] | null | undefined ?? [])
       .slice()
       .sort((a, b) => a.sort_order - b.sort_order)

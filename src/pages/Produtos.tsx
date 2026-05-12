@@ -1,11 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getProducts } from '@/lib/api';
+import { getProducts, getCollections } from '@/lib/api';
 import { bannerUrl } from '@/lib/storage';
-import type { Product } from '@/types';
+import type { Collection, Product } from '@/types';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
+import {
+  ProductFiltersSidebar,
+  ProductFiltersMobile,
+} from '@/components/produtos/ProductFilters';
+import {
+  applyFilters,
+  buildCategoryMap,
+  emptyFilters,
+  filtersFromParams,
+  writeFiltersToParams,
+} from '@/lib/productFilters';
 
 type SortKey = 'recent' | 'price_asc' | 'price_desc' | 'name_asc';
 
@@ -21,6 +32,7 @@ const isSortKey = (v: string): v is SortKey =>
 
 const Produtos = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useCart();
@@ -28,21 +40,23 @@ const Produtos = () => {
 
   const sortParam = searchParams.get('ordem') ?? '';
   const sort: SortKey = isSortKey(sortParam) ? sortParam : 'recent';
-  const busca = searchParams.get('busca')?.trim().toLowerCase() ?? '';
+
+  const filters = useMemo(() => filtersFromParams(searchParams), [searchParams]);
 
   useEffect(() => {
     setLoading(true);
-    getProducts()
-      .then((all) => setProducts(all))
+    Promise.all([getProducts(), getCollections()])
+      .then(([prods, cols]) => {
+        setProducts(prods);
+        setCollections(cols);
+      })
       .finally(() => setLoading(false));
   }, []);
 
-  const visibleSorted = useMemo(() => {
-    const term = busca;
-    const filtered = term
-      ? products.filter((p) => p.name.toLowerCase().includes(term))
-      : products.slice();
+  const categoryMap = useMemo(() => buildCategoryMap(collections), [collections]);
 
+  const visibleSorted = useMemo(() => {
+    const filtered = applyFilters(products, filters, categoryMap);
     if (sort === 'price_asc')  filtered.sort((a, b) => a.price - b.price);
     if (sort === 'price_desc') filtered.sort((a, b) => b.price - a.price);
     if (sort === 'name_asc')   filtered.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
@@ -50,13 +64,17 @@ const Produtos = () => {
       filtered.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
     }
     return filtered;
-  }, [products, sort, busca]);
+  }, [products, filters, categoryMap, sort]);
 
   const updateSort = (next: SortKey) => {
     const params = new URLSearchParams(searchParams);
     if (next === 'recent') params.delete('ordem');
     else params.set('ordem', next);
     setSearchParams(params, { replace: true });
+  };
+
+  const updateFilters = (next: typeof filters) => {
+    setSearchParams(writeFiltersToParams(searchParams, next), { replace: true });
   };
 
   return (
@@ -122,98 +140,108 @@ const Produtos = () => {
           </div>
         </section>
 
-        {/* Grid */}
+        {/* Sidebar + Grid */}
         <section className="py-14 md:py-20 px-6" style={{ background: '#fcf5e0' }}>
-          <div className="max-w-[1400px] mx-auto">
-            {/* Toolbar */}
-            <div className="flex justify-between items-center mb-10 md:mb-14 gap-4 flex-wrap">
-              <span
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 300,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  fontSize: '0.65rem',
-                  color: 'rgba(0,0,0,0.4)',
-                }}
-              >
-                {loading
-                  ? 'carregando…'
-                  : `${visibleSorted.length} ${visibleSorted.length === 1 ? 'produto' : 'produtos'}`}
-                {busca && !loading && (
-                  <span style={{ marginLeft: 8, color: 'rgba(0,0,0,0.6)' }}>
-                    — busca: “{busca}”
-                  </span>
-                )}
-              </span>
+          <div className="max-w-[1400px] mx-auto lg:grid lg:grid-cols-[240px_1fr] lg:gap-12">
+            <ProductFiltersSidebar
+              products={products}
+              collections={collections}
+              filters={filters}
+              onChange={updateFilters}
+            />
 
-              <label className="flex items-center gap-2">
-                <span
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 300,
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    fontSize: '0.62rem',
-                    color: 'rgba(0,0,0,0.45)',
-                  }}
-                >
-                  ordenar
-                </span>
-                <select
-                  value={sort}
-                  onChange={(e) => updateSort(e.target.value as SortKey)}
-                  style={{
-                    background: 'rgba(0,0,0,0.04)',
-                    border: '1px solid rgba(0,0,0,0.12)',
-                    color: '#000',
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 300,
-                    fontSize: '0.72rem',
-                    padding: '8px 12px',
-                    letterSpacing: '0.1em',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {sortOptions.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            {/* Grid de cards */}
-            {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i}>
-                    <div className="aspect-[3/4] mb-4" style={{ background: 'rgba(0,0,0,0.05)' }} />
-                    <div className="h-4 w-3/4 mb-2" style={{ background: 'rgba(0,0,0,0.05)' }} />
-                    <div className="h-3 w-1/2" style={{ background: 'rgba(0,0,0,0.05)' }} />
-                  </div>
-                ))}
-              </div>
-            ) : visibleSorted.length === 0 ? (
-              <div className="min-h-[40vh] flex flex-col items-center justify-center text-center gap-4">
-                <p
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 300,
-                    fontSize: '0.95rem',
-                    color: 'rgba(0,0,0,0.55)',
-                  }}
-                >
-                  {busca
-                    ? `nenhum produto encontrado para “${busca}”.`
-                    : 'nenhum produto disponível no momento.'}
-                </p>
-                {busca && (
-                  <button
-                    onClick={() => {
-                      const params = new URLSearchParams(searchParams);
-                      params.delete('busca');
-                      setSearchParams(params, { replace: true });
+            <div>
+              {/* Toolbar */}
+              <div className="flex justify-between items-center mb-10 md:mb-12 gap-4 flex-wrap">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <ProductFiltersMobile
+                    products={products}
+                    collections={collections}
+                    filters={filters}
+                    onChange={updateFilters}
+                  />
+                  <span
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontWeight: 300,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      fontSize: '0.65rem',
+                      color: 'rgba(0,0,0,0.4)',
                     }}
+                  >
+                    {loading
+                      ? 'carregando…'
+                      : `${visibleSorted.length} ${visibleSorted.length === 1 ? 'produto' : 'produtos'}`}
+                    {filters.busca && !loading && (
+                      <span style={{ marginLeft: 8, color: 'rgba(0,0,0,0.6)' }}>
+                        — busca: “{filters.busca}”
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                <label className="flex items-center gap-2">
+                  <span
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontWeight: 300,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      fontSize: '0.62rem',
+                      color: 'rgba(0,0,0,0.45)',
+                    }}
+                  >
+                    ordenar
+                  </span>
+                  <select
+                    value={sort}
+                    onChange={(e) => updateSort(e.target.value as SortKey)}
+                    style={{
+                      background: 'rgba(0,0,0,0.04)',
+                      border: '1px solid rgba(0,0,0,0.12)',
+                      color: '#000',
+                      fontFamily: "var(--font-body)",
+                      fontWeight: 300,
+                      fontSize: '0.72rem',
+                      padding: '8px 12px',
+                      letterSpacing: '0.1em',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {sortOptions.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {loading ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i}>
+                      <div className="aspect-[3/4] mb-4" style={{ background: 'rgba(0,0,0,0.05)' }} />
+                      <div className="h-4 w-3/4 mb-2" style={{ background: 'rgba(0,0,0,0.05)' }} />
+                      <div className="h-3 w-1/2" style={{ background: 'rgba(0,0,0,0.05)' }} />
+                    </div>
+                  ))}
+                </div>
+              ) : visibleSorted.length === 0 ? (
+                <div className="min-h-[40vh] flex flex-col items-center justify-center text-center gap-4">
+                  <p
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontWeight: 300,
+                      fontSize: '0.95rem',
+                      color: 'rgba(0,0,0,0.55)',
+                    }}
+                  >
+                    {filters.busca
+                      ? `nenhum produto encontrado para “${filters.busca}”.`
+                      : 'nenhum produto corresponde aos filtros selecionados.'}
+                  </p>
+                  <button
+                    onClick={() => updateFilters(emptyFilters)}
                     style={{
                       fontFamily: "var(--font-body)",
                       fontWeight: 300,
@@ -228,85 +256,85 @@ const Produtos = () => {
                       textUnderlineOffset: '4px',
                     }}
                   >
-                    limpar busca
+                    limpar filtros
                   </button>
-                )}
-              </div>
-            ) : (
-              <div className="reveal-stagger grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-                {visibleSorted.map((product) => (
-                  <div key={product.id} className="reveal group">
-                    <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
-                      {product.images[0] ? (
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          loading="lazy"
-                          decoding="async"
+                </div>
+              ) : (
+                <div className="reveal-stagger grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+                  {visibleSorted.map((product) => (
+                    <div key={product.id} className="reveal group">
+                      <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-[3/4] mb-4">
+                        {product.images[0] ? (
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
+                        )}
+                        <div
+                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }}
                         />
-                      ) : (
-                        <div className="w-full h-full" style={{ backgroundColor: '#f4edd2' }} />
-                      )}
-                      <div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)' }}
-                      />
-                      <button
-                        onClick={(e) => { e.preventDefault(); addItem(product); }}
-                        className="absolute bottom-0 left-0 right-0 py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300"
-                        style={{
-                          background: 'rgba(86,86,0,0.9)',
-                          color: '#f4edd2',
-                          fontFamily: "var(--font-body)",
-                          fontWeight: 300,
-                          letterSpacing: '0.2em',
-                          textTransform: 'uppercase',
-                          fontSize: '0.65rem',
-                          backdropFilter: 'blur(4px)',
-                        }}
-                      >
-                        adicionar ao carrinho
-                      </button>
-                    </Link>
-                    <Link to={`/product/${product.slug}`} className="block">
-                      <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
-                        {product.name}
-                      </h3>
-                      {product.notes && (
-                        <p
+                        <button
+                          onClick={(e) => { e.preventDefault(); addItem(product); }}
+                          className="absolute bottom-0 left-0 right-0 py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300"
                           style={{
+                            background: 'rgba(86,86,0,0.9)',
+                            color: '#f4edd2',
                             fontFamily: "var(--font-body)",
                             fontWeight: 300,
-                            fontSize: '0.75rem',
-                            color: 'rgba(0,0,0,0.7)',
-                            lineHeight: 1.6,
-                            marginBottom: 8,
-                            textTransform: 'lowercase',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
+                            letterSpacing: '0.2em',
+                            textTransform: 'uppercase',
+                            fontSize: '0.65rem',
+                            backdropFilter: 'blur(4px)',
                           }}
                         >
-                          {product.notes}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-3">
-                        <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
-                          R$ {product.price.toFixed(2)}
-                        </span>
-                        {product.compare_at_price && (
-                          <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(0,0,0,0.4)', textDecoration: 'line-through' }}>
-                            R$ {product.compare_at_price.toFixed(2)}
-                          </span>
+                          adicionar ao carrinho
+                        </button>
+                      </Link>
+                      <Link to={`/product/${product.slug}`} className="block">
+                        <h3 style={{ fontFamily: "'Wagon', sans-serif", fontWeight: 400, fontSize: '1.1rem', color: '#000', marginBottom: 4 }}>
+                          {product.name}
+                        </h3>
+                        {product.notes && (
+                          <p
+                            style={{
+                              fontFamily: "var(--font-body)",
+                              fontWeight: 300,
+                              fontSize: '0.75rem',
+                              color: 'rgba(0,0,0,0.7)',
+                              lineHeight: 1.6,
+                              marginBottom: 8,
+                              textTransform: 'lowercase',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            {product.notes}
+                          </p>
                         )}
-                      </div>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            )}
+                        <div className="flex items-center gap-3">
+                          <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.8rem', color: '#000' }}>
+                            R$ {product.price.toFixed(2)}
+                          </span>
+                          {product.compare_at_price && (
+                            <span style={{ fontFamily: "var(--font-body)", fontWeight: 300, fontSize: '0.7rem', color: 'rgba(0,0,0,0.4)', textDecoration: 'line-through' }}>
+                              R$ {product.compare_at_price.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </section>
       </div>
