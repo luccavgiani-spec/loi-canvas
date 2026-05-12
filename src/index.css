@@ -482,24 +482,28 @@
 .hero-btn-primary:hover { color: #f4edd2; }
 .hero-btn-primary:hover::after { transform: translateX(0); }
 
-/* ── Hero ghost button ── */
+/* ── Hero ghost button (preenchido olive) ── */
 .hero-btn-ghost {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(244, 237, 210, 0.5);
+  padding: 0.85rem 2.2rem;
+  background: #565600;
+  color: #fcf5e0;
   font-family: 'Sackers Gothic', sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   font-size: 0.75rem;
   text-decoration: none;
-  background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
-.hero-btn-ghost:hover { color: #fcf5e0; }
+.hero-btn-ghost:hover {
+  background: #3f3f00;
+  color: #fcf5e0;
+}
 .hero-btn-ghost-dash {
   display: inline-block;
   width: 20px;
@@ -517,6 +521,7 @@
     letter-spacing: 0.22em;
   }
   .hero-btn-ghost {
+    padding: 0.7rem 1.5rem;
     font-size: 0.6rem;
     letter-spacing: 0.22em;
   }
