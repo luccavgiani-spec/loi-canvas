@@ -527,7 +527,7 @@ const HomeSections = () => {
             )}
             {focusPomar && (
               <div className="relative">
-                <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} dark />
+                <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('LOIE.pomarOverdelivery.mp4')} dark />
               </div>
             )}
             {!focusBosque && !focusPomar && (
@@ -539,7 +539,7 @@ const HomeSections = () => {
                 )}
                 {allProducts[1] && (
                   <div className="relative">
-                    <ProductFocusBanner product={allProducts[1]} reverse videoSrc={storageUrl('loie_vela_pomar.mp4')} dark />
+                    <ProductFocusBanner product={allProducts[1]} reverse videoSrc={storageUrl('LOIE.pomarOverdelivery.mp4')} dark />
                   </div>
                 )}
               </>

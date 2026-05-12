@@ -14,7 +14,7 @@ O plano Free do Supabase inclui apenas 5 GB de cached egress por mes.
 | `Cartao_Postal_Loie.mp4` | About (hero), Shop (hero), HomeSections (collabs), mocks | ~5-15 MB |
 | `video_sobre (1).mp4` | About (manifesto) | ~5-20 MB |
 | `loie_vela_bosque_compress (1).mp4` | HomeSections (banner + collabs), mocks | ~3-10 MB |
-| `loie_vela_pomar.mp4` | HomeSections (banner + collabs), mocks | ~3-10 MB |
+| `LOIE.pomarOverdelivery.mp4` | HomeSections (banner + collabs), mocks | ~3-10 MB |
 | `loie_vela_estela (1).mp4` | HomeSections (collabs), mocks | ~3-10 MB |
 
 **Total estimado de videos: ~25-80 MB**
@@ -53,7 +53,7 @@ wrangler r2 object put loie-assets/escritorio_cadeira__1_.mp4 --file ./escritori
 wrangler r2 object put loie-assets/Cartao_Postal_Loie.mp4 --file ./Cartao_Postal_Loie.mp4
 wrangler r2 object put loie-assets/video_sobre_1.mp4 --file "./video_sobre (1).mp4"
 wrangler r2 object put loie-assets/loie_vela_bosque_compress_1.mp4 --file "./loie_vela_bosque_compress (1).mp4"
-wrangler r2 object put loie-assets/loie_vela_pomar.mp4 --file ./loie_vela_pomar.mp4
+wrangler r2 object put loie-assets/LOIE.pomarOverdelivery.mp4 --file ./LOIE.pomarOverdelivery.mp4
 wrangler r2 object put loie-assets/loie_vela_estela_1.mp4 --file "./loie_vela_estela (1).mp4"
 ```
 
