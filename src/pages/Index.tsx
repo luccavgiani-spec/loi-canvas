@@ -4,7 +4,7 @@ import CartDrawer from '@/components/layout/CartDrawer';
 import Header from '@/components/layout/Header';
 
 /* Lazy-load everything below the fold — reduces initial bundle and
-   defers hydration of carousels, videos, FAQ, newsletter, and footer
+   defers hydration of carousels, videos, FAQ, and footer
    until the user approaches that content. */
 const HomeSections = lazy(() => import('@/components/home/HomeSections'));
 const Footer = lazy(() => import('@/components/layout/Footer'));

@@ -648,52 +648,6 @@ const HomeSections = () => {
         </div>
       </section>
 
-      {/* ── 6. Newsletter / CTA Section ── */}
-      <section className="py-16 px-6 relative overflow-hidden md:py-[40px] loi-section-lazy" style={{ background: '#f4edd2' }}>
-        <div className="loi-grain" />
-        <div className="relative z-[1] max-w-lg mx-auto text-center">
-          <span className="reveal loi-label block mb-6">exclusivo</span>
-          <h2
-            className="reveal mb-4"
-            style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#000', lineHeight: 1.5 }}
-          >
-            Ganhe 15% na primeira compra
-          </h2>
-          <p
-            className="reveal mb-10"
-            style={{
-              fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
-              fontWeight: 300,
-              fontSize: '0.72rem',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: '#000',
-              lineHeight: 1.9,
-            }}
-          >
-            Cadastre seu e-mail e receba um cupom exclusivo de boas-vindas,
-            além de novidades e lançamentos em primeira mão.
-          </p>
-          <form className="reveal flex flex-col sm:flex-row gap-3" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder="seu@email.com"
-              className="flex-1 px-4 py-3 bg-transparent border text-base"
-              style={{
-                borderColor: 'rgba(0,0,0,0.2)',
-                color: '#000',
-                fontFamily: "var(--font-body)",
-                fontWeight: 300,
-                letterSpacing: '0.05em',
-                outline: 'none',
-              }}
-            />
-            <button type="submit" className="loi-btn w-full sm:w-auto justify-center" style={{ padding: '0.75rem 1.8rem' }}>
-              cadastrar
-            </button>
-          </form>
-        </div>
-      </section>
     </div>
   );
 };
