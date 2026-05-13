@@ -112,11 +112,7 @@ export default function AdminLayout() {
     <AdminPreferencesProvider>
     <div
       className="min-h-screen flex"
-      style={{
-        background: COLOR.cream,
-        color: COLOR.charcoal,
-        fontFamily: 'var(--admin-ui-font, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif)',
-      }}
+      style={{ background: COLOR.cream, color: COLOR.charcoal }}
     >
       {/* Sidebar — desktop */}
       <aside
@@ -210,7 +206,10 @@ export default function AdminLayout() {
         </header>
 
         {/* Content */}
-        <main className="flex-1">
+        <main
+          className="flex-1"
+          style={{ fontFamily: 'var(--admin-ui-font, inherit)' }}
+        >
           <Outlet />
         </main>
       </div>

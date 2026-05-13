@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 
 export type AdminFontSize = 'pequeno' | 'normal' | 'grande' | 'extra';
 export type AdminDensity = 'compacto' | 'normal' | 'confortavel';
-export type AdminTypography = 'sistema' | 'serifada';
+export type AdminTypography = 'loie' | 'sistema' | 'serifada';
 
 export interface AdminPreferences {
   fontSize: AdminFontSize;
@@ -13,7 +13,7 @@ export interface AdminPreferences {
 const DEFAULT: AdminPreferences = {
   fontSize: 'normal',
   density: 'normal',
-  typography: 'sistema',
+  typography: 'loie',
 };
 
 const STORAGE_KEY = 'loie_admin_prefs_v1';
@@ -32,6 +32,7 @@ const DENSITY_SCALE: Record<AdminDensity, string> = {
 };
 
 const TYPOGRAPHY_FAMILY: Record<AdminTypography, string> = {
+  loie:     '"Sackers Gothic", sans-serif',
   sistema:  'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
   serifada: '"Cormorant Garamond", Georgia, serif',
 };

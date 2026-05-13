@@ -15,8 +15,9 @@ const DENSITY_OPTIONS: Array<{ value: AdminDensity; label: string; hint: string 
 ];
 
 const TYPOGRAPHY_OPTIONS: Array<{ value: AdminTypography; label: string; hint: string }> = [
-  { value: 'sistema',  label: 'Sistema',  hint: 'sans-serif do sistema (padrão)' },
-  { value: 'serifada', label: 'Serifada', hint: 'Cormorant Garamond para leitura confortável' },
+  { value: 'loie',     label: 'Padrão Loiê', hint: 'Sackers Gothic, identidade da marca' },
+  { value: 'sistema',  label: 'Sistema',     hint: 'sans-serif do sistema operacional' },
+  { value: 'serifada', label: 'Serifada',    hint: 'Cormorant Garamond para leitura confortável' },
 ];
 
 const cardCls = 'border border-border rounded-md p-5 bg-card space-y-3';
@@ -102,7 +103,7 @@ export function PreferencesTab() {
             Família de fonte aplicada ao texto corrido do painel.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           {TYPOGRAPHY_OPTIONS.map((opt) => {
             const active = prefs.typography === opt.value;
             return (
