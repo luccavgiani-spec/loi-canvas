@@ -1,8 +1,42 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook } from 'lucide-react';
+import { Instagram, Facebook, Link2 } from 'lucide-react';
 import { useState } from 'react';
 import MensagemForm from '@/components/MensagemForm';
 import GlareHover from '@/components/ui/GlareHover';
+import { useSiteContent, useSiteContentList, readBlockText, readBlockUrl } from '@/lib/site-content/hooks';
+import EditableText from '@/components/site-content/EditableText';
+
+/* Mapa nome → ícone Lucide. Redes não mapeadas caem no Link2 (genérico). */
+const SOCIAL_ICONS: Record<string, typeof Instagram> = {
+  Instagram,
+  Facebook,
+};
+
+const SocialIcon = ({ nome }: { nome: string }) => {
+  const Icon = SOCIAL_ICONS[nome] ?? Link2;
+  return <Icon size={18} strokeWidth={1.5} />;
+};
+
+/* Dados estáticos hoje; no Bloco 6 viram leitura do site_content. */
+const COLECAO_LINKS: Array<{ rotulo: string; url: string }> = [
+  { rotulo: 'Todos os produtos', url: '/produtos' },
+  { rotulo: 'Cotidianas', url: '/colecoes/cotidianas' },
+  { rotulo: 'Sala', url: '/colecoes/sala-ou-estar' },
+  { rotulo: 'Refúgio', url: '/colecoes/refugio' },
+  { rotulo: 'Botânicas & Florais', url: '/colecoes/botanicas-e-florais' },
+];
+
+const SOBRE_LINKS: Array<{ rotulo: string; url: string }> = [
+  { rotulo: 'Nossa História', url: '/sobre' },
+  { rotulo: 'Colaborações', url: '/collabs' },
+  { rotulo: 'Contato', url: '/contact' },
+  { rotulo: 'Políticas', url: '/policies' },
+];
+
+const REDES_SOCIAIS: Array<{ nome: string; url: string }> = [
+  { nome: 'Instagram', url: 'https://www.instagram.com/loie_____/' },
+  { nome: 'Facebook', url: 'https://www.facebook.com/loievelas' },
+];
 
 /* ── Olfactory families data ── */
 const FAMILIES = [
@@ -50,6 +84,33 @@ const FONT_HEADING = "'Wagon', sans-serif";
 
 const Footer = () => {
   const [activeFamily, setActiveFamily] = useState<string | null>(null);
+
+  const { data: contatoSection } = useSiteContent('footer', 'contato');
+  const { data: bottomBar } = useSiteContent('footer', 'bottom_bar');
+  const { data: colecaoLinksRemote } = useSiteContentList('footer', 'colecao', 'links');
+  const { data: sobreLinksRemote } = useSiteContentList('footer', 'sobre', 'links');
+  const { data: redesRemote } = useSiteContentList('footer', 'contato', 'redes_sociais');
+
+  const colecaoLinks = (colecaoLinksRemote && colecaoLinksRemote.length > 0)
+    ? colecaoLinksRemote.filter((it) => it.is_visible).map((it) => ({
+        rotulo: (it.fields?.rotulo as string | undefined) ?? '',
+        url: (it.fields?.url as string | undefined) ?? '/',
+      }))
+    : COLECAO_LINKS;
+  const sobreLinks = (sobreLinksRemote && sobreLinksRemote.length > 0)
+    ? sobreLinksRemote.filter((it) => it.is_visible).map((it) => ({
+        rotulo: (it.fields?.rotulo as string | undefined) ?? '',
+        url: (it.fields?.url as string | undefined) ?? '/',
+      }))
+    : SOBRE_LINKS;
+  const redes = (redesRemote && redesRemote.length > 0)
+    ? redesRemote.filter((it) => it.is_visible).map((it) => ({
+        nome: (it.fields?.nome as string | undefined) ?? 'Link',
+        url: (it.fields?.url as string | undefined) ?? '#',
+      }))
+    : REDES_SOCIAIS;
+
+  const politicasUrl = readBlockUrl(bottomBar, 'link_politicas_url', '/policies');
 
   return (
     <footer style={{ background: '#29241f' }}>
@@ -128,7 +189,12 @@ const Footer = () => {
               className="h-8 w-auto mb-6"
               style={{ opacity: 0.8 }}
             />
-            <p
+            <EditableText
+              pageKey="footer"
+              sectionKey="brand"
+              blockKey="tagline"
+              defaultText="a loiê é uma marca brasileira de velas aromáticas feita com óleos essenciais e estética autoral."
+              as="p"
               style={{
                 fontFamily: FONT_BODY,
                 fontWeight: 300,
@@ -136,25 +202,24 @@ const Footer = () => {
                 color: 'rgba(244,237,210,0.4)',
                 lineHeight: 1.7,
               }}
-            >
-              a loiê é uma marca brasileira de velas aromáticas feita com óleos essenciais e estética autoral.
-            </p>
+            />
           </div>
 
           {/* Shop */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>Coleção</h4>
+            <EditableText
+              pageKey="footer"
+              sectionKey="colecao"
+              blockKey="heading"
+              defaultText="Coleção"
+              as="h4"
+              style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}
+            />
             <ul className="space-y-3">
-              {[
-                { to: '/produtos', label: 'Todos os produtos' },
-                { to: '/colecoes/cotidianas', label: 'Cotidianas' },
-                { to: '/colecoes/sala-ou-estar', label: 'Sala' },
-                { to: '/colecoes/refugio', label: 'Refúgio' },
-                { to: '/colecoes/botanicas-e-florais', label: 'Botânicas & Florais' },
-              ].map((link) => (
-                <li key={link.to}>
+              {colecaoLinks.map((link, i) => (
+                <li key={link.url + i}>
                   <Link
-                    to={link.to}
+                    to={link.url}
                     style={{
                       fontFamily: FONT_BODY,
                       fontWeight: 300,
@@ -165,7 +230,7 @@ const Footer = () => {
                     }}
                     className="hover:!text-[#f4edd2]"
                   >
-                    {link.label}
+                    {link.rotulo}
                   </Link>
                 </li>
               ))}
@@ -174,17 +239,19 @@ const Footer = () => {
 
           {/* About */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>Sobre</h4>
+            <EditableText
+              pageKey="footer"
+              sectionKey="sobre"
+              blockKey="heading"
+              defaultText="Sobre"
+              as="h4"
+              style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}
+            />
             <ul className="space-y-3">
-              {[
-                { to: '/sobre', label: 'Nossa História' },
-                { to: '/collabs', label: 'Colaborações' },
-                { to: '/contact', label: 'Contato' },
-                { to: '/policies', label: 'Políticas' },
-              ].map((link) => (
-                <li key={link.to}>
+              {sobreLinks.map((link, i) => (
+                <li key={link.url + i}>
                   <Link
-                    to={link.to}
+                    to={link.url}
                     style={{
                       fontFamily: FONT_BODY,
                       fontWeight: 300,
@@ -195,7 +262,7 @@ const Footer = () => {
                     }}
                     className="hover:!text-[#f4edd2]"
                   >
-                    {link.label}
+                    {link.rotulo}
                   </Link>
                 </li>
               ))}
@@ -204,41 +271,41 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>Contato</h4>
+            <EditableText
+              pageKey="footer"
+              sectionKey="contato"
+              blockKey="heading"
+              defaultText="Contato"
+              as="h4"
+              style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}
+            />
             <ul className="space-y-3">
               <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
-                loie.aromatica@gmail.com
+                {readBlockText(contatoSection, 'email', 'loie.aromatica@gmail.com')}
               </li>
               <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
-                (11) 99649-7672
+                {readBlockText(contatoSection, 'telefone', '(11) 99649-7672')}
               </li>
               <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
-                Rua Cel. João Leme, 688
+                {readBlockText(contatoSection, 'endereco_1', 'Rua Cel. João Leme, 688')}
               </li>
               <li style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(244,237,210,0.4)' }}>
-                Bragança Paulista, SP 12900-161
+                {readBlockText(contatoSection, 'endereco_2', 'Bragança Paulista, SP 12900-161')}
               </li>
               <li className="pt-3 flex items-center gap-4">
-                <a
-                  href="https://www.instagram.com/loie_____/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  style={{ color: 'rgba(244,237,210,0.4)', transition: 'color 0.3s ease' }}
-                  className="hover:!text-[#f4edd2]"
-                >
-                  <Instagram size={18} strokeWidth={1.5} />
-                </a>
-                <a
-                  href="https://www.facebook.com/loievelas"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                  style={{ color: 'rgba(244,237,210,0.4)', transition: 'color 0.3s ease' }}
-                  className="hover:!text-[#f4edd2]"
-                >
-                  <Facebook size={18} strokeWidth={1.5} />
-                </a>
+                {redes.map((rede, i) => (
+                  <a
+                    key={rede.nome + rede.url + i}
+                    href={rede.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={rede.nome}
+                    style={{ color: 'rgba(244,237,210,0.4)', transition: 'color 0.3s ease' }}
+                    className="hover:!text-[#f4edd2]"
+                  >
+                    <SocialIcon nome={rede.nome} />
+                  </a>
+                ))}
               </li>
             </ul>
           </div>
@@ -268,7 +335,7 @@ const Footer = () => {
             {['Termos', 'Privacidade', 'Trocas'].map((label) => (
               <Link
                 key={label}
-                to="/policies"
+                to={politicasUrl}
                 style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.7rem', color: 'rgba(244,237,210,0.25)', textDecoration: 'none', letterSpacing: '0.05em', transition: 'color 0.3s ease' }}
                 className="hover:!text-[rgba(244,237,210,0.5)]"
               >
@@ -280,9 +347,14 @@ const Footer = () => {
 
         {/* ── Brand signature ── */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1.2rem' }}>
-          <span style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(244,237,210,0.2)' }}>
-            somos brasileiros, feitos à mão, com técnica e com alma
-          </span>
+          <EditableText
+            pageKey="footer"
+            sectionKey="brand_signature"
+            blockKey="texto"
+            defaultText="somos brasileiros, feitos à mão, com técnica e com alma"
+            as="span"
+            style={{ fontFamily: FONT_BODY, fontWeight: 300, fontSize: '0.6rem', letterSpacing: '0.15em', color: 'rgba(244,237,210,0.2)' }}
+          />
         </div>
       </div>
 

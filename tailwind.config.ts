@@ -18,6 +18,7 @@ export default {
         body: ['"Sackers Gothic"', 'sans-serif'],
         wagon: ['Wagon', 'sans-serif'],
         sackers: ['"Sackers Gothic"', 'sans-serif'],
+        cormorant: ['"Cormorant Garamond"', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",

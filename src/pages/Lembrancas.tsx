@@ -2,6 +2,9 @@ import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { lembrancasUrl } from '@/lib/storage';
 import { sendCampaignEmail } from '@/lib/api';
+import LembrancasGalleryBlock, { type GalleryPosition, type GalleryTheme, type GalleryFraseAlign } from '@/components/lembrancas/LembrancasGalleryBlock';
+import { useSiteContent, useSiteContentList, readBlockText } from '@/lib/site-content/hooks';
+import EditableText from '@/components/site-content/EditableText';
 
 const inputStyle: React.CSSProperties = {
   borderBottom: '1px solid rgba(41,36,31,0.30)',
@@ -25,6 +28,38 @@ const OCASIOES = [
   { value: 'madrinha', label: 'MADRINHA / PADRINHO' },
   { value: 'presente', label: 'PRESENTE CORPORATIVO' },
   { value: 'outro', label: 'OUTRO' },
+];
+
+type GaleriaBloco = {
+  imagem: string;
+  frase: string;
+  posicao: GalleryPosition;
+  tema: GalleryTheme;
+  posicaoFrase: GalleryFraseAlign;
+};
+
+const GALERIA_BLOCOS: GaleriaBloco[] = [
+  {
+    imagem: lembrancasUrl('andreloie-81.webp'),
+    frase: 'Uma vela que leva o nome deles. Que traduz o dia em que disseram sim',
+    posicao: 'esquerda',
+    tema: 'cream',
+    posicaoFrase: 'direita',
+  },
+  {
+    imagem: lembrancasUrl('andreloie-82.webp'),
+    frase: 'Para quem não some depois da festa',
+    posicao: 'direita',
+    tema: 'charcoal',
+    posicaoFrase: 'direita',
+  },
+  {
+    imagem: lembrancasUrl('andreloie-86.webp'),
+    frase: 'Discreto no gesto. Marcante na lembrança. Sem excesso. Com intenção',
+    posicao: 'esquerda',
+    tema: 'cream',
+    posicaoFrase: 'direita',
+  },
 ];
 
 const CONVERSAO = [
@@ -55,6 +90,31 @@ const Lembrancas = () => {
   const [quantidade, setQuantidade] = useState('');
   const [mensagem, setMensagem] = useState('');
   const [status, setStatus] = useState<Status>('idle');
+
+  const { data: heroSection } = useSiteContent('lembrancas', 'hero');
+  const { data: formSection } = useSiteContent('lembrancas', 'formulario');
+  const { data: galeriaItems } = useSiteContentList('lembrancas', 'galeria_intercalada', 'blocos');
+  const { data: conversaoItems } = useSiteContentList('lembrancas', 'conversao', 'cards');
+
+  const heroBg = heroSection?.['imagem_fundo']?.value_image_url ?? lembrancasUrl('andreloie-96.jpg');
+
+  const galeriaBlocos: GaleriaBloco[] = (galeriaItems && galeriaItems.length > 0)
+    ? galeriaItems.filter((it) => it.is_visible).map((it) => ({
+        imagem: (it.fields?.imagem_url as string | undefined) ?? '',
+        frase: (it.fields?.frase as string | undefined) ?? '',
+        posicao: ((it.fields?.posicao as GalleryPosition | undefined) ?? 'esquerda'),
+        tema: ((it.fields?.tema as GalleryTheme | undefined) ?? 'cream'),
+        posicaoFrase: ((it.fields?.posicao_frase as GalleryFraseAlign | undefined) ?? 'direita'),
+      }))
+    : GALERIA_BLOCOS;
+
+  const cards = (conversaoItems && conversaoItems.length > 0)
+    ? conversaoItems.filter((it) => it.is_visible).map((it) => ({
+        num: (it.fields?.numeral as string | undefined) ?? '',
+        titulo: (it.fields?.titulo as string | undefined) ?? '',
+        desc: (it.fields?.descricao as string | undefined) ?? '',
+      }))
+    : CONVERSAO;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +149,7 @@ const Lembrancas = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundImage: `url(${lembrancasUrl('andreloie-96.jpg')})`,
+          backgroundImage: `url(${heroBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -109,18 +169,26 @@ const Lembrancas = () => {
             maxWidth: '760px',
           }}
         >
-          <h1
-            className="heading-display"
+          <EditableText
+            pageKey="lembrancas"
+            sectionKey="hero"
+            blockKey="titulo"
+            defaultText="Lembranças sob Curadoria"
+            as="h1"
+            defaultClass="heading-display"
             style={{
               fontSize: 'clamp(2.8rem, 6vw, 5rem)',
               color: '#f4edd2',
               lineHeight: 1.1,
               marginBottom: '1.2rem',
             }}
-          >
-            Lembranças sob Curadoria
-          </h1>
-          <p
+          />
+          <EditableText
+            pageKey="lembrancas"
+            sectionKey="hero"
+            blockKey="subtitulo"
+            defaultText="memória e sofisticação: há gestos que permanecem"
+            as="p"
             style={{
               fontFamily: "var(--font-body)",
               fontWeight: 300,
@@ -129,9 +197,7 @@ const Lembrancas = () => {
               color: 'rgba(244,237,210,0.75)',
               margin: 0,
             }}
-          >
-            memória e sofisticação: há gestos que permanecem
-          </p>
+          />
         </div>
       </section>
 
@@ -143,7 +209,12 @@ const Lembrancas = () => {
         }}
       >
         <div style={{ maxWidth: '36rem', margin: '0 auto' }}>
-          <p
+          <EditableText
+            pageKey="lembrancas"
+            sectionKey="storytelling"
+            blockKey="corpo"
+            defaultText="as lembranças da loiê nascem com..."
+            as="p"
             style={{
               fontFamily: "var(--font-body)",
               fontWeight: 300,
@@ -151,132 +222,21 @@ const Lembrancas = () => {
               lineHeight: 2.1,
               color: '#29241f',
             }}
-          >
-            as lembranças da loiê nascem com...
-          </p>
+          />
         </div>
       </section>
 
       {/* ─── GALERIA INTERCALADA ─── */}
-
-      {/* Bloco 1 — imagem à esquerda */}
-      <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-        <div style={{ overflow: 'hidden' }}>
-          <img
-            src={lembrancasUrl('andreloie-81.webp')}
-            alt=""
-            loading="lazy"
-            style={{
-              width: '100%',
-              aspectRatio: '4 / 5',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        </div>
-        <div
-          style={{
-            background: '#fcf5e0',
-            display: 'flex',
-            alignItems: 'center',
-            padding: 'clamp(3rem, 6vw, 4rem)',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
-              color: '#29241f',
-              lineHeight: 1.6,
-              textAlign: 'right',
-            }}
-          >
-            Uma vela que leva o nome deles. Que traduz o dia em que disseram sim
-          </p>
-        </div>
-      </section>
-
-      {/* Bloco 2 — imagem à direita */}
-      <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-        <div
-          style={{
-            background: '#29241f',
-            display: 'flex',
-            alignItems: 'center',
-            padding: 'clamp(3rem, 6vw, 4rem)',
-            order: 1,
-          }}
-          className="md:order-none"
-        >
-          <p
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
-              color: '#f4edd2',
-              lineHeight: 1.6,
-              textAlign: 'right',
-            }}
-          >
-            Para quem não some depois da festa
-          </p>
-        </div>
-        <div style={{ overflow: 'hidden', order: 0 }} className="md:order-none">
-          <img
-            src={lembrancasUrl('andreloie-82.webp')}
-            alt=""
-            loading="lazy"
-            style={{
-              width: '100%',
-              aspectRatio: '4 / 5',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        </div>
-      </section>
-
-      {/* Bloco 3 — imagem à esquerda */}
-      <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-        <div style={{ overflow: 'hidden' }}>
-          <img
-            src={lembrancasUrl('andreloie-86.webp')}
-            alt=""
-            loading="lazy"
-            style={{
-              width: '100%',
-              aspectRatio: '4 / 5',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        </div>
-        <div
-          style={{
-            background: '#fcf5e0',
-            display: 'flex',
-            alignItems: 'center',
-            padding: 'clamp(3rem, 6vw, 4rem)',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
-              color: '#29241f',
-              lineHeight: 1.6,
-              textAlign: 'right',
-            }}
-          >
-            Discreto no gesto. Marcante na lembrança. Sem excesso. Com intenção
-          </p>
-        </div>
-      </section>
+      {galeriaBlocos.map((bloco, i) => (
+        <LembrancasGalleryBlock
+          key={i}
+          imagem={bloco.imagem}
+          frase={bloco.frase}
+          posicao={bloco.posicao}
+          tema={bloco.tema}
+          posicaoFrase={bloco.posicaoFrase}
+        />
+      ))}
 
       {/* ─── CONVERSÃO ─── */}
       <section
@@ -294,7 +254,7 @@ const Lembrancas = () => {
             margin: '0 auto',
           }}
         >
-          {CONVERSAO.map(({ num, titulo, desc }) => (
+          {cards.map(({ num, titulo, desc }) => (
             <div
               key={titulo}
               style={{
@@ -354,17 +314,25 @@ const Lembrancas = () => {
         }}
       >
         <div style={{ maxWidth: '620px', margin: '0 auto' }}>
-          <h2
-            className="heading-display"
+          <EditableText
+            pageKey="lembrancas"
+            sectionKey="formulario"
+            blockKey="titulo"
+            defaultText="solicitar proposta"
+            as="h2"
+            defaultClass="heading-display"
             style={{
               fontSize: 'clamp(2rem, 4vw, 3rem)',
               color: '#29241f',
               marginBottom: '0.5rem',
             }}
-          >
-            solicitar proposta
-          </h2>
-          <p
+          />
+          <EditableText
+            pageKey="lembrancas"
+            sectionKey="formulario"
+            blockKey="subtitulo"
+            defaultText="conte-nos sobre o seu projeto"
+            as="p"
             style={{
               fontFamily: "var(--font-body)",
               fontWeight: 300,
@@ -373,12 +341,15 @@ const Lembrancas = () => {
               color: 'rgba(41,36,31,0.65)',
               marginBottom: '2.5rem',
             }}
-          >
-            conte-nos sobre o seu projeto
-          </p>
+          />
 
           {status === 'sent' ? (
-            <p
+            <EditableText
+              pageKey="lembrancas"
+              sectionKey="formulario"
+              blockKey="texto_sucesso"
+              defaultText="mensagem enviada. entraremos em contato em breve."
+              as="p"
               style={{
                 fontFamily: "var(--font-body)",
                 fontWeight: 300,
@@ -387,9 +358,7 @@ const Lembrancas = () => {
                 color: '#29241f',
                 letterSpacing: '0.04em',
               }}
-            >
-              mensagem enviada. entraremos em contato em breve.
-            </p>
+            />
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div>
@@ -466,7 +435,12 @@ const Lembrancas = () => {
               </div>
 
               {status === 'error' && (
-                <p
+                <EditableText
+                  pageKey="lembrancas"
+                  sectionKey="formulario"
+                  blockKey="texto_erro"
+                  defaultText="algo deu errado. tente novamente ou entre em contato pelo whatsapp."
+                  as="p"
                   style={{
                     fontFamily: "var(--font-body)",
                     fontWeight: 300,
@@ -474,9 +448,7 @@ const Lembrancas = () => {
                     color: '#7F2700',
                     letterSpacing: '0.04em',
                   }}
-                >
-                  algo deu errado. tente novamente ou entre em contato pelo whatsapp.
-                </p>
+                />
               )}
 
               <button
@@ -498,7 +470,7 @@ const Lembrancas = () => {
                   transition: 'opacity 0.2s',
                 }}
               >
-                {status === 'sending' ? 'ENVIANDO…' : 'SOLICITAR PROPOSTA'}
+                {status === 'sending' ? 'ENVIANDO…' : readBlockText(formSection, 'botao', 'SOLICITAR PROPOSTA')}
               </button>
             </form>
           )}

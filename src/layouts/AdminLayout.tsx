@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { AdminPreferencesProvider } from '@/components/admin/preferences/AdminPreferencesContext';
 
 interface NavItem {
   to: string;
@@ -108,6 +109,7 @@ export default function AdminLayout() {
   const displayName = user?.email?.split('@')[0] ?? '';
 
   return (
+    <AdminPreferencesProvider>
     <div
       className="min-h-screen flex"
       style={{ background: COLOR.cream, color: COLOR.charcoal }}
@@ -204,10 +206,14 @@ export default function AdminLayout() {
         </header>
 
         {/* Content */}
-        <main className="flex-1">
+        <main
+          className="flex-1"
+          style={{ fontFamily: 'var(--admin-ui-font, inherit)' }}
+        >
           <Outlet />
         </main>
       </div>
     </div>
+    </AdminPreferencesProvider>
   );
 }

@@ -446,6 +446,7 @@ export type Database = {
           is_bestseller: boolean | null
           name: string
           notes: string | null
+          olfactory_family: string | null
           price: number
           ritual: string | null
           sku: string
@@ -471,6 +472,7 @@ export type Database = {
           is_bestseller?: boolean | null
           name: string
           notes?: string | null
+          olfactory_family?: string | null
           price: number
           ritual?: string | null
           sku: string
@@ -496,6 +498,7 @@ export type Database = {
           is_bestseller?: boolean | null
           name?: string
           notes?: string | null
+          olfactory_family?: string | null
           price?: number
           ritual?: string | null
           sku?: string
@@ -600,6 +603,96 @@ export type Database = {
         }
         Relationships: []
       }
+      site_content: {
+        Row: {
+          block_key: string
+          content_type: string
+          id: string
+          is_visible: boolean
+          page_key: string
+          presentation_overrides: Json
+          section_key: string
+          updated_at: string
+          updated_by: string | null
+          value_image_url: string | null
+          value_ref_id: string | null
+          value_text: string | null
+          value_url: string | null
+          value_video_url: string | null
+        }
+        Insert: {
+          block_key: string
+          content_type: string
+          id?: string
+          is_visible?: boolean
+          page_key: string
+          presentation_overrides?: Json
+          section_key: string
+          updated_at?: string
+          updated_by?: string | null
+          value_image_url?: string | null
+          value_ref_id?: string | null
+          value_text?: string | null
+          value_url?: string | null
+          value_video_url?: string | null
+        }
+        Update: {
+          block_key?: string
+          content_type?: string
+          id?: string
+          is_visible?: boolean
+          page_key?: string
+          presentation_overrides?: Json
+          section_key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value_image_url?: string | null
+          value_ref_id?: string | null
+          value_text?: string | null
+          value_url?: string | null
+          value_video_url?: string | null
+        }
+        Relationships: []
+      }
+      site_content_list_items: {
+        Row: {
+          fields: Json
+          id: string
+          is_visible: boolean
+          item_index: number
+          list_key: string
+          page_key: string
+          presentation_overrides: Json
+          section_key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          fields?: Json
+          id?: string
+          is_visible?: boolean
+          item_index: number
+          list_key: string
+          page_key: string
+          presentation_overrides?: Json
+          section_key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          fields?: Json
+          id?: string
+          is_visible?: boolean
+          item_index?: number
+          list_key?: string
+          page_key?: string
+          presentation_overrides?: Json
+          section_key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       vip_coupon_discounts: {
         Row: {
           collection_id: string
@@ -659,7 +752,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      admin_customer_summary: {
+        Row: {
+          customer_since: string | null
+          email: string | null
+          favorite_products: Json | null
+          first_order_at: string | null
+          id: string | null
+          last_order_at: string | null
+          name: string | null
+          orders_count: number | null
+          phone: string | null
+          shipping_address: Json | null
+          total_spent: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
