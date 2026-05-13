@@ -23,6 +23,7 @@ import { CouponsTab } from '@/components/admin/coupons/CouponsTab';
 import { ReviewsTab } from '@/components/admin/reviews/ReviewsTab';
 import { CollabsTab } from '@/components/admin/collabs/CollabsTab';
 import { OrdersTab } from '@/components/admin/orders/OrdersTab';
+import { SiteContentTab } from '@/components/admin/site-content/SiteContentTab';
 
 /* ═══════════ ADMIN ═══════════ */
 const ADMIN_TABS = [
@@ -36,6 +37,7 @@ const ADMIN_TABS = [
   { value: 'reviews', label: 'Avaliações' },
   { value: 'newsletter', label: 'Newsletter' },
   { value: 'campanhas', label: 'Campanhas' },
+  { value: 'site_content', label: 'Configurações Gerais' },
   // TODO: tab mensagens oculta — tabela 'mensagens' não existe, aguarda v3.2+
   // { value: 'mensagens', label: 'Mensagens' },
 ] as const;
@@ -78,6 +80,7 @@ const Admin = () => {
         <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
         <TabsContent value="campanhas"><CampaignsTab /></TabsContent>
         <TabsContent value="mensagens"><MensagensTab /></TabsContent>
+        <TabsContent value="site_content"><SiteContentTab /></TabsContent>
       </Tabs>
     </div>
   );
