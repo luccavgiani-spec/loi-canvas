@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { lembrancasUrl } from '@/lib/storage';
 import { sendCampaignEmail } from '@/lib/api';
+import LembrancasGalleryBlock, { type GalleryPosition, type GalleryTheme } from '@/components/lembrancas/LembrancasGalleryBlock';
 
 const inputStyle: React.CSSProperties = {
   borderBottom: '1px solid rgba(41,36,31,0.30)',
@@ -25,6 +26,27 @@ const OCASIOES = [
   { value: 'madrinha', label: 'MADRINHA / PADRINHO' },
   { value: 'presente', label: 'PRESENTE CORPORATIVO' },
   { value: 'outro', label: 'OUTRO' },
+];
+
+const GALERIA_BLOCOS: Array<{ imagem: string; frase: string; posicao: GalleryPosition; tema: GalleryTheme }> = [
+  {
+    imagem: lembrancasUrl('andreloie-81.webp'),
+    frase: 'Uma vela que leva o nome deles. Que traduz o dia em que disseram sim',
+    posicao: 'esquerda',
+    tema: 'cream',
+  },
+  {
+    imagem: lembrancasUrl('andreloie-82.webp'),
+    frase: 'Para quem não some depois da festa',
+    posicao: 'direita',
+    tema: 'charcoal',
+  },
+  {
+    imagem: lembrancasUrl('andreloie-86.webp'),
+    frase: 'Discreto no gesto. Marcante na lembrança. Sem excesso. Com intenção',
+    posicao: 'esquerda',
+    tema: 'cream',
+  },
 ];
 
 const CONVERSAO = [
@@ -158,125 +180,15 @@ const Lembrancas = () => {
       </section>
 
       {/* ─── GALERIA INTERCALADA ─── */}
-
-      {/* Bloco 1 — imagem à esquerda */}
-      <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-        <div style={{ overflow: 'hidden' }}>
-          <img
-            src={lembrancasUrl('andreloie-81.webp')}
-            alt=""
-            loading="lazy"
-            style={{
-              width: '100%',
-              aspectRatio: '4 / 5',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        </div>
-        <div
-          style={{
-            background: '#fcf5e0',
-            display: 'flex',
-            alignItems: 'center',
-            padding: 'clamp(3rem, 6vw, 4rem)',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
-              color: '#29241f',
-              lineHeight: 1.6,
-              textAlign: 'right',
-            }}
-          >
-            Uma vela que leva o nome deles. Que traduz o dia em que disseram sim
-          </p>
-        </div>
-      </section>
-
-      {/* Bloco 2 — imagem à direita */}
-      <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-        <div
-          style={{
-            background: '#29241f',
-            display: 'flex',
-            alignItems: 'center',
-            padding: 'clamp(3rem, 6vw, 4rem)',
-            order: 1,
-          }}
-          className="md:order-none"
-        >
-          <p
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
-              color: '#f4edd2',
-              lineHeight: 1.6,
-              textAlign: 'right',
-            }}
-          >
-            Para quem não some depois da festa
-          </p>
-        </div>
-        <div style={{ overflow: 'hidden', order: 0 }} className="md:order-none">
-          <img
-            src={lembrancasUrl('andreloie-82.webp')}
-            alt=""
-            loading="lazy"
-            style={{
-              width: '100%',
-              aspectRatio: '4 / 5',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        </div>
-      </section>
-
-      {/* Bloco 3 — imagem à esquerda */}
-      <section className="md:grid md:grid-cols-2" style={{ gap: 0 }}>
-        <div style={{ overflow: 'hidden' }}>
-          <img
-            src={lembrancasUrl('andreloie-86.webp')}
-            alt=""
-            loading="lazy"
-            style={{
-              width: '100%',
-              aspectRatio: '4 / 5',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        </div>
-        <div
-          style={{
-            background: '#fcf5e0',
-            display: 'flex',
-            alignItems: 'center',
-            padding: 'clamp(3rem, 6vw, 4rem)',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: "'Wagon', sans-serif",
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
-              color: '#29241f',
-              lineHeight: 1.6,
-              textAlign: 'right',
-            }}
-          >
-            Discreto no gesto. Marcante na lembrança. Sem excesso. Com intenção
-          </p>
-        </div>
-      </section>
+      {GALERIA_BLOCOS.map((bloco, i) => (
+        <LembrancasGalleryBlock
+          key={i}
+          imagem={bloco.imagem}
+          frase={bloco.frase}
+          posicao={bloco.posicao}
+          tema={bloco.tema}
+        />
+      ))}
 
       {/* ─── CONVERSÃO ─── */}
       <section

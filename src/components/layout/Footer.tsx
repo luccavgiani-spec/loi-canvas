@@ -1,8 +1,40 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook } from 'lucide-react';
+import { Instagram, Facebook, Link2 } from 'lucide-react';
 import { useState } from 'react';
 import MensagemForm from '@/components/MensagemForm';
 import GlareHover from '@/components/ui/GlareHover';
+
+/* Mapa nome → ícone Lucide. Redes não mapeadas caem no Link2 (genérico). */
+const SOCIAL_ICONS: Record<string, typeof Instagram> = {
+  Instagram,
+  Facebook,
+};
+
+const SocialIcon = ({ nome }: { nome: string }) => {
+  const Icon = SOCIAL_ICONS[nome] ?? Link2;
+  return <Icon size={18} strokeWidth={1.5} />;
+};
+
+/* Dados estáticos hoje; no Bloco 6 viram leitura do site_content. */
+const COLECAO_LINKS: Array<{ rotulo: string; url: string }> = [
+  { rotulo: 'Todos os produtos', url: '/produtos' },
+  { rotulo: 'Cotidianas', url: '/colecoes/cotidianas' },
+  { rotulo: 'Sala', url: '/colecoes/sala-ou-estar' },
+  { rotulo: 'Refúgio', url: '/colecoes/refugio' },
+  { rotulo: 'Botânicas & Florais', url: '/colecoes/botanicas-e-florais' },
+];
+
+const SOBRE_LINKS: Array<{ rotulo: string; url: string }> = [
+  { rotulo: 'Nossa História', url: '/sobre' },
+  { rotulo: 'Colaborações', url: '/collabs' },
+  { rotulo: 'Contato', url: '/contact' },
+  { rotulo: 'Políticas', url: '/policies' },
+];
+
+const REDES_SOCIAIS: Array<{ nome: string; url: string }> = [
+  { nome: 'Instagram', url: 'https://www.instagram.com/loie_____/' },
+  { nome: 'Facebook', url: 'https://www.facebook.com/loievelas' },
+];
 
 /* ── Olfactory families data ── */
 const FAMILIES = [
@@ -145,16 +177,10 @@ const Footer = () => {
           <div>
             <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>Coleção</h4>
             <ul className="space-y-3">
-              {[
-                { to: '/produtos', label: 'Todos os produtos' },
-                { to: '/colecoes/cotidianas', label: 'Cotidianas' },
-                { to: '/colecoes/sala-ou-estar', label: 'Sala' },
-                { to: '/colecoes/refugio', label: 'Refúgio' },
-                { to: '/colecoes/botanicas-e-florais', label: 'Botânicas & Florais' },
-              ].map((link) => (
-                <li key={link.to}>
+              {COLECAO_LINKS.map((link) => (
+                <li key={link.url}>
                   <Link
-                    to={link.to}
+                    to={link.url}
                     style={{
                       fontFamily: FONT_BODY,
                       fontWeight: 300,
@@ -165,7 +191,7 @@ const Footer = () => {
                     }}
                     className="hover:!text-[#f4edd2]"
                   >
-                    {link.label}
+                    {link.rotulo}
                   </Link>
                 </li>
               ))}
@@ -176,15 +202,10 @@ const Footer = () => {
           <div>
             <h4 style={{ fontFamily: FONT_BODY, fontWeight: 300, letterSpacing: '0.3em', fontSize: '0.65rem', color: 'rgba(244,237,210,0.5)', marginBottom: '1.5rem' }}>Sobre</h4>
             <ul className="space-y-3">
-              {[
-                { to: '/sobre', label: 'Nossa História' },
-                { to: '/collabs', label: 'Colaborações' },
-                { to: '/contact', label: 'Contato' },
-                { to: '/policies', label: 'Políticas' },
-              ].map((link) => (
-                <li key={link.to}>
+              {SOBRE_LINKS.map((link) => (
+                <li key={link.url}>
                   <Link
-                    to={link.to}
+                    to={link.url}
                     style={{
                       fontFamily: FONT_BODY,
                       fontWeight: 300,
@@ -195,7 +216,7 @@ const Footer = () => {
                     }}
                     className="hover:!text-[#f4edd2]"
                   >
-                    {link.label}
+                    {link.rotulo}
                   </Link>
                 </li>
               ))}
@@ -219,26 +240,19 @@ const Footer = () => {
                 Bragança Paulista, SP 12900-161
               </li>
               <li className="pt-3 flex items-center gap-4">
-                <a
-                  href="https://www.instagram.com/loie_____/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  style={{ color: 'rgba(244,237,210,0.4)', transition: 'color 0.3s ease' }}
-                  className="hover:!text-[#f4edd2]"
-                >
-                  <Instagram size={18} strokeWidth={1.5} />
-                </a>
-                <a
-                  href="https://www.facebook.com/loievelas"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                  style={{ color: 'rgba(244,237,210,0.4)', transition: 'color 0.3s ease' }}
-                  className="hover:!text-[#f4edd2]"
-                >
-                  <Facebook size={18} strokeWidth={1.5} />
-                </a>
+                {REDES_SOCIAIS.map((rede) => (
+                  <a
+                    key={rede.nome + rede.url}
+                    href={rede.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={rede.nome}
+                    style={{ color: 'rgba(244,237,210,0.4)', transition: 'color 0.3s ease' }}
+                    className="hover:!text-[#f4edd2]"
+                  >
+                    <SocialIcon nome={rede.nome} />
+                  </a>
+                ))}
               </li>
             </ul>
           </div>

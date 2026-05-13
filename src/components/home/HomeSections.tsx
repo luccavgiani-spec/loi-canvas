@@ -473,8 +473,17 @@ const HomeSections = () => {
       p.collection_slug === 'refugio'
     )
     .slice(0, 4);
-  const focusBosque = allProducts.find((p) => p.slug === 'bosque');
-  const focusPomar = allProducts.find((p) => p.slug === 'pomar');
+
+  /* Slots editáveis no admin: cada slot referencia 1 produto por slug + 1 vídeo.
+     Quando o produto não é encontrado, faz fallback para allProducts[i]. */
+  const FOCUS_SLOTS: Array<{ slug: string; videoSrc: string }> = [
+    { slug: 'bosque', videoSrc: storageUrl('loie_vela_bosque_compress (1).mp4') },
+    { slug: 'pomar',  videoSrc: storageUrl('LOIE.pomarOverdelivery.mp4') },
+  ];
+  const focusItems = FOCUS_SLOTS.map((slot, i) => {
+    const product = allProducts.find((p) => p.slug === slot.slug) ?? allProducts[i];
+    return product ? { product, videoSrc: slot.videoSrc } : null;
+  }).filter((x): x is { product: Product; videoSrc: string } => x !== null);
 
   return (
     <div ref={ref} style={{ background: '#fcf5e0' }}>
@@ -517,37 +526,21 @@ const HomeSections = () => {
       {/* ── Separador cream → cream (sutil) ── */}
       <div style={{ height: 'clamp(40px, 6vw, 80px)', background: '#f4edd2' }} />
 
-      {/* ── 2. Banner de Produto Foco — Bosque (video) / Pomar (video) ── */}
+      {/* ── 2. Banner de Produto Foco — slots iteráveis ── */}
       <section style={{ background: '#f4edd2' }} className="loi-section-lazy">
         {loading ? (
           <div style={{ minHeight: '50vh', background: '#f4edd2' }} />
         ) : (
-          <>
-            {focusBosque && (
-              <div className="relative">
-                <ProductFocusBanner product={focusBosque} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
-              </div>
-            )}
-            {focusPomar && (
-              <div className="relative">
-                <ProductFocusBanner product={focusPomar} reverse videoSrc={storageUrl('LOIE.pomarOverdelivery.mp4')} dark />
-              </div>
-            )}
-            {!focusBosque && !focusPomar && (
-              <>
-                {allProducts[0] && (
-                  <div className="relative">
-                    <ProductFocusBanner product={allProducts[0]} videoSrc={storageUrl('loie_vela_bosque_compress (1).mp4')} dark />
-                  </div>
-                )}
-                {allProducts[1] && (
-                  <div className="relative">
-                    <ProductFocusBanner product={allProducts[1]} reverse videoSrc={storageUrl('LOIE.pomarOverdelivery.mp4')} dark />
-                  </div>
-                )}
-              </>
-            )}
-          </>
+          focusItems.map((slot, i) => (
+            <div className="relative" key={slot.product.id}>
+              <ProductFocusBanner
+                product={slot.product}
+                videoSrc={slot.videoSrc}
+                reverse={i % 2 === 1}
+                dark
+              />
+            </div>
+          ))
         )}
       </section>
 
