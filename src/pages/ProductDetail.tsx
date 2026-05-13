@@ -10,10 +10,19 @@ import { Star, Truck, RefreshCw, Leaf, Package } from 'lucide-react';
 import ReviewSection from '@/components/product/ReviewSection';
 import ShippingCalculator from '@/components/ShippingCalculator';
 import ProductPriceTag from '@/components/shop/ProductPriceTag';
+import { useSiteContent, useSiteContentList, readBlockText } from '@/lib/site-content/hooks';
+import EditableText from '@/components/site-content/EditableText';
 
 const FONT_BODY = "'Sackers Gothic', sans-serif";
 
-const benefits = [
+const BENEFIT_ICON_MAP: Record<string, typeof Truck> = {
+  truck: Truck,
+  'refresh-cw': RefreshCw,
+  leaf: Leaf,
+  package: Package,
+};
+
+const DEFAULT_BENEFITS: Array<{ icon: typeof Truck; label: string }> = [
   { icon: Truck, label: 'Frete grátis acima de R$ 299' },
   { icon: RefreshCw, label: 'Trocas em até 7 dias' },
   { icon: Leaf, label: 'Embalagem sustentável' },
@@ -27,6 +36,30 @@ const ProductDetail = () => {
   const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+
+  const { data: dropdownLabels } = useSiteContent('product_detail', 'dropdowns');
+  const { data: ctas } = useSiteContent('product_detail', 'ctas');
+  const { data: benefitsItems } = useSiteContentList('product_detail', 'benefits', 'itens');
+
+  const labelDescricao = readBlockText(dropdownLabels, 'label_descricao_sensorial', 'DESCRIÇÃO SENSORIAL');
+  const labelUso = readBlockText(dropdownLabels, 'label_uso_sugerido', 'USO SUGERIDO');
+  const labelComposicao = readBlockText(dropdownLabels, 'label_composicao', 'COMPOSIÇÃO & DESEMPENHO');
+  const labelRitual = readBlockText(dropdownLabels, 'label_ritual', 'RITUAL DE USO');
+
+  const ctaAdd = readBlockText(ctas, 'adicionar_carrinho', 'adicionar ao carrinho');
+  const ctaBuy = readBlockText(ctas, 'comprar_agora', 'comprar agora');
+  const ctaEmBreve = readBlockText(ctas, 'em_breve', 'em breve');
+  const ctaEsgotado = readBlockText(ctas, 'esgotado', 'esgotado');
+
+  const benefits = (benefitsItems && benefitsItems.length > 0)
+    ? benefitsItems.filter((it) => it.is_visible).map((it) => {
+        const iconKey = (it.fields?.icone as string | undefined) ?? '';
+        return {
+          icon: BENEFIT_ICON_MAP[iconKey] ?? Package,
+          label: (it.fields?.texto as string | undefined) ?? '',
+        };
+      })
+    : DEFAULT_BENEFITS;
 
   useEffect(() => {
     if (!slug) return;
@@ -305,7 +338,7 @@ const ProductDetail = () => {
                         color: '#000',
                       }}
                     >
-                      DESCRIÇÃO SENSORIAL
+                      {labelDescricao}
                       <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
@@ -340,7 +373,7 @@ const ProductDetail = () => {
                         color: '#000',
                       }}
                     >
-                      USO SUGERIDO
+                      {labelUso}
                       <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
@@ -375,7 +408,7 @@ const ProductDetail = () => {
                         color: '#000',
                       }}
                     >
-                      COMPOSIÇÃO & DESEMPENHO
+                      {labelComposicao}
                       <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
@@ -410,7 +443,7 @@ const ProductDetail = () => {
                         color: '#000',
                       }}
                     >
-                      RITUAL DE USO
+                      {labelRitual}
                       <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 200 }}>+</span>
                     </summary>
                     <p
@@ -469,9 +502,9 @@ const ProductDetail = () => {
                 const canAdd = availability === 'estoque';
                 const ctaLabel = (action: string) =>
                   availability === 'em-breve'
-                    ? 'em breve'
+                    ? ctaEmBreve
                     : availability === 'esgotado'
-                      ? 'esgotado'
+                      ? ctaEsgotado
                       : action;
                 return (
                   <div className="flex flex-col gap-3 mb-10">
@@ -480,14 +513,14 @@ const ProductDetail = () => {
                       disabled={!canAdd}
                       className="loi-btn w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {ctaLabel('adicionar ao carrinho')}
+                      {ctaLabel(ctaAdd)}
                     </button>
                     <button
                       onClick={() => addItem(product)}
                       disabled={!canAdd}
                       className="loi-btn-outline w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {ctaLabel('comprar agora')}
+                      {ctaLabel(ctaBuy)}
                     </button>
                   </div>
                 );
@@ -503,10 +536,23 @@ const ProductDetail = () => {
           {related.length > 0 && (
             <section className="mt-20 md:mt-28">
               <div className="text-center mb-12">
-                <span className="loi-label block mb-4">recomendados</span>
-                <h2 className="heading-display" style={{ fontSize: '2rem', color: '#000' }}>
-                  Você também pode gostar
-                </h2>
+                <EditableText
+                  pageKey="product_detail"
+                  sectionKey="relacionados"
+                  blockKey="eyebrow"
+                  defaultText="recomendados"
+                  as="span"
+                  defaultClass="loi-label block mb-4"
+                />
+                <EditableText
+                  pageKey="product_detail"
+                  sectionKey="relacionados"
+                  blockKey="titulo"
+                  defaultText="Você também pode gostar"
+                  as="h2"
+                  defaultClass="heading-display"
+                  style={{ fontSize: '2rem', color: '#000' }}
+                />
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 {related.map((p) => (
