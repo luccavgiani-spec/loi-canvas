@@ -3,6 +3,7 @@ import { ShoppingBag, Menu, X, Search, Truck } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect, useRef } from 'react';
 import SearchAutocomplete from '@/components/layout/SearchAutocomplete';
+import LoieSymbol from '@/components/ui/LoieSymbol';
 
 // Flag temporária — futuramente migra para config/admin
 const SHOW_CORPO = false;
@@ -166,19 +167,10 @@ const Header = () => {
               )}
             </div>
 
-            {/* Produtos (sem dropdown) */}
-            <Link
-              to="/produtos"
-              onClick={() => setActiveSection(null)}
-              className={linkClass}
-              style={{
-                textDecoration: 'none',
-                color: location.pathname === '/produtos' ? activeLinkColor : undefined,
-                opacity: activeSection ? 0.45 : 1,
-              }}
-            >
-              produtos
-            </Link>
+            {/* Produtos — símbolo Loiê (sem dropdown) */}
+            <LoieSymbol
+              className={activeSection ? 'opacity-[0.45]' : ''}
+            />
 
             {/* Section dropdowns */}
             {NAV_SECTIONS.map((section) => (
