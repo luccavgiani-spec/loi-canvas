@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { bannerUrl } from '@/lib/storage';
 import { supabase } from '@/integrations/supabase/client';
 import GlareHover from '@/components/ui/GlareHover';
 import { FAMILIES } from '@/lib/families';
+import { useSiteContent, useSiteContentList, readBlockText } from '@/lib/site-content/hooks';
 
 /* ─── grain SVG data URI ─── */
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`;
@@ -12,9 +13,14 @@ const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
   const [activeFamily, setActiveFamily] = useState<string | null>(null);
-  const [bannerImages, setBannerImages] = useState<string[]>([]);
+  const [storageBanners, setStorageBanners] = useState<string[] | null>(null);
 
+  const { data: heroSection } = useSiteContent('home', 'hero');
+  const { data: bannerItems } = useSiteContentList('home', 'hero', 'banners');
+
+  // Banners do banco têm prioridade; storage só é consultado como fallback.
   useEffect(() => {
+    if (bannerItems !== undefined) return;
     supabase.storage.from('banner').list().then(({ data, error }) => {
       if (error) {
         console.error('[HeroSection] banner list() failed:', error.message);
@@ -25,10 +31,23 @@ const HeroSection = () => {
           .filter(f => f.name.match(/\.(webp|jpg|jpeg|png)$/i))
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(f => bannerUrl(f.name));
-        setBannerImages(urls);
+        setStorageBanners(urls);
       }
     });
-  }, []);
+  }, [bannerItems]);
+
+  const bannerImages = useMemo(() => {
+    if (bannerItems && bannerItems.length > 0) {
+      return bannerItems
+        .filter((it) => it.is_visible)
+        .map((it) => (it.fields?.url as string | undefined) ?? '')
+        .filter(Boolean);
+    }
+    return storageBanners ?? [];
+  }, [bannerItems, storageBanners]);
+
+  const ctaPrimario = readBlockText(heroSection, 'cta_primario', 'navegar');
+  const ctaSecundario = readBlockText(heroSection, 'cta_secundario', 'nossa história');
 
   useEffect(() => {
     if (bannerImages.length === 0) return;
@@ -87,7 +106,7 @@ const HeroSection = () => {
               className="hero-fadeUp hero-btn-primary"
               style={{ animationDelay: '1.0s' }}
             >
-              navegar
+              {ctaPrimario}
             </a>
 
             <a
@@ -95,7 +114,7 @@ const HeroSection = () => {
               className="hero-fadeUp hero-btn-ghost group"
               style={{ animationDelay: '1.1s' }}
             >
-              <span>nossa história</span>
+              <span>{ctaSecundario}</span>
             </a>
           </div>
         </div>

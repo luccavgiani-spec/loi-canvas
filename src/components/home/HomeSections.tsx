@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useReveal } from '@/hooks/useReveal';
 import { useCart } from '@/contexts/CartContext';
-import { getProducts, getCollabs, getBestsellerProducts } from '@/lib/api';
+import { getProducts, getCollabs, getBestsellerProducts, getCollections } from '@/lib/api';
 import { storageUrl } from '@/lib/storage';
-import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/LazyVideo';
 import ArrowLink from '@/components/ui/ArrowLink';
 import ProductPriceTag from '@/components/shop/ProductPriceTag';
 import { getProductAvailability } from '@/lib/productFilters';
-import type { Product, Collab } from '@/types';
+import type { Product, Collab, Collection } from '@/types';
+import { useSiteContent, useSiteContentList, readBlockText } from '@/lib/site-content/hooks';
+import EditableText from '@/components/site-content/EditableText';
 
 /* ── Horizontal carousel with snap scrolling ── */
 const ProductCarousel = memo(({
@@ -448,8 +450,13 @@ CollabCarousel.displayName = 'CollabCarousel';
 const HomeSections = () => {
   const { addItem } = useCart();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allCollections, setAllCollections] = useState<Collection[]>([]);
   const [bestsellers, setBestsellers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { data: descubraSection } = useSiteContent('home', 'descubra_novos_aromas');
+  const { data: faqItems } = useSiteContentList('home', 'faq', 'perguntas');
+  const { data: focusSlots } = useSiteContentList('home', 'produto_foco', 'slots');
   // Bestsellers vem de um fetch separado de getProducts. Sem incluir
   // bestsellers.length nas deps, a secao monta DEPOIS que loading virou
   // false e seus .reveal nunca recebem .revealed (somem).
@@ -459,6 +466,7 @@ const HomeSections = () => {
     getProducts()
       .then(setAllProducts)
       .finally(() => setLoading(false));
+    getCollections().then(setAllCollections).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -467,23 +475,44 @@ const HomeSections = () => {
       .catch(err => console.error('[HomeSections] bestsellers load failed', err));
   }, []);
 
-  const refugio = allProducts
-    .filter((p) =>
-      p.collection?.toLowerCase().includes('ref') ||
-      p.collection_slug === 'refugio'
-    )
-    .slice(0, 4);
+  // Coleção do "Descubra novos aromas" — vem do site_content (FK), fallback Refúgio.
+  const descubraColecaoSlug = useMemo(() => {
+    const refId = descubraSection?.['colecao_ref']?.value_ref_id;
+    if (refId) {
+      const col = allCollections.find((c) => c.id === refId);
+      if (col) return col.slug;
+    }
+    return 'refugio';
+  }, [descubraSection, allCollections]);
 
-  /* Slots editáveis no admin: cada slot referencia 1 produto por slug + 1 vídeo.
-     Quando o produto não é encontrado, faz fallback para allProducts[i]. */
-  const FOCUS_SLOTS: Array<{ slug: string; videoSrc: string }> = [
-    { slug: 'bosque', videoSrc: storageUrl('loie_vela_bosque_compress (1).mp4') },
-    { slug: 'pomar',  videoSrc: storageUrl('LOIE.pomarOverdelivery.mp4') },
-  ];
-  const focusItems = FOCUS_SLOTS.map((slot, i) => {
-    const product = allProducts.find((p) => p.slug === slot.slug) ?? allProducts[i];
-    return product ? { product, videoSrc: slot.videoSrc } : null;
-  }).filter((x): x is { product: Product; videoSrc: string } => x !== null);
+  const refugio = useMemo(() => allProducts
+    .filter((p) =>
+      p.collection_slug === descubraColecaoSlug ||
+      (descubraColecaoSlug === 'refugio' && p.collection?.toLowerCase().includes('ref'))
+    )
+    .slice(0, 4), [allProducts, descubraColecaoSlug]);
+
+  /* Slots vêm do site_content; fallback para Bosque+Pomar hardcoded. */
+  const focusItems = useMemo(() => {
+    const slots = (focusSlots ?? []).filter((s) => s.is_visible);
+    if (slots.length > 0) {
+      return slots.map((slot) => {
+        const productId = slot.fields?.produto_id as string | undefined;
+        const videoSrc = (slot.fields?.video_url as string | undefined) ?? '';
+        const product = allProducts.find((p) => p.id === productId);
+        return product ? { product, videoSrc } : null;
+      }).filter((x): x is { product: Product; videoSrc: string } => x !== null);
+    }
+    // fallback estático
+    const FALLBACK_SLOTS: Array<{ slug: string; videoSrc: string }> = [
+      { slug: 'bosque', videoSrc: storageUrl('loie_vela_bosque_compress (1).mp4') },
+      { slug: 'pomar',  videoSrc: storageUrl('LOIE.pomarOverdelivery.mp4') },
+    ];
+    return FALLBACK_SLOTS.map((slot, i) => {
+      const product = allProducts.find((p) => p.slug === slot.slug) ?? allProducts[i];
+      return product ? { product, videoSrc: slot.videoSrc } : null;
+    }).filter((x): x is { product: Product; videoSrc: string } => x !== null);
+  }, [focusSlots, allProducts]);
 
   return (
     <div ref={ref} style={{ background: '#fcf5e0' }}>
@@ -500,21 +529,32 @@ const HomeSections = () => {
       <section className="py-16 px-6 md:py-0 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span style={{
-              fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
-              fontWeight: 300,
-              fontSize: '0.65rem',
-              letterSpacing: '0.25em',
-              textTransform: 'uppercase',
-              color: 'rgba(0,0,0,0.4)',
-              display: 'block',
-              marginBottom: '0.4rem',
-            }}>
-              bestsellers
-            </span>
-            <h2 className="reveal heading-display" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}>
-              mais pedidas
-            </h2>
+            <EditableText
+              pageKey="home"
+              sectionKey="bestsellers"
+              blockKey="eyebrow"
+              defaultText="bestsellers"
+              as="span"
+              style={{
+                fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
+                fontWeight: 300,
+                fontSize: '0.65rem',
+                letterSpacing: '0.25em',
+                textTransform: 'uppercase',
+                color: 'rgba(0,0,0,0.4)',
+                display: 'block',
+                marginBottom: '0.4rem',
+              }}
+            />
+            <EditableText
+              pageKey="home"
+              sectionKey="bestsellers"
+              blockKey="titulo"
+              defaultText="mais pedidas"
+              as="h2"
+              defaultClass="reveal heading-display"
+              style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#000' }}
+            />
           </div>
           <div className="reveal">
             <ProductCarousel products={bestsellers} addItem={addItem} />
@@ -551,16 +591,22 @@ const HomeSections = () => {
       <section className="py-16 md:py-20 px-6 loi-section-lazy">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <h2 className="reveal" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#000' }}>
-              Descubra novos aromas
-            </h2>
+            <EditableText
+              pageKey="home"
+              sectionKey="descubra_novos_aromas"
+              blockKey="titulo"
+              defaultText="Descubra novos aromas"
+              as="h2"
+              defaultClass="reveal"
+              style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#000' }}
+            />
           </div>
           <div className="reveal">
             <ProductCarousel products={refugio} addItem={addItem} />
           </div>
           <div className="reveal text-center mt-10">
-            <Link to="/colecoes/refugio">
-              <ArrowLink>ver toda a coleção</ArrowLink>
+            <Link to={`/colecoes/${descubraColecaoSlug}`}>
+              <ArrowLink>{readBlockText(descubraSection, 'cta', 'ver toda a coleção')}</ArrowLink>
             </Link>
           </div>
         </div>
@@ -570,7 +616,12 @@ const HomeSections = () => {
       <section className="py-16 px-6 md:py-[5px] loi-section-lazy" style={{ background: '#f4edd2' }}>
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-12">
-            <span
+            <EditableText
+              pageKey="home"
+              sectionKey="colaboracoes"
+              blockKey="eyebrow"
+              defaultText="collabs"
+              as="span"
               style={{
                 fontFamily: "'Sackers Gothic Std', 'Sackers Gothic', sans-serif",
                 fontWeight: 300,
@@ -581,17 +632,21 @@ const HomeSections = () => {
                 display: 'block',
                 marginBottom: '0.4rem',
               }}
-            >
-              collabs
-            </span>
-            <h2 className="reveal" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#000' }}>
-              Colaborações
-            </h2>
+            />
+            <EditableText
+              pageKey="home"
+              sectionKey="colaboracoes"
+              blockKey="titulo"
+              defaultText="Colaborações"
+              as="h2"
+              defaultClass="reveal"
+              style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#000' }}
+            />
           </div>
           <CollabCarousel />
           <div className="reveal text-center mt-10">
             <Link to="/collabs">
-              <ArrowLink>ver todas as colaborações</ArrowLink>
+              <ArrowLink><EditableText pageKey="home" sectionKey="colaboracoes" blockKey="cta" defaultText="ver todas as colaborações" /></ArrowLink>
             </Link>
           </div>
         </div>
@@ -601,22 +656,35 @@ const HomeSections = () => {
       <section className="py-16 md:py-20 px-6 loi-section-lazy">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
-            <span className="reveal loi-label block mb-4" style={{ color: '#29241f' }}>dúvidas</span>
-            <h2 className="reveal" style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#29241f' }}>
-              Perguntas frequentes
-            </h2>
+            <EditableText
+              pageKey="home"
+              sectionKey="faq"
+              blockKey="eyebrow"
+              defaultText="dúvidas"
+              as="span"
+              defaultClass="reveal loi-label block mb-4"
+              style={{ color: '#29241f' }}
+            />
+            <EditableText
+              pageKey="home"
+              sectionKey="faq"
+              blockKey="titulo"
+              defaultText="Perguntas frequentes"
+              as="h2"
+              defaultClass="reveal"
+              style={{ fontFamily: "'Sackers Gothic', sans-serif", fontWeight: 300, letterSpacing: '0.2em', fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', color: '#29241f' }}
+            />
           </div>
           <div className="reveal space-y-0">
-            {[
-              { q: 'Qual o tempo de queima das velas?', a: 'cotidianas 160g ————————— aprox. 20 horas\nsala 200g —————————————— aprox. 45 horas\nrefúgio 300g ——————————— aprox. 55 horas\nbotânicas & florais 400g —— aprox. 65 horas\n\npara queimas saudáveis e seguras, recomendamos sessões de até 4 horas seguidas — tempo suficiente para perfumar o ambiente sem comprometer o desempenho da vela.' },
-              { q: 'Por que o aroma não se comporta igual em todos os ambientes?', a: 'A percepção de uma composição aromática no ambiente depende de fatores físicos e de uso. não se trata apenas da fragrância em si, mas de como ela se difunde e se mantém no espaço.\n\nos principais pontos são:\n\ntamanho do ambiente\nA escala do espaço influencia diretamente a intensidade percebida. Ambientes maiores diluem mais rapidamente o aroma, exigindo maior carga ou reforço de aplicação. Ambientes menores concentram, o que pede moderação para evitar saturação.\n\ncirculação de ar\na movimentação do ar acelera a dispersão das partículas aromáticas. locais com janelas abertas, ventilação constante ou ar-condicionado tendem a reduzir a duração do aroma. ambientes fechados favorecem maior permanência.\n\nforma de uso\ncada produto atua de maneira diferente na liberação da composição aromática:\n• velas aromáticas: a liberação ocorre pelo aquecimento da cera, promovendo difusão gradual e contínua enquanto acesa.\n• sprays de ambiente: liberam partículas no ar de forma imediata, com efeito mais rápido e duração mais curta.\n\nposicionamento\na localização do produto interfere na distribuição do aroma. pontos de circulação favorecem a propagação. superfícies muito isoladas tendem a limitar o alcance.' },
-              { q: 'As velas são veganas e cruelty-free?', a: 'Sim. Utilizamos exclusivamente ceras vegetais de coco, arroz e palma, pavios de algodão e óleos essenciais puros — sem nenhum componente de origem animal. Nenhum produto Loiê é testado em animais.' },
-              { q: 'Posso trocar ou devolver?', a: 'Aceitamos trocas e devoluções em até 7 dias após o recebimento, desde que o produto esteja sem uso. Para solicitar, basta entrar em contato pelo e-mail ou WhatsApp — resolvemos com agilidade.' },
-              { q: 'As velas são seguras para uso com pets ou crianças?', a: 'Nossas velas são feitas com óleos essenciais puros e ceras vegetais sem aditivos sintéticos. Em ambientes com pets ou crianças pequenas, recomendamos ventilação adequada e manter a vela fora do alcance. Óleos como eucalipto e menta exigem atenção especial com gatos — prefira usar com o ambiente bem arejado.' },
-              { q: 'Qual a diferença entre as velas de 200g e as de 300g?', a: 'As velas de 200g têm duração aproximada de 45 horas e são ideais para ambientes menores ou uso diário. As de 300g duram cerca de 55 horas e entregam maior presença aromática — indicadas para salas maiores ou para quem quer que o aroma se prolongue por mais tempo.' },
-              { q: 'Posso usar a vela em ambientes pequenos, como banheiros?', a: 'Sim. Em espaços menores, o aroma se concentra com rapidez. Recomendamos sessões mais curtas para evitar saturação sensorial. Velas com perfil mais suave, como Campos ou Ícaro, funcionam especialmente bem nesses ambientes.' },
-              { q: 'Como armazenar a vela quando não estiver em uso?', a: 'Guarde em local fresco, seco e afastado da luz solar direta. Evite superfícies que absorvam calor, como peitoris de janela em dias quentes.' },
-            ].map((faq, i) => (
+            {(faqItems && faqItems.length > 0
+              ? faqItems
+                  .filter((it) => it.is_visible)
+                  .map((it) => ({
+                    q: (it.fields?.pergunta as string | undefined) ?? '',
+                    a: (it.fields?.resposta as string | undefined) ?? '',
+                  }))
+              : []
+            ).map((faq, i) => (
               <details key={i} className="group" style={{ borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
                 <summary
                   className="flex items-center py-5 cursor-pointer list-none"
