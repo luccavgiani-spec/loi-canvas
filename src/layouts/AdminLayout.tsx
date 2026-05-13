@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { AdminPreferencesProvider } from '@/components/admin/preferences/AdminPreferencesContext';
 
 interface NavItem {
   to: string;
@@ -108,9 +109,14 @@ export default function AdminLayout() {
   const displayName = user?.email?.split('@')[0] ?? '';
 
   return (
+    <AdminPreferencesProvider>
     <div
       className="min-h-screen flex"
-      style={{ background: COLOR.cream, color: COLOR.charcoal }}
+      style={{
+        background: COLOR.cream,
+        color: COLOR.charcoal,
+        fontFamily: 'var(--admin-ui-font, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif)',
+      }}
     >
       {/* Sidebar — desktop */}
       <aside
@@ -209,5 +215,6 @@ export default function AdminLayout() {
         </main>
       </div>
     </div>
+    </AdminPreferencesProvider>
   );
 }

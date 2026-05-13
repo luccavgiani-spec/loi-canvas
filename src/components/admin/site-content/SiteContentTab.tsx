@@ -108,12 +108,12 @@ export function SiteContentTab() {
   return (
     <div className="space-y-4">
       {/* Page picker — pills no topo */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2.5">
         {PAGES.map((p) => (
           <button
             key={p.key}
             onClick={() => setPageKey(p.key)}
-            className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+            className={`text-sm px-4 py-2 rounded-full border transition-colors ${
               pageKey === p.key
                 ? 'bg-primary text-primary-foreground border-primary'
                 : 'border-border text-muted-foreground hover:text-foreground'
@@ -126,30 +126,30 @@ export function SiteContentTab() {
       </div>
 
       {currentPage && (
-        <p className="text-[11px] text-muted-foreground/80 -mt-1">
+        <p className="text-sm text-muted-foreground/80 -mt-1">
           editando: <span className="font-medium">{currentPage.label}</span>
           {' '}·{' '}<span className="font-mono">{currentPage.hint}</span>
         </p>
       )}
 
       {(loadingBlocks || loadingLists) && (
-        <p className="text-xs text-muted-foreground">Carregando…</p>
+        <p className="text-sm text-muted-foreground">Carregando…</p>
       )}
 
       {!loadingBlocks && !loadingLists && sectionKeys.length === 0 && (
-        <p className="text-xs text-muted-foreground italic">
+        <p className="text-sm text-muted-foreground italic">
           Nenhum conteúdo seedado para esta página ainda.
         </p>
       )}
 
       {sectionKeys.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 border-t border-border pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-7 border-t border-border pt-5">
           {/* ── Sidebar de seções ── */}
-          <aside className="md:sticky md:top-4 self-start space-y-0.5">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 px-2">
+          <aside className="md:sticky md:top-4 self-start space-y-1">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2.5 px-2.5">
               Seções da página
             </p>
-            <nav className="flex flex-row flex-wrap md:flex-col gap-1">
+            <nav className="flex flex-row flex-wrap md:flex-col gap-1.5">
               {sectionKeys.map((sk) => {
                 const isActive = sk === activeSection;
                 const visible = sectionVisible(sk);
@@ -159,19 +159,19 @@ export function SiteContentTab() {
                   <button
                     key={sk}
                     onClick={() => setActiveSection(sk)}
-                    className={`group flex items-center gap-2 px-2 py-1.5 rounded-md text-left text-xs transition-colors ${
+                    className={`group flex items-center gap-2 px-2.5 py-2 rounded-md text-left text-sm transition-colors ${
                       isActive
                         ? 'bg-accent text-accent-foreground'
                         : 'hover:bg-muted text-muted-foreground'
                     }`}
                   >
                     <ChevronRight
-                      size={12}
+                      size={14}
                       className={`flex-shrink-0 transition-transform ${isActive ? 'rotate-90 text-foreground' : 'text-muted-foreground/40'}`}
                     />
                     <span className="flex-1 truncate">{sectionLabel(pageKey, sk)}</span>
-                    {!visible && <EyeOff size={11} className="text-muted-foreground/60" />}
-                    <span className="text-[9px] text-muted-foreground/60 tabular-nums">
+                    {!visible && <EyeOff size={13} className="text-muted-foreground/60" />}
+                    <span className="text-[11px] text-muted-foreground/60 tabular-nums">
                       {nBlocks + nLists}
                     </span>
                   </button>
@@ -181,13 +181,13 @@ export function SiteContentTab() {
           </aside>
 
           {/* ── Painel direito: editor da seção ativa ── */}
-          <div className="min-w-0 space-y-4">
+          <div className="min-w-0 space-y-5">
             {activeSection && (
               <>
-                <header className="flex items-center justify-between gap-3 pb-2 border-b border-border">
+                <header className="flex items-center justify-between gap-3 pb-3 border-b border-border">
                   <div>
-                    <h3 className="text-base font-medium">{sectionLabel(pageKey, activeSection)}</h3>
-                    <p className="text-[10px] text-muted-foreground/70 font-mono">
+                    <h3 className="text-lg font-medium">{sectionLabel(pageKey, activeSection)}</h3>
+                    <p className="text-xs text-muted-foreground/70 font-mono mt-0.5">
                       {pageKey} › {activeSection}
                     </p>
                   </div>
@@ -199,12 +199,12 @@ export function SiteContentTab() {
                         const wasVisible = sectionVisible(activeSection);
                         toggleSection.mutate({ sectionKey: activeSection, isVisible: !wasVisible });
                       }}
-                      className="gap-1"
+                      className="gap-1.5 text-sm"
                     >
                       {sectionVisible(activeSection) ? (
-                        <><Eye size={14} /> seção visível no site</>
+                        <><Eye size={16} /> seção visível no site</>
                       ) : (
-                        <><EyeOff size={14} /> seção oculta</>
+                        <><EyeOff size={16} /> seção oculta</>
                       )}
                     </Button>
                   )}

@@ -39,7 +39,7 @@ function bucketForContext(pageKey: string, sectionKey: string): string {
   return 'produtos';
 }
 
-const fieldLabelCls = 'block text-[10px] uppercase tracking-wider text-muted-foreground mb-1';
+const fieldLabelCls = 'block text-xs uppercase tracking-wider text-muted-foreground mb-1.5';
 
 const BlockEditor = ({ block, onSave, products = [], collections = [], showVertical = false }: Props) => {
   const { toast } = useToast();
@@ -118,11 +118,11 @@ const BlockEditor = ({ block, onSave, products = [], collections = [], showVerti
   }
 
   return (
-    <div className="border border-border rounded-md p-4 bg-card">
-      <div className="flex items-center justify-between mb-3">
+    <div className="border border-border rounded-md p-5 bg-card">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs font-medium">{block.block_key}</p>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{block.content_type}</p>
+          <p className="text-sm font-medium">{block.block_key}</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground mt-0.5">{block.content_type}</p>
         </div>
       </div>
 
@@ -130,9 +130,9 @@ const BlockEditor = ({ block, onSave, products = [], collections = [], showVerti
         <div>
           <label className={fieldLabelCls}>Conteúdo</label>
           {block.content_type === 'rich_text' || (valueText && valueText.length > 80) ? (
-            <Textarea value={valueText} onChange={(e) => setValueText(e.target.value)} className="min-h-[120px] text-sm" />
+            <Textarea value={valueText} onChange={(e) => setValueText(e.target.value)} className="min-h-[140px] text-base" />
           ) : (
-            <Input value={valueText} onChange={(e) => setValueText(e.target.value)} className="text-sm" />
+            <Input value={valueText} onChange={(e) => setValueText(e.target.value)} className="text-base" />
           )}
         </div>
       )}
@@ -141,11 +141,11 @@ const BlockEditor = ({ block, onSave, products = [], collections = [], showVerti
         <div className="space-y-3">
           <label className={fieldLabelCls}>Imagem atual</label>
           {(previewFile || valueImage) && (
-            <img src={previewFile ?? valueImage} alt="" className="max-h-40 border border-border rounded" />
+            <img src={previewFile ?? valueImage} alt="" className="max-h-48 border border-border rounded" />
           )}
-          <Input type="file" accept="image/*" disabled={uploading} onChange={(e) => handleUpload(e, 'image')} />
-          {uploading && <p className="text-xs text-muted-foreground">Enviando…</p>}
-          <Input value={valueImage} onChange={(e) => setValueImage(e.target.value)} placeholder="URL pública" className="text-xs" />
+          <Input type="file" accept="image/*" disabled={uploading} onChange={(e) => handleUpload(e, 'image')} className="text-sm" />
+          {uploading && <p className="text-sm text-muted-foreground">Enviando…</p>}
+          <Input value={valueImage} onChange={(e) => setValueImage(e.target.value)} placeholder="URL pública" className="text-sm" />
         </div>
       )}
 
@@ -153,18 +153,18 @@ const BlockEditor = ({ block, onSave, products = [], collections = [], showVerti
         <div className="space-y-3">
           <label className={fieldLabelCls}>Vídeo atual</label>
           {(previewFile || valueVideo) && (
-            <video src={previewFile ?? valueVideo} controls className="max-h-40 border border-border rounded" />
+            <video src={previewFile ?? valueVideo} controls className="max-h-48 border border-border rounded" />
           )}
-          <Input type="file" accept="video/mp4" disabled={uploading} onChange={(e) => handleUpload(e, 'video')} />
-          {uploading && <p className="text-xs text-muted-foreground">Enviando…</p>}
-          <Input value={valueVideo} onChange={(e) => setValueVideo(e.target.value)} placeholder="URL pública" className="text-xs" />
+          <Input type="file" accept="video/mp4" disabled={uploading} onChange={(e) => handleUpload(e, 'video')} className="text-sm" />
+          {uploading && <p className="text-sm text-muted-foreground">Enviando…</p>}
+          <Input value={valueVideo} onChange={(e) => setValueVideo(e.target.value)} placeholder="URL pública" className="text-sm" />
         </div>
       )}
 
       {isProductRef && (
         <div>
           <label className={fieldLabelCls}>Produto</label>
-          <select className="w-full border border-border rounded-md px-2 py-1.5 text-sm bg-transparent" value={valueRef ?? ''} onChange={(e) => setValueRef(e.target.value)}>
+          <select className="w-full border border-border rounded-md px-3 py-2 text-base bg-transparent" value={valueRef ?? ''} onChange={(e) => setValueRef(e.target.value)}>
             <option value="">— selecionar —</option>
             {products.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>
@@ -176,7 +176,7 @@ const BlockEditor = ({ block, onSave, products = [], collections = [], showVerti
       {isCollectionRef && (
         <div>
           <label className={fieldLabelCls}>Coleção</label>
-          <select className="w-full border border-border rounded-md px-2 py-1.5 text-sm bg-transparent" value={valueRef ?? ''} onChange={(e) => setValueRef(e.target.value)}>
+          <select className="w-full border border-border rounded-md px-3 py-2 text-base bg-transparent" value={valueRef ?? ''} onChange={(e) => setValueRef(e.target.value)}>
             <option value="">— selecionar —</option>
             {collections.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
@@ -188,19 +188,19 @@ const BlockEditor = ({ block, onSave, products = [], collections = [], showVerti
       {isUrl && (
         <div>
           <label className={fieldLabelCls}>URL</label>
-          <Input value={valueUrl} onChange={(e) => setValueUrl(e.target.value)} placeholder="/policies" className="text-sm" />
+          <Input value={valueUrl} onChange={(e) => setValueUrl(e.target.value)} placeholder="/policies" className="text-base" />
         </div>
       )}
 
       {(isText) && (
-        <details className="mt-2">
-          <summary className="text-xs text-muted-foreground cursor-pointer">apresentação</summary>
+        <details className="mt-3">
+          <summary className="text-sm text-muted-foreground cursor-pointer">apresentação</summary>
           <PresentationControls value={overrides} onChange={setOverrides} showVertical={showVertical} />
         </details>
       )}
 
-      <div className="mt-3 flex justify-end">
-        <Button size="sm" onClick={handleSave} disabled={saving || uploading}>
+      <div className="mt-4 flex justify-end">
+        <Button onClick={handleSave} disabled={saving || uploading} className="text-sm">
           {saving ? 'Salvando…' : 'Salvar'}
         </Button>
       </div>

@@ -9,15 +9,15 @@ interface Props {
 }
 
 const selectCls =
-  'w-full border border-border rounded-md px-2 py-1.5 text-xs bg-transparent focus:outline-none focus:ring-1 focus:ring-ring';
+  'w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent focus:outline-none focus:ring-1 focus:ring-ring';
 
-const labelCls = 'block text-[10px] uppercase tracking-wider text-muted-foreground mb-1';
+const labelCls = 'block text-xs uppercase tracking-wider text-muted-foreground mb-1.5';
 
 const PresentationControls = ({ value, onChange, showVertical = false }: Props) => {
   const set = (patch: Partial<PresentationOverrides>) => onChange({ ...value, ...patch });
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-3 p-3 border border-dashed border-border rounded-md">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4 p-4 border border-dashed border-border rounded-md">
       <div>
         <label className={labelCls}>Fonte</label>
         <select className={selectCls} value={value.fonte ?? 'padrao'} onChange={(e) => set({ fonte: e.target.value as PresentationOverrides['fonte'] })}>

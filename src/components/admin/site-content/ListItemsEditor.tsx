@@ -34,7 +34,7 @@ interface Props {
   onReorder: (ids: string[]) => Promise<void> | void;
 }
 
-const fieldLabelCls = 'block text-[10px] uppercase tracking-wider text-muted-foreground mb-1';
+const fieldLabelCls = 'block text-xs uppercase tracking-wider text-muted-foreground mb-1.5';
 
 const FieldEditor = ({
   spec, value, onChange, products, bucketHint,
@@ -71,11 +71,11 @@ const FieldEditor = ({
   }
 
   if (spec.type === 'textarea') {
-    return <Textarea value={str} onChange={(e) => onChange(e.target.value)} className="text-sm min-h-[100px]" />;
+    return <Textarea value={str} onChange={(e) => onChange(e.target.value)} className="text-base min-h-[120px]" />;
   }
   if (spec.type === 'select') {
     return (
-      <select className="w-full border border-border rounded-md px-2 py-1.5 text-sm bg-transparent" value={str} onChange={(e) => onChange(e.target.value)}>
+      <select className="w-full border border-border rounded-md px-3 py-2 text-base bg-transparent" value={str} onChange={(e) => onChange(e.target.value)}>
         <option value="">—</option>
         {spec.options?.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
@@ -88,20 +88,20 @@ const FieldEditor = ({
       <div className="space-y-2">
         {str && (
           spec.type === 'image'
-            ? <img src={str} alt="" className="max-h-24 border border-border rounded" />
-            : <video src={str} controls className="max-h-24 border border-border rounded" />
+            ? <img src={str} alt="" className="max-h-32 border border-border rounded" />
+            : <video src={str} controls className="max-h-32 border border-border rounded" />
         )}
         <div className="flex items-center gap-2">
-          <Input type="file" accept={spec.type === 'image' ? 'image/*' : 'video/mp4'} disabled={uploading} onChange={handleUpload} className="text-xs" />
-          {uploading && <ImageIcon size={14} className="animate-pulse" />}
+          <Input type="file" accept={spec.type === 'image' ? 'image/*' : 'video/mp4'} disabled={uploading} onChange={handleUpload} className="text-sm" />
+          {uploading && <ImageIcon size={16} className="animate-pulse" />}
         </div>
-        <Input value={str} onChange={(e) => onChange(e.target.value)} placeholder="URL" className="text-xs" />
+        <Input value={str} onChange={(e) => onChange(e.target.value)} placeholder="URL" className="text-sm" />
       </div>
     );
   }
   if (spec.type === 'product_ref') {
     return (
-      <select className="w-full border border-border rounded-md px-2 py-1.5 text-sm bg-transparent" value={str} onChange={(e) => onChange(e.target.value)}>
+      <select className="w-full border border-border rounded-md px-3 py-2 text-base bg-transparent" value={str} onChange={(e) => onChange(e.target.value)}>
         <option value="">— selecionar —</option>
         {(products ?? []).map((p) => (
           <option key={p.id} value={p.id}>{p.name}</option>
@@ -109,7 +109,7 @@ const FieldEditor = ({
       </select>
     );
   }
-  return <Input value={str} onChange={(e) => onChange(e.target.value)} className="text-sm" />;
+  return <Input value={str} onChange={(e) => onChange(e.target.value)} className="text-base" />;
 };
 
 const ItemRow = ({
@@ -131,16 +131,16 @@ const ItemRow = ({
   useEffect(() => { setLocal(item.fields ?? {}); }, [item.id, item.updated_at]);
 
   return (
-    <div className="border border-border rounded-md p-3 bg-card space-y-2">
+    <div className="border border-border rounded-md p-4 bg-card space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">item {item.item_index + 1}</span>
+        <span className="text-xs uppercase tracking-wider text-muted-foreground">item {item.item_index + 1}</span>
         <div className="flex items-center gap-1">
-          <button onClick={() => onMove(-1)} disabled={isFirst} className="p-1 text-muted-foreground disabled:opacity-30" aria-label="Mover acima"><ChevronUp size={14} /></button>
-          <button onClick={() => onMove(1)} disabled={isLast} className="p-1 text-muted-foreground disabled:opacity-30" aria-label="Mover abaixo"><ChevronDown size={14} /></button>
-          <button onClick={() => { if (confirm('Remover este item?')) onDelete(); }} className="p-1 text-destructive" aria-label="Remover"><Trash2 size={14} /></button>
+          <button onClick={() => onMove(-1)} disabled={isFirst} className="p-1.5 text-muted-foreground disabled:opacity-30" aria-label="Mover acima"><ChevronUp size={16} /></button>
+          <button onClick={() => onMove(1)} disabled={isLast} className="p-1.5 text-muted-foreground disabled:opacity-30" aria-label="Mover abaixo"><ChevronDown size={16} /></button>
+          <button onClick={() => { if (confirm('Remover este item?')) onDelete(); }} className="p-1.5 text-destructive" aria-label="Remover"><Trash2 size={16} /></button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {fields.map((spec) => (
           <div key={spec.key} className={spec.type === 'textarea' || spec.type === 'image' || spec.type === 'video' ? 'md:col-span-2' : ''}>
             <label className={fieldLabelCls}>{spec.label}</label>
@@ -155,7 +155,7 @@ const ItemRow = ({
         ))}
       </div>
       <div className="flex justify-end">
-        <Button size="sm" disabled={saving} onClick={async () => {
+        <Button disabled={saving} className="text-sm" onClick={async () => {
           setSaving(true);
           try { await onSave(local); toast({ title: 'Item salvo.' }); }
           catch (err: unknown) { toast({ title: err instanceof Error ? err.message : 'Erro ao salvar', variant: 'destructive' }); }
@@ -178,12 +178,12 @@ const ListItemsEditor = ({
     : 'produtos';
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="text-xs font-medium">{listKey} ({sorted.length})</h4>
-        <Button size="sm" variant="outline" onClick={() => onCreate()} className="gap-1 text-xs"><Plus size={14} /> Adicionar</Button>
+        <h4 className="text-sm font-medium">{listKey} ({sorted.length})</h4>
+        <Button variant="outline" onClick={() => onCreate()} className="gap-1.5 text-sm"><Plus size={16} /> Adicionar</Button>
       </div>
-      {sorted.length === 0 && <p className="text-xs text-muted-foreground italic">Nenhum item.</p>}
+      {sorted.length === 0 && <p className="text-sm text-muted-foreground italic">Nenhum item.</p>}
       {sorted.map((item, i) => (
         <ItemRow
           key={item.id}
@@ -204,7 +204,7 @@ const ListItemsEditor = ({
           isLast={i === sorted.length - 1}
         />
       ))}
-      <p className="text-[10px] text-muted-foreground/70 mt-1">page_key: {pageKey} · section_key: {sectionKey} · list_key: {listKey}</p>
+      <p className="text-xs text-muted-foreground/70 mt-2 font-mono">page_key: {pageKey} · section_key: {sectionKey} · list_key: {listKey}</p>
     </div>
   );
 };
