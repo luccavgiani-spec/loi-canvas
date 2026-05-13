@@ -19,6 +19,8 @@ import {
   writeFiltersToParams,
 } from '@/lib/productFilters';
 import ProductPriceTag from '@/components/shop/ProductPriceTag';
+import EditableText from '@/components/site-content/EditableText';
+import EditableImage from '@/components/site-content/EditableImage';
 
 type SortKey = 'recent' | 'price_asc' | 'price_desc' | 'name_asc';
 
@@ -90,11 +92,14 @@ const Produtos = () => {
           className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-6 overflow-hidden"
           style={{ background: '#29241f' }}
         >
-          <img
-            src={bannerUrl('banners (6).webp')}
-            alt=""
+          <EditableImage
+            pageKey="produtos"
+            sectionKey="hero"
+            blockKey="imagem_fundo"
+            fallbackSrc={bannerUrl('banners (6).webp')}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ filter: 'saturate(0.5) brightness(0.35) contrast(1.05)' }}
+            loading="eager"
           />
           <div
             className="absolute inset-0 pointer-events-none"
@@ -107,8 +112,13 @@ const Produtos = () => {
           />
 
           <div className="max-w-[1400px] mx-auto relative z-10 text-center">
-            <span
-              className="reveal-fade inline-block mb-6"
+            <EditableText
+              pageKey="produtos"
+              sectionKey="hero"
+              blockKey="eyebrow"
+              defaultText="produtos"
+              as="span"
+              defaultClass="reveal-fade inline-block mb-6"
               style={{
                 fontFamily: "var(--font-body)",
                 fontWeight: 300,
@@ -117,21 +127,27 @@ const Produtos = () => {
                 fontSize: '0.6rem',
                 color: 'rgba(244,237,210,0.35)',
               }}
-            >
-              produtos
-            </span>
-            <h1
-              className="reveal-fade heading-display mb-6"
+            />
+            <EditableText
+              pageKey="produtos"
+              sectionKey="hero"
+              blockKey="titulo"
+              defaultText="todos os aromas"
+              as="h1"
+              defaultClass="reveal-fade heading-display mb-6"
               style={{
                 fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
                 color: '#f4edd2',
                 lineHeight: 1.1,
               }}
-            >
-              todos os aromas
-            </h1>
-            <p
-              className="reveal-fade max-w-xl mx-auto"
+            />
+            <EditableText
+              pageKey="produtos"
+              sectionKey="hero"
+              blockKey="subtitulo"
+              defaultText="o catálogo inteiro, em um só lugar. navegue, refine e encontre o aroma que habita o seu espaço."
+              as="p"
+              defaultClass="reveal-fade max-w-xl mx-auto"
               style={{
                 fontFamily: "var(--font-body)",
                 fontWeight: 300,
@@ -139,9 +155,7 @@ const Produtos = () => {
                 color: 'rgba(244,237,210,0.5)',
                 lineHeight: 1.8,
               }}
-            >
-              o catálogo inteiro, em um só lugar. navegue, refine e encontre o aroma que habita o seu espaço.
-            </p>
+            />
           </div>
         </section>
 
