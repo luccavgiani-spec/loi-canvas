@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { lembrancasUrl } from '@/lib/storage';
 import { sendCampaignEmail } from '@/lib/api';
-import LembrancasGalleryBlock, { type GalleryPosition, type GalleryTheme } from '@/components/lembrancas/LembrancasGalleryBlock';
+import LembrancasGalleryBlock, { type GalleryPosition, type GalleryTheme, type GalleryFraseAlign } from '@/components/lembrancas/LembrancasGalleryBlock';
 import { useSiteContent, useSiteContentList, readBlockText } from '@/lib/site-content/hooks';
 import EditableText from '@/components/site-content/EditableText';
 
@@ -30,24 +30,35 @@ const OCASIOES = [
   { value: 'outro', label: 'OUTRO' },
 ];
 
-const GALERIA_BLOCOS: Array<{ imagem: string; frase: string; posicao: GalleryPosition; tema: GalleryTheme }> = [
+type GaleriaBloco = {
+  imagem: string;
+  frase: string;
+  posicao: GalleryPosition;
+  tema: GalleryTheme;
+  posicaoFrase: GalleryFraseAlign;
+};
+
+const GALERIA_BLOCOS: GaleriaBloco[] = [
   {
     imagem: lembrancasUrl('andreloie-81.webp'),
     frase: 'Uma vela que leva o nome deles. Que traduz o dia em que disseram sim',
     posicao: 'esquerda',
     tema: 'cream',
+    posicaoFrase: 'direita',
   },
   {
     imagem: lembrancasUrl('andreloie-82.webp'),
     frase: 'Para quem não some depois da festa',
     posicao: 'direita',
     tema: 'charcoal',
+    posicaoFrase: 'direita',
   },
   {
     imagem: lembrancasUrl('andreloie-86.webp'),
     frase: 'Discreto no gesto. Marcante na lembrança. Sem excesso. Com intenção',
     posicao: 'esquerda',
     tema: 'cream',
+    posicaoFrase: 'direita',
   },
 ];
 
@@ -87,12 +98,13 @@ const Lembrancas = () => {
 
   const heroBg = heroSection?.['imagem_fundo']?.value_image_url ?? lembrancasUrl('andreloie-96.jpg');
 
-  const galeriaBlocos: typeof GALERIA_BLOCOS = (galeriaItems && galeriaItems.length > 0)
+  const galeriaBlocos: GaleriaBloco[] = (galeriaItems && galeriaItems.length > 0)
     ? galeriaItems.filter((it) => it.is_visible).map((it) => ({
         imagem: (it.fields?.imagem_url as string | undefined) ?? '',
         frase: (it.fields?.frase as string | undefined) ?? '',
         posicao: ((it.fields?.posicao as GalleryPosition | undefined) ?? 'esquerda'),
         tema: ((it.fields?.tema as GalleryTheme | undefined) ?? 'cream'),
+        posicaoFrase: ((it.fields?.posicao_frase as GalleryFraseAlign | undefined) ?? 'direita'),
       }))
     : GALERIA_BLOCOS;
 
@@ -222,6 +234,7 @@ const Lembrancas = () => {
           frase={bloco.frase}
           posicao={bloco.posicao}
           tema={bloco.tema}
+          posicaoFrase={bloco.posicaoFrase}
         />
       ))}
 

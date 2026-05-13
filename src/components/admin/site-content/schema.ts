@@ -33,6 +33,11 @@ export const LIST_FIELD_SCHEMAS: Record<string, FieldSpec[]> = {
       { value: 'esquerda', label: 'imagem à esquerda' },
       { value: 'direita', label: 'imagem à direita' },
     ]},
+    { key: 'posicao_frase', label: 'Alinhamento da frase', type: 'select', options: [
+      { value: 'esquerda', label: 'frase alinhada à esquerda' },
+      { value: 'centro',   label: 'frase centralizada' },
+      { value: 'direita',  label: 'frase alinhada à direita' },
+    ]},
     { key: 'tema', label: 'Tema do bloco de texto', type: 'select', options: [
       { value: 'cream', label: 'cream (texto charcoal sobre cream)' },
       { value: 'charcoal', label: 'charcoal (texto cream sobre charcoal)' },
