@@ -8,6 +8,7 @@ import { useReveal } from '@/hooks/useReveal';
 import { ArrowLeft } from 'lucide-react';
 import ProductPriceTag from '@/components/shop/ProductPriceTag';
 import { getProductAvailability } from '@/lib/productFilters';
+import EditableText from '@/components/site-content/EditableText';
 
 
 const sortOptions = [
@@ -128,7 +129,12 @@ const CollectionPage = () => {
               }}
             >
               <ArrowLeft size={14} className="transition-transform duration-300 group-hover/back:-translate-x-1" />
-              todas as coleções
+              <EditableText
+                pageKey="collection_detail"
+                sectionKey="nav"
+                blockKey="cta_back"
+                defaultText="todas as coleções"
+              />
             </Link>
 
             <div className="max-w-2xl">
@@ -315,8 +321,13 @@ const CollectionPage = () => {
           <section className="py-24 md:py-40 px-6" style={{ background: '#f5ecd0' }}>
             <div className="max-w-[1400px] mx-auto">
               <div className="text-center mb-14">
-                <span
-                  className="reveal-fade block mb-4"
+                <EditableText
+                  pageKey="collection_detail"
+                  sectionKey="outras_colecoes"
+                  blockKey="eyebrow"
+                  defaultText="explorar"
+                  as="span"
+                  defaultClass="reveal-fade block mb-4"
                   style={{
                     fontFamily: "var(--font-body)",
                     fontWeight: 300,
@@ -325,18 +336,19 @@ const CollectionPage = () => {
                     fontSize: '0.6rem',
                     color: 'rgba(0,0,0,0.35)',
                   }}
-                >
-                  explorar
-                </span>
-                <h2
-                  className="reveal-fade heading-display"
+                />
+                <EditableText
+                  pageKey="collection_detail"
+                  sectionKey="outras_colecoes"
+                  blockKey="titulo"
+                  defaultText="Outras Coleções"
+                  as="h2"
+                  defaultClass="reveal-fade heading-display"
                   style={{
                     fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
                     color: '#000',
                   }}
-                >
-                  Outras Coleções
-                </h2>
+                />
               </div>
               <div className="reveal-stagger grid grid-cols-1 md:grid-cols-3 gap-6">
                 {otherCollections.map((other) => {
