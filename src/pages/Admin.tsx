@@ -35,9 +35,9 @@ const ADMIN_TABS = [
   { value: 'collabs', label: 'Collabs' },
   { value: 'coupons', label: 'Cupons' },
   { value: 'reviews', label: 'Avaliações' },
+  { value: 'site_content', label: 'Conteúdo' },
   { value: 'newsletter', label: 'Newsletter' },
   { value: 'campanhas', label: 'Campanhas' },
-  { value: 'site_content', label: 'Configurações Gerais' },
   // TODO: tab mensagens oculta — tabela 'mensagens' não existe, aguarda v3.2+
   // { value: 'mensagens', label: 'Mensagens' },
 ] as const;

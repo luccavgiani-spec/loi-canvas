@@ -10,27 +10,22 @@ interface FieldSpec {
 }
 
 export const LIST_FIELD_SCHEMAS: Record<string, FieldSpec[]> = {
-  // home.hero.banners
   'home:hero:banners': [
     { key: 'url', label: 'Imagem (URL)', type: 'image', bucket: 'banner' },
   ],
-  // home.produto_foco.slots
   'home:produto_foco:slots': [
     { key: 'produto_id', label: 'Produto', type: 'product_ref' },
     { key: 'video_url', label: 'Vídeo (MP4, máx 50MB)', type: 'video', bucket: 'produtos' },
   ],
-  // home.faq.perguntas
   'home:faq:perguntas': [
     { key: 'pergunta', label: 'Pergunta', type: 'text' },
     { key: 'resposta', label: 'Resposta', type: 'textarea' },
   ],
-  // sobre.filosofia.pilares
   'sobre:filosofia:pilares': [
     { key: 'label', label: 'Eyebrow', type: 'text' },
     { key: 'titulo', label: 'Título', type: 'text' },
     { key: 'texto', label: 'Texto', type: 'textarea' },
   ],
-  // lembrancas.galeria_intercalada.blocos
   'lembrancas:galeria_intercalada:blocos': [
     { key: 'imagem_url', label: 'Imagem', type: 'image', bucket: 'lembrancas' },
     { key: 'frase', label: 'Frase', type: 'textarea' },
@@ -43,13 +38,11 @@ export const LIST_FIELD_SCHEMAS: Record<string, FieldSpec[]> = {
       { value: 'charcoal', label: 'charcoal (texto cream sobre charcoal)' },
     ]},
   ],
-  // lembrancas.conversao.cards
   'lembrancas:conversao:cards': [
     { key: 'numeral', label: 'Numeral (01, 02…)', type: 'text' },
     { key: 'titulo', label: 'Título', type: 'text' },
     { key: 'descricao', label: 'Descrição', type: 'textarea' },
   ],
-  // product_detail.benefits.itens
   'product_detail:benefits:itens': [
     { key: 'texto', label: 'Texto', type: 'text' },
     { key: 'icone', label: 'Ícone', type: 'select', options: [
@@ -59,17 +52,14 @@ export const LIST_FIELD_SCHEMAS: Record<string, FieldSpec[]> = {
       { value: 'package', label: 'package (lote)' },
     ]},
   ],
-  // footer.colecao.links
   'footer:colecao:links': [
     { key: 'rotulo', label: 'Rótulo', type: 'text' },
     { key: 'url', label: 'URL', type: 'url' },
   ],
-  // footer.sobre.links
   'footer:sobre:links': [
     { key: 'rotulo', label: 'Rótulo', type: 'text' },
     { key: 'url', label: 'URL', type: 'url' },
   ],
-  // footer.contato.redes_sociais
   'footer:contato:redes_sociais': [
     { key: 'nome', label: 'Nome (Instagram, Facebook, etc.)', type: 'text' },
     { key: 'url', label: 'URL', type: 'url' },
@@ -82,15 +72,77 @@ export function fieldsFor(pageKey: string, sectionKey: string, listKey: string):
   ];
 }
 
-export const PAGES: Array<{ key: string; label: string }> = [
-  { key: 'home', label: 'Home' },
-  { key: 'sobre', label: 'Sobre' },
-  { key: 'produtos', label: 'Listagem de Produtos' },
-  { key: 'lembrancas', label: 'Lembranças' },
-  { key: 'product_detail', label: 'Página de Produto (global)' },
-  { key: 'collection_detail', label: 'Página de Coleção (global)' },
-  { key: 'footer', label: 'Footer' },
+export interface PageMeta {
+  key: string;
+  label: string;
+  /** Rota / contexto mostrado como hint. */
+  hint: string;
+}
+
+export const PAGES: PageMeta[] = [
+  { key: 'home',              label: 'Home',          hint: '/' },
+  { key: 'sobre',             label: 'Sobre',         hint: '/sobre' },
+  { key: 'produtos',          label: 'Produtos',      hint: '/produtos · catálogo geral' },
+  { key: 'lembrancas',        label: 'Lembranças',    hint: '/lembrancas' },
+  { key: 'product_detail',    label: 'Produto',       hint: '/product/:slug · textos globais' },
+  { key: 'collection_detail', label: 'Coleção',       hint: '/colecoes/:slug · textos globais' },
+  { key: 'footer',            label: 'Rodapé',        hint: 'componente global' },
 ];
+
+/** Ordem em que as seções aparecem no site (de cima para baixo).
+ *  Ditada pelo MAPEAMENTO_PAINEL.md. */
+export const SECTION_ORDER: Record<string, string[]> = {
+  home: [
+    'hero',
+    'bestsellers',
+    'produto_foco',
+    'descubra_novos_aromas',
+    'colaboracoes',
+    'faq',
+  ],
+  sobre: [
+    'hero',
+    'historia',
+    'manifesto',
+    'imagem_full_bleed',
+    'filosofia',
+    'cta_final',
+  ],
+  produtos: [
+    'hero',
+  ],
+  lembrancas: [
+    'hero',
+    'storytelling',
+    'galeria_intercalada',
+    'conversao',
+    'formulario',
+  ],
+  product_detail: [
+    'dropdowns',
+    'benefits',
+    'relacionados',
+    'ctas',
+  ],
+  collection_detail: [
+    'nav',
+    'outras_colecoes',
+  ],
+  footer: [
+    'brand',
+    'colecao',
+    'sobre',
+    'contato',
+    'bottom_bar',
+    'brand_signature',
+  ],
+};
+
+export function orderSections(pageKey: string, available: Set<string>): string[] {
+  const ordered = (SECTION_ORDER[pageKey] ?? []).filter((s) => available.has(s));
+  const extras = Array.from(available).filter((s) => !ordered.includes(s)).sort();
+  return [...ordered, ...extras];
+}
 
 export function sectionLabel(pageKey: string, sectionKey: string): string {
   const map: Record<string, string> = {

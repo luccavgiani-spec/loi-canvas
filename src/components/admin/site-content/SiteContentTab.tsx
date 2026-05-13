@@ -16,13 +16,12 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import BlockEditor from './BlockEditor';
 import ListItemsEditor from './ListItemsEditor';
-import { PAGES, sectionLabel, fieldsFor } from './schema';
-import { Eye, EyeOff } from 'lucide-react';
+import { PAGES, sectionLabel, fieldsFor, orderSections } from './schema';
+import { Eye, EyeOff, ChevronRight } from 'lucide-react';
 
 type Product = Pick<Tables<'products'>, 'id' | 'name' | 'slug'>;
 type Collection = Pick<Tables<'collections'>, 'id' | 'name' | 'slug'>;
 
-/** Agrupa blocks por section_key. */
 function groupBlocks(blocks: SiteContentBlock[]): Record<string, SiteContentBlock[]> {
   const out: Record<string, SiteContentBlock[]> = {};
   blocks.forEach((b) => {
@@ -32,7 +31,6 @@ function groupBlocks(blocks: SiteContentBlock[]): Record<string, SiteContentBloc
   return out;
 }
 
-/** Agrupa items por section_key:list_key */
 function groupListItems(items: SiteContentListItem[]): Record<string, Record<string, SiteContentListItem[]>> {
   const out: Record<string, Record<string, SiteContentListItem[]>> = {};
   items.forEach((it) => {
@@ -51,6 +49,8 @@ const SECTIONS_WITH_VERTICAL = new Set([
 
 export function SiteContentTab() {
   const [pageKey, setPageKey] = useState<string>('home');
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
   const { data: blocks = [], isLoading: loadingBlocks } = useSiteContentPage(pageKey);
   const { data: listItems = [], isLoading: loadingLists } = useSiteContentPageLists(pageKey);
 
@@ -61,7 +61,6 @@ export function SiteContentTab() {
   const reorderListItems = useReorderListItems(pageKey);
   const toggleSection = useUpdateSectionVisibility(pageKey);
 
-  /* selects de produto/coleção globais */
   const [products, setProducts] = useState<Product[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   useEffect(() => {
@@ -76,13 +75,24 @@ export function SiteContentTab() {
   const grouped = useMemo(() => groupBlocks(blocks), [blocks]);
   const groupedLists = useMemo(() => groupListItems(listItems), [listItems]);
 
-  /** todas as section_keys conhecidas (blocks + listas) */
+  /** Seções na ordem em que aparecem no site (SECTION_ORDER). */
   const sectionKeys = useMemo(() => {
     const set = new Set<string>();
     Object.keys(grouped).forEach((k) => set.add(k));
     Object.keys(groupedLists).forEach((k) => set.add(k));
-    return Array.from(set).sort();
-  }, [grouped, groupedLists]);
+    return orderSections(pageKey, set);
+  }, [grouped, groupedLists, pageKey]);
+
+  /** Seleciona automaticamente a primeira seção ao trocar de página. */
+  useEffect(() => {
+    if (sectionKeys.length === 0) {
+      setActiveSection(null);
+      return;
+    }
+    if (!activeSection || !sectionKeys.includes(activeSection)) {
+      setActiveSection(sectionKeys[0]);
+    }
+  }, [sectionKeys, activeSection]);
 
   function sectionVisible(sectionKey: string): boolean {
     const blocksInSection = grouped[sectionKey] ?? [];
@@ -90,9 +100,14 @@ export function SiteContentTab() {
     return blocksInSection.every((b) => b.is_visible);
   }
 
+  const currentPage = PAGES.find((p) => p.key === pageKey);
+  const sectionBlocks = activeSection ? (grouped[activeSection] ?? []) : [];
+  const listsInSection = activeSection ? (groupedLists[activeSection] ?? {}) : {};
+  const showVertical = !!activeSection && SECTIONS_WITH_VERTICAL.has(`${pageKey}:${activeSection}`);
+
   return (
-    <div className="space-y-6">
-      {/* Page picker */}
+    <div className="space-y-4">
+      {/* Page picker — pills no topo */}
       <div className="flex flex-wrap gap-2">
         {PAGES.map((p) => (
           <button
@@ -103,11 +118,19 @@ export function SiteContentTab() {
                 ? 'bg-primary text-primary-foreground border-primary'
                 : 'border-border text-muted-foreground hover:text-foreground'
             }`}
+            title={p.hint}
           >
             {p.label}
           </button>
         ))}
       </div>
+
+      {currentPage && (
+        <p className="text-[11px] text-muted-foreground/80 -mt-1">
+          editando: <span className="font-medium">{currentPage.label}</span>
+          {' '}·{' '}<span className="font-mono">{currentPage.hint}</span>
+        </p>
+      )}
 
       {(loadingBlocks || loadingLists) && (
         <p className="text-xs text-muted-foreground">Carregando…</p>
@@ -119,92 +142,123 @@ export function SiteContentTab() {
         </p>
       )}
 
-      {/* Seções */}
-      {sectionKeys.map((sectionKey) => {
-        const sectionBlocks = grouped[sectionKey] ?? [];
-        const listsInSection = groupedLists[sectionKey] ?? {};
-        const visible = sectionVisible(sectionKey);
-        const showVertical = SECTIONS_WITH_VERTICAL.has(`${pageKey}:${sectionKey}`);
-
-        return (
-          <details
-            key={sectionKey}
-            className="border border-border rounded-md bg-card/30"
-            open={pageKey === 'home' && sectionKey === 'hero'}
-          >
-            <summary className="cursor-pointer px-4 py-3 flex items-center justify-between hover:bg-card/50 transition-colors">
-              <span className="text-sm font-medium">{sectionLabel(pageKey, sectionKey)}</span>
-              <span className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground">
-                  {sectionBlocks.length} bloco{sectionBlocks.length !== 1 ? 's' : ''} ·{' '}
-                  {Object.keys(listsInSection).length} lista{Object.keys(listsInSection).length !== 1 ? 's' : ''}
-                </span>
-                {sectionBlocks.length > 0 && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toggleSection.mutate({ sectionKey, isVisible: !visible });
-                    }}
-                    className="h-6 px-2 gap-1"
+      {sectionKeys.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 border-t border-border pt-4">
+          {/* ── Sidebar de seções ── */}
+          <aside className="md:sticky md:top-4 self-start space-y-0.5">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 px-2">
+              Seções da página
+            </p>
+            <nav className="flex flex-row flex-wrap md:flex-col gap-1">
+              {sectionKeys.map((sk) => {
+                const isActive = sk === activeSection;
+                const visible = sectionVisible(sk);
+                const nBlocks = (grouped[sk] ?? []).length;
+                const nLists = Object.keys(groupedLists[sk] ?? {}).length;
+                return (
+                  <button
+                    key={sk}
+                    onClick={() => setActiveSection(sk)}
+                    className={`group flex items-center gap-2 px-2 py-1.5 rounded-md text-left text-xs transition-colors ${
+                      isActive
+                        ? 'bg-accent text-accent-foreground'
+                        : 'hover:bg-muted text-muted-foreground'
+                    }`}
                   >
-                    {visible ? <Eye size={12} /> : <EyeOff size={12} />}
-                    <span className="text-[10px]">{visible ? 'visível' : 'oculta'}</span>
-                  </Button>
-                )}
-              </span>
-            </summary>
+                    <ChevronRight
+                      size={12}
+                      className={`flex-shrink-0 transition-transform ${isActive ? 'rotate-90 text-foreground' : 'text-muted-foreground/40'}`}
+                    />
+                    <span className="flex-1 truncate">{sectionLabel(pageKey, sk)}</span>
+                    {!visible && <EyeOff size={11} className="text-muted-foreground/60" />}
+                    <span className="text-[9px] text-muted-foreground/60 tabular-nums">
+                      {nBlocks + nLists}
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
+          </aside>
 
-            <div className="px-4 pb-4 space-y-4">
-              {sectionBlocks.length > 0 && (
-                <div className="space-y-3 pt-2">
-                  {sectionBlocks.map((block) => (
-                    <BlockEditor
-                      key={block.id}
-                      block={block}
+          {/* ── Painel direito: editor da seção ativa ── */}
+          <div className="min-w-0 space-y-4">
+            {activeSection && (
+              <>
+                <header className="flex items-center justify-between gap-3 pb-2 border-b border-border">
+                  <div>
+                    <h3 className="text-base font-medium">{sectionLabel(pageKey, activeSection)}</h3>
+                    <p className="text-[10px] text-muted-foreground/70 font-mono">
+                      {pageKey} › {activeSection}
+                    </p>
+                  </div>
+                  {sectionBlocks.length > 0 && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const wasVisible = sectionVisible(activeSection);
+                        toggleSection.mutate({ sectionKey: activeSection, isVisible: !wasVisible });
+                      }}
+                      className="gap-1"
+                    >
+                      {sectionVisible(activeSection) ? (
+                        <><Eye size={14} /> seção visível no site</>
+                      ) : (
+                        <><EyeOff size={14} /> seção oculta</>
+                      )}
+                    </Button>
+                  )}
+                </header>
+
+                {sectionBlocks.length > 0 && (
+                  <div className="space-y-3">
+                    {sectionBlocks.map((block) => (
+                      <BlockEditor
+                        key={block.id}
+                        block={block}
+                        products={products}
+                        collections={collections}
+                        showVertical={showVertical}
+                        onSave={async (input) => {
+                          await updateBlock.mutateAsync(input);
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {Object.entries(listsInSection).map(([listKey, items]) => (
+                  <div key={listKey} className="border-t border-border pt-4 mt-4">
+                    <ListItemsEditor
+                      pageKey={pageKey}
+                      sectionKey={activeSection}
+                      listKey={listKey}
+                      items={items}
+                      fields={fieldsFor(pageKey, activeSection, listKey)}
                       products={products}
-                      collections={collections}
-                      showVertical={showVertical}
-                      onSave={async (input) => {
-                        await updateBlock.mutateAsync(input);
+                      onCreate={async () => {
+                        const fieldSpecs = fieldsFor(pageKey, activeSection, listKey);
+                        const emptyFields: Record<string, Json> = {};
+                        fieldSpecs.forEach((f) => { emptyFields[f.key] = ''; });
+                        await insertListItem.mutateAsync({ page_key: pageKey, section_key: activeSection, list_key: listKey, fields: emptyFields });
+                      }}
+                      onUpdate={async (id, fields) => {
+                        await updateListItem.mutateAsync({ id, fields });
+                      }}
+                      onDelete={async (id) => {
+                        await deleteListItem.mutateAsync(id);
+                      }}
+                      onReorder={async (ids) => {
+                        await reorderListItems.mutateAsync(ids);
                       }}
                     />
-                  ))}
-                </div>
-              )}
-
-              {Object.entries(listsInSection).map(([listKey, items]) => (
-                <div key={listKey} className="pt-2">
-                  <ListItemsEditor
-                    pageKey={pageKey}
-                    sectionKey={sectionKey}
-                    listKey={listKey}
-                    items={items}
-                    fields={fieldsFor(pageKey, sectionKey, listKey)}
-                    products={products}
-                    onCreate={async () => {
-                      const fieldSpecs = fieldsFor(pageKey, sectionKey, listKey);
-                      const emptyFields: Record<string, Json> = {};
-                      fieldSpecs.forEach((f) => { emptyFields[f.key] = ''; });
-                      await insertListItem.mutateAsync({ page_key: pageKey, section_key: sectionKey, list_key: listKey, fields: emptyFields });
-                    }}
-                    onUpdate={async (id, fields) => {
-                      await updateListItem.mutateAsync({ id, fields });
-                    }}
-                    onDelete={async (id) => {
-                      await deleteListItem.mutateAsync(id);
-                    }}
-                    onReorder={async (ids) => {
-                      await reorderListItems.mutateAsync(ids);
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </details>
-        );
-      })}
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
