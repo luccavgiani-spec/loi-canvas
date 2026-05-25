@@ -7,6 +7,12 @@ import { Loader2, Package } from 'lucide-react';
 import type { Product } from '@/types';
 import { PickupMap } from '@/components/order/PickupMap';
 
+declare global {
+  interface Window {
+    dataLayer?: Record<string, unknown>[];
+  }
+}
+
 const CHAR = '#29241f';
 const OLIVA = '#565600';
 const CREME = '#f4edd2';
@@ -55,6 +61,29 @@ const OrderConfirmation = () => {
     load();
     return () => { cancelled = true; };
   }, [orderId, navigate]);
+
+  // GTM purchase — emite uma única vez por order.id (trava via sessionStorage
+  // sobrevive a F5 / navegação dentro da sessão).
+  useEffect(() => {
+    if (!order) return;
+    const key = `gtm_purchase_fired:${order.id}`;
+    if (sessionStorage.getItem(key)) return;
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'purchase',
+      transaction_id: order.id,
+      value: Number(order.total),
+      currency: 'BRL',
+      items: order.items.map(i => ({
+        item_name: i.product_name,
+        quantity: i.quantity,
+        price: i.unit_price,
+      })),
+    });
+
+    sessionStorage.setItem(key, '1');
+  }, [order]);
 
   // Bridge UpsellProduct → Product para passar ao addItem do CartContext.
   // O CartDrawer só usa id/slug/name/price/images[0]; os demais campos
