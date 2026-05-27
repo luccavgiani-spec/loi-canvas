@@ -11,7 +11,9 @@ interface FieldSpec {
 
 export const LIST_FIELD_SCHEMAS: Record<string, FieldSpec[]> = {
   'home:hero:banners': [
-    { key: 'url', label: 'Imagem (URL)', type: 'image', bucket: 'banner' },
+    { key: 'url_desktop', label: 'Imagem desktop — recomendado 1920×1080', type: 'image', bucket: 'banner' },
+    { key: 'url_mobile', label: 'Imagem mobile — recomendado 1080×1440', type: 'image', bucket: 'banner' },
+    { key: 'alt_text', label: 'Texto alternativo (acessibilidade)', type: 'text' },
   ],
   'home:produto_foco:slots': [
     { key: 'produto_id', label: 'Produto', type: 'product_ref' },

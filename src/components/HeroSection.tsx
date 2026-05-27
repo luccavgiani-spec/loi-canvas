@@ -36,14 +36,28 @@ const HeroSection = () => {
     });
   }, [bannerItems]);
 
-  const bannerImages = useMemo(() => {
+  interface HeroBanner {
+    desktop: string;
+    mobile: string;
+    alt: string;
+  }
+
+  const bannerImages = useMemo<HeroBanner[]>(() => {
     if (bannerItems && bannerItems.length > 0) {
       return bannerItems
         .filter((it) => it.is_visible)
-        .map((it) => (it.fields?.url as string | undefined) ?? '')
-        .filter(Boolean);
+        .map((it) => {
+          const f = it.fields ?? {};
+          const desktop =
+            (f.url_desktop as string | undefined) ?? (f.url as string | undefined) ?? '';
+          const mobile =
+            (f.url_mobile as string | undefined) ?? desktop;
+          const alt = (f.alt_text as string | undefined) ?? '';
+          return { desktop, mobile, alt };
+        })
+        .filter((b) => b.desktop);
     }
-    return storageBanners ?? [];
+    return (storageBanners ?? []).map((url) => ({ desktop: url, mobile: url, alt: '' }));
   }, [bannerItems, storageBanners]);
 
   const ctaPrimario = readBlockText(heroSection, 'cta_primario', 'navegar');
@@ -63,19 +77,24 @@ const HeroSection = () => {
       style={{ background: '#29241f' }}
     >
       {/* ── banner images ── */}
-      {bannerImages.map((src, i) => (
-        <img
-          key={src}
-          src={src}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 w-full h-full object-cover"
+      {bannerImages.map((banner, i) => (
+        <picture
+          key={banner.desktop}
+          className="absolute inset-0 w-full h-full"
           style={{
             opacity: i === current ? 1 : 0,
             transition: 'opacity 1.2s ease',
           }}
-          loading={i === 0 ? 'eager' : 'lazy'}
-        />
+        >
+          <source media="(max-width: 768px)" srcSet={banner.mobile} />
+          <img
+            src={banner.desktop}
+            alt={banner.alt}
+            aria-hidden={banner.alt ? undefined : true}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        </picture>
       ))}
 
       {/* ── grain ── */}
