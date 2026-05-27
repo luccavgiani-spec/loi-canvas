@@ -1,1 +1,7 @@
 project_id = "xigituxddrtsqhmrmsvy"
+
+# send-campaign exige JWT obrigatório porque a função dispara e-mails em massa
+# pra base inteira de clientes/newsletter. Sem token nenhum (e dentro da função,
+# sem membership em admin_users) a chamada é rejeitada antes de tocar no Resend.
+[functions.send-campaign]
+verify_jwt = true

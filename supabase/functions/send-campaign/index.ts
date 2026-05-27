@@ -5,6 +5,13 @@ import { getSupabaseAdmin } from '../_shared/supabase.ts';
 const RESEND_API_URL = 'https://api.resend.com/emails';
 const FROM_EMAIL = 'Loiê <noreply@loiecandles.com>';
 
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 function buildCampaignHtml(subject: string, htmlContent: string): string {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -43,9 +50,6 @@ function buildCampaignHtml(subject: string, htmlContent: string): string {
               <p style="margin:0 0 6px;font-size:11px;color:#b0a090;letter-spacing:0.05em;">
                 © ${new Date().getFullYear()} Loiê · Velas artesanais feitas com intenção
               </p>
-              <p style="margin:0;font-size:11px;color:#b0a090;">
-                <a href="#" style="color:#9c8677;text-decoration:underline;">Descadastrar</a>
-              </p>
             </td>
           </tr>
         </table>
@@ -61,58 +65,90 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  try {
-    const { subject, html_content } = await req.json();
+  const supabase = getSupabaseAdmin();
 
-    if (!subject || !html_content) {
-      return new Response(
-        JSON.stringify({ error: 'subject e html_content são obrigatórios' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+  // ── Gate: o painel ainda não tem login obrigatório front-end, então a função
+  // verifica o JWT do chamador e exige membership em admin_users antes de mexer
+  // em destinatários e Resend. verify_jwt=true no config.toml impede chamadas
+  // sem token; a verificação de admin é feita aqui.
+  const authHeader = req.headers.get('Authorization') ?? '';
+  const token = authHeader.replace(/^Bearer\s+/i, '');
+  if (!token) return json({ error: 'Missing authorization' }, 401);
+
+  const { data: { user }, error: userErr } = await supabase.auth.getUser(token);
+  if (userErr || !user) return json({ error: 'Unauthorized' }, 401);
+
+  const { data: adminRow } = await supabase
+    .from('admin_users')
+    .select('user_id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (!adminRow) return json({ error: 'Forbidden' }, 403);
+
+  try {
+    const { campaign_id } = await req.json().catch(() => ({}));
+    if (!campaign_id) return json({ error: 'campaign_id é obrigatório' }, 400);
+
+    const { data: campaign, error: cErr } = await supabase
+      .from('email_campaigns')
+      .select('*')
+      .eq('id', campaign_id)
+      .single();
+    if (cErr || !campaign) return json({ error: 'Campanha não encontrada' }, 404);
+
+    if (campaign.status === 'sending') {
+      return json({ error: 'Campanha já está em envio' }, 409);
     }
 
-    const supabase = getSupabaseAdmin();
+    // Marca como "sending" antes de qualquer chamada externa, pra UI refletir o
+    // estado real e bloquear cliques duplicados.
+    await supabase
+      .from('email_campaigns')
+      .update({ status: 'sending' })
+      .eq('id', campaign_id);
 
-    // Collect emails from orders (non-cancelled)
-    const { data: orderRows } = await supabase
-      .from('orders')
-      .select('customer_email')
-      .neq('status', 'cancelled');
-
-    // Collect emails from newsletter
-    const { data: newsletterRows } = await supabase
-      .from('newsletter')
-      .select('email');
+    // Coleta destinatários: orders.customer_email ∪ customers.email ∪ newsletter.email,
+    // com deduplicação case-insensitive.
+    const [ordersRes, customersRes, newsletterRes] = await Promise.all([
+      supabase.from('orders').select('customer_email').neq('status', 'cancelled'),
+      supabase.from('customers').select('email'),
+      supabase.from('newsletter').select('email'),
+    ]);
 
     const emailSet = new Set<string>();
-    for (const row of orderRows || []) {
-      if (row.customer_email) emailSet.add(row.customer_email.toLowerCase().trim());
+    for (const row of ordersRes.data ?? []) {
+      if (row.customer_email) emailSet.add(String(row.customer_email).toLowerCase().trim());
     }
-    for (const row of newsletterRows || []) {
-      if (row.email) emailSet.add(row.email.toLowerCase().trim());
+    for (const row of customersRes.data ?? []) {
+      if (row.email) emailSet.add(String(row.email).toLowerCase().trim());
     }
-
+    for (const row of newsletterRes.data ?? []) {
+      if (row.email) emailSet.add(String(row.email).toLowerCase().trim());
+    }
     const emails = Array.from(emailSet);
+
     if (emails.length === 0) {
-      return new Response(
-        JSON.stringify({ count: 0 }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      await supabase
+        .from('email_campaigns')
+        .update({ status: 'sent', recipients_count: 0, sent_at: new Date().toISOString() })
+        .eq('id', campaign_id);
+      return json({ count: 0, status: 'sent' });
     }
 
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
-      return new Response(
-        JSON.stringify({ count: 0, warning: 'RESEND_API_KEY não configurado' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      await supabase
+        .from('email_campaigns')
+        .update({ status: 'failed' })
+        .eq('id', campaign_id);
+      return json({ error: 'RESEND_API_KEY não configurado' }, 500);
     }
 
-    const html = buildCampaignHtml(subject, html_content);
+    const html = buildCampaignHtml(campaign.subject, campaign.html_content);
     let sent = 0;
-
-    // Send in batches of 50 (Resend batch limit)
+    let failedBatches = 0;
     const BATCH = 50;
+
     for (let i = 0; i < emails.length; i += BATCH) {
       const batch = emails.slice(i, i + BATCH);
       const res = await fetch(RESEND_API_URL, {
@@ -124,26 +160,33 @@ serve(async (req) => {
         body: JSON.stringify({
           from: FROM_EMAIL,
           to: batch,
-          subject,
+          subject: campaign.subject,
           html,
         }),
       });
       if (res.ok) {
         sent += batch.length;
       } else {
+        failedBatches += 1;
         console.error(`Resend batch error (${i}-${i + BATCH}):`, await res.text());
       }
     }
 
-    return new Response(
-      JSON.stringify({ count: sent }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    // Tudo falhou → 'failed'; ao menos um lote saiu → 'sent' (com a contagem real).
+    const allFailed = sent === 0 && failedBatches > 0;
+    const finalStatus = allFailed ? 'failed' : 'sent';
+    await supabase
+      .from('email_campaigns')
+      .update({
+        status: finalStatus,
+        recipients_count: sent,
+        sent_at: allFailed ? null : new Date().toISOString(),
+      })
+      .eq('id', campaign_id);
+
+    return json({ count: sent, status: finalStatus });
   } catch (err) {
     console.error('send-campaign error:', err);
-    return new Response(
-      JSON.stringify({ error: 'Erro ao enviar campanha' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return json({ error: 'Erro ao enviar campanha' }, 500);
   }
 });
