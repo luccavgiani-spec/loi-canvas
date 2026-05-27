@@ -138,6 +138,19 @@ export interface NewsletterSubscriber {
   subscribed_at: string;
 }
 
+export type EmailCampaignStatus = 'draft' | 'sending' | 'sent' | 'failed';
+
+export interface EmailCampaign {
+  id: string;
+  subject: string;
+  html_content: string;
+  status: EmailCampaignStatus;
+  recipients_count: number;
+  sent_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Coupon {
   id: string;
   code: string;

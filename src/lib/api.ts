@@ -1,6 +1,6 @@
 // v2 - schema corrigido
 import { API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/config';
-import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, CouponValidation, CartItem, Collection, Collab, VipCoupon } from '@/types';
+import type { Product, Review, ShippingQuote, Order, KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, Coupon, CouponValidation, CartItem, Collection, Collab, VipCoupon, EmailCampaign, EmailCampaignStatus } from '@/types';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { mockProducts, mockReviews, mockOrders, mockCustomers, mockKPIs, mockSalesTimeseries, mockTopProducts, mockNewsletterSubs, mockCoupons, mockCollections } from '@/lib/mocks';
 import { supabase } from '@/integrations/supabase/client';
@@ -1024,8 +1024,73 @@ export const updateOrderTracking = (order_id: string, tracking_code: string) =>
 export const sendTrackingEmail = (order_id: string, tracking_code: string) =>
   callEdgeFunction<{ sent_at: string }>('send-tracking-email', { order_id, tracking_code });
 
-export const sendCampaign = (subject: string, html_content: string) =>
-  callEdgeFunction<{ count: number }>('send-campaign', { subject, html_content });
+// Email campaigns — CRUD via Supabase (RLS-gated, admin_users only).
+function mapEmailCampaign(row: any): EmailCampaign {
+  return {
+    id: row.id,
+    subject: row.subject,
+    html_content: row.html_content,
+    status: row.status as EmailCampaignStatus,
+    recipients_count: Number(row.recipients_count ?? 0),
+    sent_at: row.sent_at ?? null,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
+}
+
+export const getAdminCampaigns = async (): Promise<EmailCampaign[]> => {
+  const { data, error } = await (supabase as any)
+    .from('email_campaigns')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapEmailCampaign);
+};
+
+export const createAdminCampaign = async (input: {
+  subject: string;
+  html_content: string;
+}): Promise<EmailCampaign> => {
+  const { data, error } = await (supabase as any)
+    .from('email_campaigns')
+    .insert({ subject: input.subject, html_content: input.html_content, status: 'draft' })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return mapEmailCampaign(data);
+};
+
+export const updateAdminCampaign = async (
+  id: string,
+  patch: { subject?: string; html_content?: string },
+): Promise<EmailCampaign> => {
+  const { data, error } = await (supabase as any)
+    .from('email_campaigns')
+    .update(patch)
+    .eq('id', id)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return mapEmailCampaign(data);
+};
+
+export const deleteAdminCampaign = async (id: string): Promise<void> => {
+  const { error } = await (supabase as any).from('email_campaigns').delete().eq('id', id);
+  if (error) throw error;
+};
+
+// Dispara a Edge Function de envio. Usa supabase.functions.invoke para que o
+// JWT do admin logado vá no Authorization — a função valida admin_users
+// internamente antes de mandar pro Resend.
+export const sendCampaign = async (
+  campaign_id: string,
+): Promise<{ count: number; status: EmailCampaignStatus }> => {
+  const { data, error } = await supabase.functions.invoke('send-campaign', {
+    body: { campaign_id },
+  });
+  if (error) throw error;
+  return data as { count: number; status: EmailCampaignStatus };
+};
 
 // Coupons — admin CRUD via Supabase (RLS-gated, admin_users only).
 export const createAdminCoupon = async (input: TablesInsert<'coupons'>): Promise<Coupon> => {

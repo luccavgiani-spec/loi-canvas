@@ -3,10 +3,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   getAdminKPIs, getAdminSalesTimeseries, getAdminTopProducts, getAdminCustomers,
   getAdminNewsletter,
-  sendCampaign, sendCampaignEmail, getAdminNewsletterEmails,
+  getAdminCampaigns, createAdminCampaign, updateAdminCampaign, deleteAdminCampaign, sendCampaign,
   getAdminMensagens,
 } from '@/lib/api';
-import type { KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber } from '@/types';
+import type { KPIs, SalesTimeseriesPoint, TopProduct, Customer, NewsletterSubscriber, EmailCampaign } from '@/types';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -236,14 +236,17 @@ function CustomersTab() {
 
 
 /* ═══════════ CAMPAIGNS ═══════════ */
-function CampaignsTab() {
-  const { toast } = useToast();
-  const [subject, setSubject] = useState('');
-  const [content, setContent] = useState('');
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [sending, setSending] = useState(false);
+const CAMPAIGN_STATUS_LABEL: Record<EmailCampaign['status'], string> = {
+  draft: 'rascunho',
+  sending: 'enviando',
+  sent: 'enviado',
+  failed: 'falhou',
+};
 
-  const previewHtml = `
+function buildCampaignPreviewHtml(subject: string, content: string): string {
+  // Mesmo template visual usado pela Edge Function send-campaign — qualquer
+  // ajuste fica em sincronia manual com supabase/functions/send-campaign/index.ts.
+  return `
     <div style="font-family:Georgia,serif;background:#f5f0eb;padding:32px;border-radius:4px;">
       <div style="background:#fffdf9;border:1px solid #e8dfd4;border-radius:4px;max-width:560px;margin:0 auto;overflow:hidden;">
         <div style="text-align:center;padding:28px 32px 20px;border-bottom:1px solid #e8dfd4;">
@@ -256,62 +259,244 @@ function CampaignsTab() {
         </div>
         <div style="text-align:center;padding:16px 32px;border-top:1px solid #e8dfd4;margin-top:24px;">
           <p style="margin:0;font-size:10px;color:#b0a090;">© ${new Date().getFullYear()} Loiê · Velas artesanais feitas com intenção</p>
-          <p style="margin:4px 0 0;font-size:10px;color:#b0a090;">Descadastrar</p>
         </div>
       </div>
     </div>
   `;
+}
 
-  const handleSend = async () => {
+function CampaignsTab() {
+  const { toast } = useToast();
+  const [campaigns, setCampaigns] = useState<EmailCampaign[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [subject, setSubject] = useState('');
+  const [content, setContent] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [confirmTarget, setConfirmTarget] = useState<EmailCampaign | null>(null);
+  const [sendingId, setSendingId] = useState<string | null>(null);
+
+  const refresh = async () => {
+    try {
+      const list = await getAdminCampaigns();
+      setCampaigns(list);
+    } catch (err: any) {
+      toast({ title: err?.message || 'Erro ao carregar campanhas.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { refresh(); }, []);
+
+  const resetForm = () => {
+    setEditingId(null);
+    setSubject('');
+    setContent('');
+  };
+
+  const handleSaveDraft = async () => {
     if (!subject.trim() || !content.trim()) {
-      toast({ title: 'Preencha o assunto e o conteúdo antes de enviar.', variant: 'destructive' });
+      toast({ title: 'Preencha o assunto e o conteúdo antes de salvar.', variant: 'destructive' });
       return;
     }
-    setSending(true);
+    setSaving(true);
     try {
-      const { count } = await sendCampaign(subject, content);
+      if (editingId) {
+        await updateAdminCampaign(editingId, { subject, html_content: content });
+        toast({ title: 'Campanha atualizada.' });
+      } else {
+        await createAdminCampaign({ subject, html_content: content });
+        toast({ title: 'Rascunho salvo.' });
+      }
+      resetForm();
+      await refresh();
+    } catch (err: any) {
+      toast({ title: err?.message || 'Erro ao salvar.', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEdit = (c: EmailCampaign) => {
+    setEditingId(c.id);
+    setSubject(c.subject);
+    setContent(c.html_content);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (c: EmailCampaign) => {
+    if (!confirm(`Excluir a campanha "${c.subject}"?`)) return;
+    try {
+      await deleteAdminCampaign(c.id);
+      if (editingId === c.id) resetForm();
+      await refresh();
+      toast({ title: 'Campanha excluída.' });
+    } catch (err: any) {
+      toast({ title: err?.message || 'Erro ao excluir.', variant: 'destructive' });
+    }
+  };
+
+  const handleConfirmSend = async () => {
+    if (!confirmTarget) return;
+    setSendingId(confirmTarget.id);
+    const targetId = confirmTarget.id;
+    setConfirmTarget(null);
+    try {
+      const { count } = await sendCampaign(targetId);
       toast({ title: `Campanha enviada para ${count} destinatário(s).` });
+      await refresh();
     } catch (err: any) {
       toast({ title: err?.message || 'Erro ao enviar campanha.', variant: 'destructive' });
+      await refresh();
     } finally {
-      setSending(false);
+      setSendingId(null);
     }
   };
 
   return (
-    <div className="max-w-2xl space-y-4">
-      <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Assunto</label>
-        <Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Ex: Novidades Loiê — coleção primavera" />
-      </div>
-      <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Conteúdo</label>
-        <Textarea
-          value={content}
-          onChange={e => setContent(e.target.value)}
-          placeholder="Escreva o texto do e-mail aqui..."
-          className="min-h-[200px] resize-y"
-        />
-      </div>
-      <div className="flex gap-2 pt-1">
-        <Button variant="outline" onClick={() => setPreviewOpen(true)} className="gap-1 text-sm">
-          <Mail size={14} /> Pré-visualizar e-mail
-        </Button>
-        <Button
-          onClick={handleSend}
-          disabled={sending}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1 text-sm"
-        >
-          <Send size={14} />
-          {sending ? 'Enviando…' : 'Enviar para todos os clientes'}
-        </Button>
+    <div className="space-y-8">
+      {/* Form ─────────────────────────────────────────────── */}
+      <div className="max-w-2xl space-y-4">
+        <div className="flex items-baseline justify-between">
+          <h3 className="text-sm font-medium">
+            {editingId ? 'Editar campanha' : 'Nova campanha'}
+          </h3>
+          {editingId && (
+            <button onClick={resetForm} className="text-xs text-muted-foreground underline">
+              cancelar edição
+            </button>
+          )}
+        </div>
+
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Assunto</label>
+          <Input
+            value={subject}
+            onChange={e => setSubject(e.target.value)}
+            placeholder="Ex: Novidades Loiê — coleção primavera"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Conteúdo</label>
+          <Textarea
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            placeholder="Escreva o texto do e-mail aqui..."
+            className="min-h-[200px] resize-y"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button variant="outline" onClick={() => setPreviewOpen(true)} disabled={!subject && !content} className="gap-1 text-sm">
+            <Mail size={14} /> Pré-visualizar
+          </Button>
+          <Button
+            onClick={handleSaveDraft}
+            disabled={saving}
+            className="gap-1 text-sm"
+          >
+            {saving ? 'Salvando…' : (editingId ? 'Salvar alterações' : 'Salvar rascunho')}
+          </Button>
+        </div>
       </div>
 
+      {/* Lista ─────────────────────────────────────────────── */}
+      <div>
+        <h3 className="text-sm font-medium mb-3">Histórico ({campaigns.length})</h3>
+        {loading ? (
+          <p className="text-xs text-muted-foreground">Carregando…</p>
+        ) : campaigns.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic">Nenhuma campanha ainda.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className={tableCls}>
+              <thead>
+                <tr className="border-b border-border">
+                  <th className={thCls}>Assunto</th>
+                  <th className={thCls}>Status</th>
+                  <th className={thCls}>Destinatários</th>
+                  <th className={thCls}>Enviada em</th>
+                  <th className={thCls}>Criada em</th>
+                  <th className={thCls}>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {campaigns.map(c => (
+                  <tr key={c.id} className="border-b border-border align-top">
+                    <td className={tdCls}>{c.subject}</td>
+                    <td className={`${tdCls} uppercase tracking-wider text-xs`}>{CAMPAIGN_STATUS_LABEL[c.status]}</td>
+                    <td className={`${tdCls} font-mono text-xs`}>{c.recipients_count}</td>
+                    <td className={`${tdCls} text-muted-foreground text-xs`}>
+                      {c.sent_at ? new Date(c.sent_at).toLocaleString('pt-BR') : '—'}
+                    </td>
+                    <td className={`${tdCls} text-muted-foreground text-xs`}>
+                      {new Date(c.created_at).toLocaleString('pt-BR')}
+                    </td>
+                    <td className={tdCls}>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => setConfirmTarget(c)}
+                          disabled={c.status === 'sending' || sendingId === c.id}
+                          className="text-xs underline disabled:opacity-40"
+                        >
+                          {sendingId === c.id ? 'enviando…' : 'enviar'}
+                        </button>
+                        <button onClick={() => handleEdit(c)} disabled={c.status === 'sending'} className="text-xs underline disabled:opacity-40">
+                          editar
+                        </button>
+                        <button onClick={() => handleDelete(c)} disabled={c.status === 'sending'} className="text-xs underline text-destructive disabled:opacity-40">
+                          excluir
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Pré-visualização ───────────────────────────────────── */}
       <Modal open={previewOpen} onClose={() => setPreviewOpen(false)} title="Pré-visualização do e-mail">
         <div
           className="rounded border border-border overflow-hidden"
-          dangerouslySetInnerHTML={{ __html: previewHtml }}
+          dangerouslySetInnerHTML={{ __html: buildCampaignPreviewHtml(subject, content) }}
         />
+      </Modal>
+
+      {/* Confirmação de envio ─────────────────────────────────── */}
+      <Modal
+        open={confirmTarget !== null}
+        onClose={() => setConfirmTarget(null)}
+        title="Confirmar envio"
+      >
+        {confirmTarget && (
+          <div className="space-y-4">
+            <div className="text-sm space-y-1">
+              <p><span className="text-muted-foreground">Assunto:</span> {confirmTarget.subject}</p>
+              <p className="text-muted-foreground">
+                Esta campanha será enviada para todos os clientes (pedidos + cadastro + newsletter, sem duplicidades).
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Pré-visualização</p>
+              <div
+                className="rounded border border-border overflow-hidden max-h-[300px] overflow-y-auto"
+                dangerouslySetInnerHTML={{ __html: buildCampaignPreviewHtml(confirmTarget.subject, confirmTarget.html_content) }}
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setConfirmTarget(null)} className="text-sm">Cancelar</Button>
+              <Button onClick={handleConfirmSend} className="gap-1 text-sm">
+                <Send size={14} /> Enviar agora
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
@@ -344,98 +529,6 @@ function NewsletterTab() {
           </table>
         </div>
       )}
-    </div>
-  );
-}
-
-/* ═══════════ CAMPAIGN ═══════════ */
-function CampaignTab() {
-  const { toast } = useToast();
-  const [subject, setSubject] = useState('');
-  const [content, setContent] = useState('');
-  const [sending, setSending] = useState(false);
-
-  const handleSend = async () => {
-    if (!subject.trim() || !content.trim()) {
-      toast({ title: 'Preencha o assunto e o conteúdo', variant: 'destructive' });
-      return;
-    }
-    setSending(true);
-    try {
-      const emails = await getAdminNewsletterEmails();
-      if (emails.length === 0) {
-        toast({ title: 'Nenhum assinante encontrado' });
-        setSending(false);
-        return;
-      }
-
-      let sent = 0;
-      let failed = 0;
-      for (const email of emails) {
-        try {
-          await sendCampaignEmail(subject.trim(), content.trim(), email);
-          sent++;
-        } catch {
-          failed++;
-        }
-      }
-
-      toast({
-        title: `Campanha enviada`,
-        description: `${sent} e-mail(s) enviado(s)${failed > 0 ? `, ${failed} falha(s)` : ''}`,
-      });
-      setSubject('');
-      setContent('');
-    } catch {
-      toast({ title: 'Erro ao enviar campanha', variant: 'destructive' });
-    } finally {
-      setSending(false);
-    }
-  };
-
-  return (
-    <div className="max-w-2xl space-y-6">
-      <div>
-        <h3 className="text-sm font-medium mb-1">Campanha de e-mail</h3>
-        <p className="text-xs text-muted-foreground">O e-mail será enviado para todos os assinantes da newsletter. Inclui link de descadastro automaticamente.</p>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Assunto</label>
-          <Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="ex: Novidades da Loiê — nova coleção disponível" />
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-1">Conteúdo (HTML ou texto simples)</label>
-          <textarea
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            rows={10}
-            placeholder={'<p>Olá! Temos novidades para você...</p>\n\n<p>Texto do e-mail aqui.</p>'}
-            className="w-full border border-border rounded-md px-3 py-2 text-sm bg-transparent resize-y font-mono"
-          />
-        </div>
-
-        {subject && content && (
-          <div>
-            <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Pré-visualização</label>
-            <div
-              className="border border-border rounded-md p-4 bg-[#fcf5e0] text-[#29241f] text-sm"
-              style={{ fontFamily: "'Wagon', sans-serif" }}
-            >
-              <div className="text-center mb-4 pb-3 border-b border-[#e8dfc8]">
-                <p className="text-base font-normal tracking-[0.3em] uppercase">LOIÊ</p>
-                <p className="text-xs text-[#726f09] mt-1">{subject}</p>
-              </div>
-              <div dangerouslySetInnerHTML={{ __html: content }} />
-            </div>
-          </div>
-        )}
-
-        <Button onClick={handleSend} disabled={!subject.trim() || !content.trim() || sending} className="gap-2">
-          <Send size={14} /> {sending ? 'Enviando...' : 'Enviar para todos os assinantes'}
-        </Button>
-      </div>
     </div>
   );
 }
