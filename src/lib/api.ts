@@ -680,15 +680,133 @@ export const getAdminOrderDetail = async (orderId: string): Promise<AdminOrderDe
 export const subscribeNewsletter = (email: string) =>
   fetchApi<{ coupon_code: string }>('/newsletter/subscribe', { method: 'POST', body: JSON.stringify({ email }) }, { coupon_code: `LOIE15-${Math.random().toString(36).substring(2, 6).toUpperCase()}` });
 
-// Admin
-export const getAdminKPIs = (range?: string) =>
-  fetchApi<KPIs>(`/admin/kpis${range ? `?range=${range}` : ''}`, undefined, mockKPIs);
+// Admin — Overview
+// Status considerados inválidos para receita/contagem: pedidos cancelados ou ainda
+// pendentes de pagamento. Mantemos a regra em uma constante para consistência entre
+// os três queries.
+const OVERVIEW_INVALID_STATUS = ['cancelled', 'pending'] as const;
 
-export const getAdminSalesTimeseries = (range?: string) =>
-  fetchApi<SalesTimeseriesPoint[]>(`/admin/sales-timeseries${range ? `?range=${range}` : ''}`, undefined, mockSalesTimeseries);
+function rangeSinceISO(range?: string): string {
+  const days = Math.max(1, parseInt(range ?? '30', 10) || 30);
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+}
 
-export const getAdminTopProducts = (range?: string) =>
-  fetchApi<TopProduct[]>(`/admin/top-products${range ? `?range=${range}` : ''}`, undefined, mockTopProducts);
+function applyValidOrdersFilter<Q extends { neq: (col: string, val: string) => Q }>(q: Q): Q {
+  return OVERVIEW_INVALID_STATUS.reduce((acc, s) => acc.neq('status', s), q);
+}
+
+export const getAdminKPIs = async (range?: string): Promise<KPIs> => {
+  try {
+    const since = rangeSinceISO(range);
+
+    const ordersQuery = applyValidOrdersFilter(
+      supabase.from('orders').select('total').gte('created_at', since),
+    );
+    const customersQuery = supabase
+      .from('customers')
+      .select('id', { count: 'exact', head: true })
+      .gte('created_at', since);
+
+    const [ordersRes, customersRes] = await Promise.all([ordersQuery, customersQuery]);
+    if (ordersRes.error) throw ordersRes.error;
+    if (customersRes.error) throw customersRes.error;
+
+    const totals = (ordersRes.data ?? []).map((r: any) => Number(r.total) || 0);
+    const total_revenue = totals.reduce((a, b) => a + b, 0);
+    const total_orders = totals.length;
+    const avg_order_value = total_orders > 0 ? total_revenue / total_orders : 0;
+    const new_customers = customersRes.count ?? 0;
+
+    return { total_revenue, total_orders, avg_order_value, new_customers, conversion_rate: 0 };
+  } catch (err) {
+    console.warn('[getAdminKPIs] Supabase query failed, using mock fallback:', err);
+    return mockKPIs;
+  }
+};
+
+export const getAdminSalesTimeseries = async (range?: string): Promise<SalesTimeseriesPoint[]> => {
+  try {
+    const since = rangeSinceISO(range);
+    const { data, error } = await applyValidOrdersFilter(
+      supabase.from('orders').select('total, created_at').gte('created_at', since),
+    );
+    if (error) throw error;
+
+    // Agrega por dia no fuso de São Paulo. Usa locale en-CA porque ele produz
+    // YYYY-MM-DD em toLocaleDateString — formato esperado pelo gráfico.
+    const buckets = new Map<string, { revenue: number; orders: number }>();
+    for (const row of data ?? []) {
+      const date = new Date(row.created_at as string).toLocaleDateString('en-CA', {
+        timeZone: 'America/Sao_Paulo',
+      });
+      const cur = buckets.get(date) ?? { revenue: 0, orders: 0 };
+      cur.revenue += Number(row.total) || 0;
+      cur.orders += 1;
+      buckets.set(date, cur);
+    }
+    return Array.from(buckets.entries())
+      .map(([date, v]) => ({ date, revenue: v.revenue, orders: v.orders }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  } catch (err) {
+    console.warn('[getAdminSalesTimeseries] Supabase query failed, using mock fallback:', err);
+    return mockSalesTimeseries;
+  }
+};
+
+export const getAdminTopProducts = async (range?: string): Promise<TopProduct[]> => {
+  try {
+    const since = rangeSinceISO(range);
+
+    const { data: orderRows, error: ordersErr } = await applyValidOrdersFilter(
+      supabase.from('orders').select('id').gte('created_at', since),
+    );
+    if (ordersErr) throw ordersErr;
+    const orderIds = (orderRows ?? []).map((r: any) => r.id as string);
+    if (orderIds.length === 0) return [];
+
+    const { data: items, error: itemsErr } = await supabase
+      .from('order_items')
+      .select('product_id, qty, unit_price')
+      .in('order_id', orderIds);
+    if (itemsErr) throw itemsErr;
+
+    const agg = new Map<string, { total_sold: number; revenue: number }>();
+    for (const it of items ?? []) {
+      const pid = (it as any).product_id as string | null;
+      if (!pid) continue;
+      const qty = Number((it as any).qty) || 0;
+      const price = Number((it as any).unit_price) || 0;
+      const cur = agg.get(pid) ?? { total_sold: 0, revenue: 0 };
+      cur.total_sold += qty;
+      cur.revenue += qty * price;
+      agg.set(pid, cur);
+    }
+
+    const topIds = Array.from(agg.entries())
+      .sort((a, b) => b[1].total_sold - a[1].total_sold)
+      .slice(0, 5)
+      .map(([id]) => id);
+    if (topIds.length === 0) return [];
+
+    // order_items.product_id tem ~79% de rows órfãs (ver get-order-public). Resolvemos
+    // o nome num lookup separado e caímos em "(produto removido)" quando faltar.
+    const { data: prods } = await supabase.from('products').select('id, name').in('id', topIds);
+    const nameById = new Map((prods ?? []).map((p: any) => [p.id as string, p.name as string]));
+
+    return topIds.map((id) => {
+      const a = agg.get(id)!;
+      return {
+        product_id: id,
+        product_name: nameById.get(id) ?? '(produto removido)',
+        total_sold: a.total_sold,
+        revenue: a.revenue,
+      };
+    });
+  } catch (err) {
+    console.warn('[getAdminTopProducts] Supabase query failed, using mock fallback:', err);
+    return mockTopProducts;
+  }
+};
 
 export const getAdminOrders = async (params?: { status?: string }): Promise<Order[]> => {
   try {
